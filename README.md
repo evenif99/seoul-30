@@ -1,177 +1,189 @@
-# Seoul 30 — 서울 30분 생활권 추천
+# Seoul 30
 
-서울 시민이 현재 위치 또는 자치구 기준으로 **30분 안에 갈 수 있는 공공문화·공공시설·생활편의 장소**를 추천하는 웹앱 / PWA.
+> A PWA that recommends public facilities and cultural venues reachable within 30 minutes — built for Seoul residents.
 
-지도앱·교통앱 대체가 아닌 **의사결정 보조형 추천 서비스**. 서울시 공공데이터 기반 규칙 기반 scoring으로 추천하며, API 키 없이도 mock 데이터로 전체 UI 흐름이 동작합니다.
+Seoul 30 is a decision-support tool, not a map replacement. It uses rule-based scoring on Seoul Open Data to surface the best nearby destination right now, considering district, category, operating hours, admission cost, and real-time congestion signals.
 
----
-
-## 기술 스택
-
-| 분류 | 기술 |
-|------|------|
-| 프레임워크 | Next.js 16 (App Router) |
-| 언어 | TypeScript strict |
-| 스타일 | Tailwind CSS v4 + shadcn/ui |
-| DB | PostgreSQL (Neon Free) + Prisma 5 |
-| 배포 | Vercel Hobby |
-| 공공데이터 | 서울 열린데이터광장 Open API |
+The full UI works out of the box with mock data — no API keys required to run locally.
 
 ---
 
-## 구현 현황
+## Tech Stack
 
-### ✅ Phase 1 — 환경 세팅
-- Prisma 5 + Neon (Singapore) DB 연결 및 스키마 적용
-- `next.config.mjs` manifest 캐시 헤더 + API `no-store` 헤더 추가
-- `.env.example` 환경변수 구조 정의 (실제 값 미포함)
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| Database | PostgreSQL via Neon Free + Prisma 5 |
+| Deployment | Vercel Hobby |
+| Public Data | Seoul Open Data Plaza API |
 
-### ✅ Phase 2 — 코어 로직 (mock 기반)
-- **도메인 타입** (`lib/types/`): `NormalizedPlace`, `RecommendationResult`, `RealtimeSignal`, `ApiResponse`
-- **서울 25개 자치구 상수** (`lib/districts.ts`)
-- **mock 데이터** (`lib/mock/`): 12개 장소, 구별 혼잡도
-- **규칙 기반 scoring** (`lib/scoring.ts`): 최대 100점 순수 함수
+---
+
+## Implementation Status
+
+### ✅ Phase 1 — Project Setup
+- Prisma 5 + Neon PostgreSQL (Singapore) schema applied
+- `next.config.mjs` — manifest cache headers and API `no-store` headers configured
+- `.env.example` — environment variable structure documented (no real values committed)
+
+### ✅ Phase 2 — Core Logic (Mock-First)
+- **Domain types** (`lib/types/`): `NormalizedPlace`, `RecommendationResult`, `RealtimeSignal`, `ApiResponse`
+- **Seoul 25-district constants** (`lib/districts.ts`)
+- **Mock data** (`lib/mock/`): 12 sample places, per-district congestion signals
+- **Rule-based scoring** (`lib/scoring.ts`): pure function, max 100 pts
 - **API Route Handlers**:
-  - `GET /api/places?district=&category=&freeOnly=` — scoring 적용 추천 목록
-  - `GET /api/realtime/[areaCode]` — 혼잡도 (mock fallback)
+  - `GET /api/places?district=&category=&freeOnly=` — scored recommendation list
+  - `GET /api/realtime/[areaCode]` — congestion level with mock fallback
 - **Feature flags**: `USE_MOCK_DATA` / `ENABLE_REALTIME_CITY_DATA` / `ENABLE_CULTURE_EVENTS_API`
-- **Prisma Client 싱글톤** (`lib/prisma.ts`)
-- **서버 전용 env 모듈** (`lib/config/env.ts`, `lib/config/feature-flags.ts`)
+- **Prisma Client singleton** (`lib/prisma.ts`)
+- **Server-only env module** (`lib/config/env.ts`, `lib/config/feature-flags.ts`)
 
-### 🔄 Phase 3 — UI 확장 (진행 중)
-- 자치구 선택 UI (`DistrictSelector`)
-- `/api/places` 연동 및 홈 페이지 리팩토링
-- 장소 상세 페이지 (`/place/[id]`)
-- 북마크 · 최근조회 (localStorage 훅)
+### ✅ Phase 3 — UI Build-Out
+- District selector (`DistrictSelector`) — all 25 Seoul districts
+- Home page wired to `/api/places` with live loading state and filter reset
+- Place detail page (`/place/[id]`) — address, hours, phone, homepage, Kakao Map deep-link CTA
+- Bookmark and recent-view hooks backed by `localStorage` (max 100 / max 20)
+- `BookmarkButton` component works inside `<Link>` without triggering navigation
 
-### 📋 Phase 4 — PWA (예정)
-- `public/manifest.json` + 아이콘
-- 오프라인 fallback 페이지
+### ✅ Phase 4 — PWA Foundation
+- `public/manifest.json` — standalone display, Korean locale, `#1A6B5A` theme color
+- `public/icons/icon.svg` — fixed-color branded SVG icon (no `prefers-color-scheme` dependency)
+- `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
+- `app/offline/page.tsx` — offline fallback page
 
-### 📋 Phase 5 — 실 API 연결 (예정)
-- 서울시 문화행사 정보 API adapter
-- 서울시 실시간 도시데이터 API adapter + Neon 캐시
-
----
-
-## 추천 로직
-
-외부 AI 없이 규칙 기반 가중치 합산으로 추천합니다.
-
-```
-score = access(0~30) + relevance(0~25) + cost(0~15) + congestion(0~15) + timefit(0~10) + freshness(0~5)
-```
-
-| 항목 | 기준 |
-|------|------|
-| access | 선택 자치구와 장소 위치 일치 여부 |
-| relevance | 카테고리 필터 일치 여부 |
-| cost | 무료 여부 |
-| congestion | 실시간 혼잡도 (없으면 중립 8점) |
-| timefit | 현재 시간 운영 중 여부 |
-| freshness | 행사 시작 임박 여부 (Phase 5 완성 예정) |
+### 📋 Phase 5 — Real API Integration (Upcoming)
+- Seoul Cultural Events API adapter (`lib/adapters/seoul-culture.adapter.ts`)
+- Seoul Real-Time City Data API adapter + Neon caching layer
+- Swap mock data behind existing feature flags — no UI changes required
 
 ---
 
-## 로컬 실행
+## Scoring Logic
+
+Recommendations are ranked by a rule-based weighted sum — no external AI involved.
+
+```
+score = access(0–30) + relevance(0–25) + cost(0–15) + congestion(0–15) + timefit(0–10) + freshness(0–5)
+```
+
+| Dimension | Criteria |
+|---|---|
+| `access` | Place district matches selected district (30 pts); no filter selected (10 pts) |
+| `relevance` | Category matches filter (25 pts); "all" selected (12 pts) |
+| `cost` | Free admission (15 pts); paid (5 pts); 0 pts if `freeOnly` filter is active and place is paid |
+| `congestion` | 여유 → 15, 보통 → 10, 약간붐빔 → 3, 붐빔 → 0, no signal → 8 (neutral) |
+| `timefit` | Currently open (10 pts); no hours data (5 pts) |
+| `freshness` | Event start imminence — placeholder, implemented in Phase 5 |
+
+---
+
+## Local Development
 
 ```bash
-# 1. 저장소 클론
+# 1. Clone
 git clone https://github.com/evenif99/seoul-30.git
 cd seoul-30
 
-# 2. 의존성 설치
+# 2. Install dependencies
 npm install
 
-# 3. 환경변수 설정
+# 3. Configure environment
 cp .env.example .env.local
-# .env.local 에 DATABASE_URL, SEOUL_OPEN_API_KEY 입력
-# API 키 없이 시작하려면 USE_MOCK_DATA=true 유지
+# Fill in DATABASE_URL and SEOUL_OPEN_API_KEY
+# Leave USE_MOCK_DATA=true to run without any API keys
 
-# 4. DB 스키마 적용
+# 4. Apply DB schema
 npx prisma db push
 
-# 5. 개발 서버 실행
+# 5. Start dev server
 npm run dev
 # → http://localhost:3000
 ```
 
 ---
 
-## 환경변수
+## Environment Variables
 
 ```bash
 # .env.local
 
-# DB (필수)
-DATABASE_URL=              # Neon PostgreSQL 연결 문자열
+# Required — Neon PostgreSQL connection string
+DATABASE_URL=
 
-# 서울 열린데이터광장 (Phase 5 실 연결 시 필수, 현재는 mock으로 대체)
-SEOUL_OPEN_API_KEY=        # data.seoul.go.kr 마이페이지 → 인증키 관리
+# Required for Phase 5 real API — not needed for mock mode
+SEOUL_OPEN_API_KEY=        # data.seoul.go.kr → My Page → API Key Management
 
-# Feature flags (기본값으로 mock 데이터 사용)
+# Feature flags (defaults enable mock mode, no API keys needed)
 USE_MOCK_DATA=true
 ENABLE_REALTIME_CITY_DATA=false
 ENABLE_CULTURE_EVENTS_API=false
 ```
 
-> `SEOUL_OPEN_API_KEY`는 서버 사이드 Route Handler에서만 사용합니다. 브라우저에 노출되지 않습니다.
+> `SEOUL_OPEN_API_KEY` is used exclusively in server-side Route Handlers. It is never exposed to the browser.
 
 ---
 
-## 폴더 구조
+## Project Structure
 
 ```
 seoul-30-webapp/
 ├── app/
-│   ├── page.tsx                        # 홈 (지역 선택 + 추천 목록)
-│   ├── place/[id]/page.tsx             # 장소 상세
+│   ├── page.tsx                         # Home — district selector + recommendation list
+│   ├── place/[id]/page.tsx              # Place detail page
+│   ├── offline/page.tsx                 # PWA offline fallback
 │   └── api/
-│       ├── places/route.ts             # 추천 목록 API (scoring 적용)
-│       └── realtime/[areaCode]/route.ts # 혼잡도 proxy API
+│       ├── places/route.ts              # Scored recommendation list endpoint
+│       └── realtime/[areaCode]/route.ts # Congestion proxy endpoint
 ├── components/
-│   ├── seoul30/                        # 도메인 UI 컴포넌트
-│   └── ui/                             # shadcn/ui 기본 컴포넌트
+│   ├── seoul30/                         # Domain UI components
+│   └── ui/                              # shadcn/ui base components
+├── hooks/                               # localStorage hooks (bookmarks, recent views)
 ├── lib/
-│   ├── config/                         # env.ts, feature-flags.ts (서버 전용)
-│   ├── types/                          # 도메인 타입 정의
-│   ├── mock/                           # mock 장소·혼잡도 데이터
-│   ├── scoring.ts                      # 추천 scoring 순수 함수
-│   ├── districts.ts                    # 서울 25개 자치구 상수
-│   └── prisma.ts                       # PrismaClient 싱글톤
-├── hooks/                              # localStorage 훅
-├── prisma/schema.prisma                # DB 스키마
-└── .env.example                        # 환경변수 템플릿
+│   ├── config/                          # env.ts, feature-flags.ts (server-only)
+│   ├── types/                           # Domain type definitions
+│   ├── mock/                            # Mock places and congestion data
+│   ├── scoring.ts                       # Recommendation scoring pure function
+│   ├── districts.ts                     # Seoul 25-district constants
+│   └── prisma.ts                        # PrismaClient singleton
+├── prisma/schema.prisma                 # DB schema
+├── public/
+│   ├── manifest.json                    # PWA manifest
+│   └── icons/icon.svg                   # Branded fixed-color app icon
+└── .env.example                         # Environment variable template
 ```
 
 ---
 
-## DB 스키마
+## Database Schema
 
 ```prisma
-model Place { ... }                   // 공공시설 정적 데이터 (seed)
-model ExternalCache { ... }           // 외부 API 응답 요약 캐시 (raw 저장 금지)
-model RecommendationSnapshot { ... }  // 추천 결과 캐시
+model Place                    // Static public facility data (seeded)
+model ExternalCache            // Normalized external API response cache
+model RecommendationSnapshot   // Scored result cache keyed by query parameters
 ```
 
 ---
 
-## 보안 원칙
+## Security
 
-- API 키는 서버 사이드(`/api/*` Route Handler)에서만 사용
-- `.env`, `.env*.local` 은 `.gitignore`에 포함 — Git에 커밋되지 않음
-- 외부 API raw response 전체 저장 금지 — 정규화된 요약 필드만 DB 캐시
-- `NEXT_PUBLIC_` prefix는 브라우저에 공개되어도 무방한 값에만 사용
-
----
-
-## 운영 목표
-
-- Vercel Hobby (무료) + Neon Free (0.5GB) 조합으로 **월 $0 운영**
-- 포트폴리오 서비스이면서 실제 서울 시민이 사용할 수 있는 공개 서비스
+- All API keys are injected via `.env.local` or deployment environment variables only — never hardcoded
+- `.env` and `.env*.local` are git-ignored and never committed
+- External API calls are made exclusively in server-side Route Handlers
+- Raw external API responses are not persisted — only normalized summary fields are cached
+- `NEXT_PUBLIC_` prefix is reserved for values safe to expose to the browser
 
 ---
 
-## 라이선스
+## Operating Cost Target
+
+Vercel Hobby (free) + Neon Free tier (0.5 GB) = **$0/month**
+
+Seoul 30 is both a portfolio project and a publicly accessible service for Seoul residents.
+
+---
+
+## License
 
 MIT
