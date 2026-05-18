@@ -1,14 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { List, Map } from 'lucide-react'
 import { Header } from '@/components/seoul30/Header'
 import { Hero } from '@/components/seoul30/Hero'
 import { FilterBar, type ActiveFilters } from '@/components/seoul30/FilterBar'
 import { PlaceCard } from '@/components/seoul30/PlaceCard'
+import { MapView } from '@/components/seoul30/MapView'
 import { BottomTabBar } from '@/components/seoul30/BottomTabBar'
 import { DesktopNav } from '@/components/seoul30/DesktopNav'
 import { EmptyState } from '@/components/seoul30/EmptyState'
 import { DistrictSelector } from '@/components/seoul30/DistrictSelector'
+import { cn } from '@/lib/utils'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 import type { NormalizedPlace } from '@/lib/types/place'
 
@@ -42,12 +45,15 @@ function syncUrl(district: string, filters: ActiveFilters) {
   window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
 }
 
+type ViewMode = 'list' | 'map'
+
 export default function HomePage() {
   const [district, setDistrict] = useState<string>('')
   const [filters, setFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
   const [results, setResults] = useState<RecommendationResult[]>([])
   const [isMock, setIsMock] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
 
   // URL에서 초기 필터 복원 (클라이언트 마운트 후)
   useEffect(() => {
@@ -143,6 +149,7 @@ export default function HomePage() {
 
           <FilterBar filters={filters} onFiltersChange={handleFiltersChange} />
 
+          {/* 결과 카운트 + 뷰 토글 */}
           <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
               {loading ? (
@@ -153,34 +160,80 @@ export default function HomePage() {
                 </>
               )}
             </p>
-            {isFiltered && (
-              <button
-                onClick={() => {
-                  setDistrict('')
-                  setFilters(DEFAULT_FILTERS)
-                  window.history.replaceState(null, '', '/')
-                }}
-                className="text-xs text-primary hover:underline"
-              >
-                필터 초기화
-              </button>
-            )}
+
+            <div className="flex items-center gap-1">
+              {isFiltered && (
+                <button
+                  onClick={() => {
+                    setDistrict('')
+                    setFilters(DEFAULT_FILTERS)
+                    window.history.replaceState(null, '', '/')
+                  }}
+                  className="text-xs text-primary hover:underline mr-2"
+                >
+                  필터 초기화
+                </button>
+              )}
+              {/* 리스트 / 지도 토글 */}
+              <div className="flex rounded-lg border border-border overflow-hidden">
+                <button
+                  onClick={() => setViewMode('list')}
+                  aria-label="리스트 뷰"
+                  className={cn(
+                    'flex items-center gap-1 px-2.5 py-1.5 text-xs transition-colors',
+                    viewMode === 'list'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background text-muted-foreground hover:bg-muted'
+                  )}
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span>목록</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  aria-label="지도 뷰"
+                  className={cn(
+                    'flex items-center gap-1 px-2.5 py-1.5 text-xs transition-colors border-l border-border',
+                    viewMode === 'map'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background text-muted-foreground hover:bg-muted'
+                  )}
+                >
+                  <Map className="w-3.5 h-3.5" />
+                  <span>지도</span>
+                </button>
+              </div>
+            </div>
           </div>
 
-          <section
-            aria-label="추천 장소 목록"
-            className="max-w-2xl mx-auto px-4 flex flex-col gap-3"
-          >
-            {loading ? null : displayResults.length === 0 ? (
-              <EmptyState />
-            ) : (
-              displayResults.map(({ place }, i) => (
-                <PlaceCard key={place.id} place={place} priority={i === 0} />
-              ))
-            )}
-          </section>
+          {/* 리스트 뷰 */}
+          {viewMode === 'list' && (
+            <section
+              aria-label="추천 장소 목록"
+              className="max-w-2xl mx-auto px-4 flex flex-col gap-3"
+            >
+              {loading ? null : displayResults.length === 0 ? (
+                <EmptyState />
+              ) : (
+                displayResults.map(({ place }, i) => (
+                  <PlaceCard key={place.id} place={place} priority={i === 0} />
+                ))
+              )}
+            </section>
+          )}
 
-          {!loading && displayResults.length > 0 && (
+          {/* 지도 뷰 */}
+          {viewMode === 'map' && !loading && (
+            <div className="max-w-2xl mx-auto w-full">
+              {displayResults.length === 0 ? (
+                <EmptyState />
+              ) : (
+                <MapView results={displayResults} />
+              )}
+            </div>
+          )}
+
+          {!loading && displayResults.length > 0 && viewMode === 'list' && (
             <p className="max-w-2xl mx-auto px-4 pt-6 text-center text-[11px] text-muted-foreground">
               {isMock ? 'mock 데이터 기반' : '서울시 공공데이터 기반'} · scoring 기준 정렬
             </p>
