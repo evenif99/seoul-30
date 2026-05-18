@@ -1,188 +1,177 @@
-# Seoul 30
+# Seoul 30 — 서울 30분 생활권 추천
 
-Seoul 30 is a mobile-first web app / PWA that helps users discover public places, cultural events, and everyday city options they can reach within 30 minutes in Seoul.
+서울 시민이 현재 위치 또는 자치구 기준으로 **30분 안에 갈 수 있는 공공문화·공공시설·생활편의 장소**를 추천하는 웹앱 / PWA.
 
-Instead of trying to replace maps or transit apps, this project focuses on decision support: helping users quickly decide where to go based on time, congestion, accessibility, and public data.
+지도앱·교통앱 대체가 아닌 **의사결정 보조형 추천 서비스**. 서울시 공공데이터 기반 규칙 기반 scoring으로 추천하며, API 키 없이도 mock 데이터로 전체 UI 흐름이 동작합니다.
 
-===
+---
 
-## Why this project exists
+## 기술 스택
 
-This project was built as a real-world portfolio service with two goals:
+| 분류 | 기술 |
+|------|------|
+| 프레임워크 | Next.js 16 (App Router) |
+| 언어 | TypeScript strict |
+| 스타일 | Tailwind CSS v4 + shadcn/ui |
+| DB | PostgreSQL (Neon Free) + Prisma 5 |
+| 배포 | Vercel Hobby |
+| 공공데이터 | 서울 열린데이터광장 Open API |
 
-1. Build a deployable, low-cost product using real public datasets.
-2. Explore how Seoul public data can be transformed into a practical recommendation experience for everyday users.
+---
 
-The product is designed around real usage, not just a demo. The focus is on maintainability, deployment simplicity, and clear product value.
+## 구현 현황
 
-===
+### ✅ Phase 1 — 환경 세팅
+- Prisma 5 + Neon (Singapore) DB 연결 및 스키마 적용
+- `next.config.mjs` manifest 캐시 헤더 + API `no-store` 헤더 추가
+- `.env.example` 환경변수 구조 정의 (실제 값 미포함)
 
-## MVP scope
+### ✅ Phase 2 — 코어 로직 (mock 기반)
+- **도메인 타입** (`lib/types/`): `NormalizedPlace`, `RecommendationResult`, `RealtimeSignal`, `ApiResponse`
+- **서울 25개 자치구 상수** (`lib/districts.ts`)
+- **mock 데이터** (`lib/mock/`): 12개 장소, 구별 혼잡도
+- **규칙 기반 scoring** (`lib/scoring.ts`): 최대 100점 순수 함수
+- **API Route Handlers**:
+  - `GET /api/places?district=&category=&freeOnly=` — scoring 적용 추천 목록
+  - `GET /api/realtime/[areaCode]` — 혼잡도 (mock fallback)
+- **Feature flags**: `USE_MOCK_DATA` / `ENABLE_REALTIME_CITY_DATA` / `ENABLE_CULTURE_EVENTS_API`
+- **Prisma Client 싱글톤** (`lib/prisma.ts`)
+- **서버 전용 env 모듈** (`lib/config/env.ts`, `lib/config/feature-flags.ts`)
 
-Current MVP goals:
+### 🔄 Phase 3 — UI 확장 (진행 중)
+- 자치구 선택 UI (`DistrictSelector`)
+- `/api/places` 연동 및 홈 페이지 리팩토링
+- 장소 상세 페이지 (`/place/[id]`)
+- 북마크 · 최근조회 (localStorage 훅)
 
-- Region-based or current-location-based recommendations
-- Public place / event recommendation cards
-- Basic filters such as category, free/paid, congestion, and time
-- Detail pages for places and events
-- Local bookmarks and recent views
-- PWA-ready mobile-first experience
-- Server-side public API integration with caching and fallback handling
+### 📋 Phase 4 — PWA (예정)
+- `public/manifest.json` + 아이콘
+- 오프라인 fallback 페이지
 
-Out of scope for the initial MVP:
+### 📋 Phase 5 — 실 API 연결 (예정)
+- 서울시 문화행사 정보 API adapter
+- 서울시 실시간 도시데이터 API adapter + Neon 캐시
 
-- Authentication and user accounts
-- Admin dashboard
-- Payment features
-- Advanced push notification flows
-- AI chatbot or RAG-based recommendations
-- Large-scale microservice architecture
+---
 
-=
+## 추천 로직
 
-## Tech stack
+외부 AI 없이 규칙 기반 가중치 합산으로 추천합니다.
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript
-- Tailwind CSS
-- PostgreSQL
-- Prisma
-- Vercel
-- Neon
-- Progressive Web App (PWA) setup
-
-==
-
-## Public data sources
-
-This project is designed to use open public datasets, primarily from:
-
-- Seoul Open Data Plaza
-- Korea Public Data Portal
-
-Planned datasets include Seoul real-time city data and public cultural event data.
-
-Some APIs may require manual application approval and issued service keys before live integration becomes available.
-Until then, parts of the app may run on mock adapters or normalized fallback data.
-
-==
-
-## Security and secrets
-
-API keys and service keys are never hardcoded in the repository.
-
-All secrets must be provided through local or deployment environment variables, such as:
-
-- `SEOUL_OPEN_API_KEY`
-- `PUBLIC_DATA_SERVICE_KEY`
-- `DATABASE_URL`
-
-External public API requests are handled on the server side only.
-Secret values must never be exposed to the browser, committed to Git, or included in documentation examples.
-
-==
-
-## Project principles
-
-This project follows a few deliberate engineering constraints:
-
-- Keep the MVP small and shippable
-- Prefer one maintainable web codebase over early multi-platform complexity
-- Use server-side integration for public APIs
-- Store normalized summaries and cache data, not full raw payloads
-- Build graceful fallbacks before full live integration
-- Prioritize clear architecture over unnecessary abstraction
-
-==
-
-## Getting started
-
-### 1. Clone the repository
-
-```bash
-git clone <your-repo-url>
-cd <your-project-name>
+```
+score = access(0~30) + relevance(0~25) + cost(0~15) + congestion(0~15) + timefit(0~10) + freshness(0~5)
 ```
 
-### 2. Install dependencies
+| 항목 | 기준 |
+|------|------|
+| access | 선택 자치구와 장소 위치 일치 여부 |
+| relevance | 카테고리 필터 일치 여부 |
+| cost | 무료 여부 |
+| congestion | 실시간 혼잡도 (없으면 중립 8점) |
+| timefit | 현재 시간 운영 중 여부 |
+| freshness | 행사 시작 임박 여부 (Phase 5 완성 예정) |
+
+---
+
+## 로컬 실행
 
 ```bash
+# 1. 저장소 클론
+git clone https://github.com/evenif99/seoul-30.git
+cd seoul-30
+
+# 2. 의존성 설치
 npm install
+
+# 3. 환경변수 설정
+cp .env.example .env.local
+# .env.local 에 DATABASE_URL, SEOUL_OPEN_API_KEY 입력
+# API 키 없이 시작하려면 USE_MOCK_DATA=true 유지
+
+# 4. DB 스키마 적용
+npx prisma db push
+
+# 5. 개발 서버 실행
+npm run dev
+# → http://localhost:3000
 ```
 
-### 3. Set up environment variables
+---
 
-Create a `.env.local` file based on `.env.example`.
-
-Example variables:
-
-```env
-SEOUL_OPEN_API_KEY=
-PUBLIC_DATA_SERVICE_KEY=
-DATABASE_URL=
-```
-
-### 4. Run the development server
+## 환경변수
 
 ```bash
-npm run dev
+# .env.local
+
+# DB (필수)
+DATABASE_URL=              # Neon PostgreSQL 연결 문자열
+
+# 서울 열린데이터광장 (Phase 5 실 연결 시 필수, 현재는 mock으로 대체)
+SEOUL_OPEN_API_KEY=        # data.seoul.go.kr 마이페이지 → 인증키 관리
+
+# Feature flags (기본값으로 mock 데이터 사용)
+USE_MOCK_DATA=true
+ENABLE_REALTIME_CITY_DATA=false
+ENABLE_CULTURE_EVENTS_API=false
 ```
 
-### 5. Open the app
+> `SEOUL_OPEN_API_KEY`는 서버 사이드 Route Handler에서만 사용합니다. 브라우저에 노출되지 않습니다.
 
-Visit `http://localhost:3000`
+---
 
-==
+## 폴더 구조
 
-## Architecture notes
+```
+seoul-30-webapp/
+├── app/
+│   ├── page.tsx                        # 홈 (지역 선택 + 추천 목록)
+│   ├── place/[id]/page.tsx             # 장소 상세
+│   └── api/
+│       ├── places/route.ts             # 추천 목록 API (scoring 적용)
+│       └── realtime/[areaCode]/route.ts # 혼잡도 proxy API
+├── components/
+│   ├── seoul30/                        # 도메인 UI 컴포넌트
+│   └── ui/                             # shadcn/ui 기본 컴포넌트
+├── lib/
+│   ├── config/                         # env.ts, feature-flags.ts (서버 전용)
+│   ├── types/                          # 도메인 타입 정의
+│   ├── mock/                           # mock 장소·혼잡도 데이터
+│   ├── scoring.ts                      # 추천 scoring 순수 함수
+│   ├── districts.ts                    # 서울 25개 자치구 상수
+│   └── prisma.ts                       # PrismaClient 싱글톤
+├── hooks/                              # localStorage 훅
+├── prisma/schema.prisma                # DB 스키마
+└── .env.example                        # 환경변수 템플릿
+```
 
-The app is being built as a mobile-first Next.js web app with PWA support.
+---
 
-High-level structure:
+## DB 스키마
 
-- `app/` – routes, pages, and route handlers
-- `components/` – reusable UI components
-- `lib/` – API adapters, normalization logic, config, and utilities
-- `prisma/` – database schema and migrations
-- `public/` – static assets and PWA-related files
+```prisma
+model Place { ... }                   // 공공시설 정적 데이터 (seed)
+model ExternalCache { ... }           // 외부 API 응답 요약 캐시 (raw 저장 금지)
+model RecommendationSnapshot { ... }  // 추천 결과 캐시
+```
 
-Public API integration is designed behind server-side adapters so the UI remains stable even when external API structures change.
+---
 
-==
+## 보안 원칙
 
-## Current status
+- API 키는 서버 사이드(`/api/*` Route Handler)에서만 사용
+- `.env`, `.env*.local` 은 `.gitignore`에 포함 — Git에 커밋되지 않음
+- 외부 API raw response 전체 저장 금지 — 정규화된 요약 필드만 DB 캐시
+- `NEXT_PUBLIC_` prefix는 브라우저에 공개되어도 무방한 값에만 사용
 
-This project is currently under active MVP development.
+---
 
-Planned development flow:
+## 운영 목표
 
-- UI direction and responsive layout
-- Mock-based recommendation flow
-- Server-side public API integration
-- Normalization and cache layer
-- Bookmark/history features
-- PWA polish and deployment readiness
+- Vercel Hobby (무료) + Neon Free (0.5GB) 조합으로 **월 $0 운영**
+- 포트폴리오 서비스이면서 실제 서울 시민이 사용할 수 있는 공개 서비스
 
-==
+---
 
-## Roadmap
+## 라이선스
 
-Short-term:
-- Finalize responsive home and exploration screens
-- Add normalized recommendation API route
-- Connect approved public datasets
-- Add bookmark and recent-view flows
-
-Mid-term:
-- Improve scoring logic for recommendations
-- Add better fallback handling for partial API failures
-- Expand supported Seoul public place categories
-
-Later:
-- Optional AI-generated recommendation explanations
-- Optional advanced notification or personalization features
-
-==
-
-This repository is maintained as both a portfolio project and a real service prototype, with an emphasis on practical architecture, low-cost operation, and incremental delivery.
+MIT
