@@ -18,7 +18,15 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Seoul 30 — 30분 안에 갈 수 있는 장소 추천',
   description: '서울 시민을 위한 30분 생활권 공공시설·문화공간 추천 서비스',
-  generator: 'v0.app',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Seoul 30',
+  },
+  icons: {
+    apple: '/apple-icon.png',
+  },
 }
 
 export const viewport: Viewport = {

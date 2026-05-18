@@ -1,0 +1,26 @@
+{
+  "name": "Seoul 30 — 서울 30분 생활권 추천",
+  "short_name": "Seoul 30",
+  "description": "서울 시민을 위한 30분 생활권 공공시설·문화공간 추천 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1A6B5A",
+  "lang": "ko",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
