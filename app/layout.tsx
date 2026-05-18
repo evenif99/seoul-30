@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Noto_Sans_KR, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import './globals.css'
 
 const notoSansKR = Noto_Sans_KR({
@@ -44,7 +45,15 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${notoSansKR.variable} ${inter.variable} bg-background`}>
       <body className="font-sans antialiased">
-        {children}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+        >
+          본문 바로가기
+        </a>
+        <ErrorBoundary>
+          <main id="main-content">{children}</main>
+        </ErrorBoundary>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

@@ -53,6 +53,12 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
 - `app/offline/page.tsx` — offline fallback page
 
+### ✅ Phase 10 — Production Hardening & Launch
+- `middleware.ts` — in-memory rate limiting on all `/api/*` routes (60 req/min per IP, per edge instance); returns `429` with `Retry-After: 60` header when exceeded
+- `components/ErrorBoundary.tsx` — React class-based error boundary; logs to `console.error`; `DefaultFallback` renders a Korean-language reload prompt
+- `app/layout.tsx` — skip-to-content link (`본문 바로가기`) for keyboard accessibility; children wrapped in `<main id="main-content">` inside `ErrorBoundary`
+- `.github/workflows/ci.yml` — GitHub Actions CI: install → `prisma generate` → `tsc --noEmit` → `next build` on push/PR to master/main
+
 ### ✅ Phase 9 — SEO & Share
 - `app/place/[id]/page.tsx` — `generateMetadata` exports per-place title, description, OpenGraph, Twitter card metadata
 - `app/place/[id]/opengraph-image.tsx` — dynamic OG image via Next.js `ImageResponse` (edge runtime, 1200×630, branded green layout)
