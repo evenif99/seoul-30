@@ -53,10 +53,13 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
 - `app/offline/page.tsx` — offline fallback page
 
-### 📋 Phase 5 — Real API Integration (Upcoming)
-- Seoul Cultural Events API adapter (`lib/adapters/seoul-culture.adapter.ts`)
-- Seoul Real-Time City Data API adapter + Neon caching layer
-- Swap mock data behind existing feature flags — no UI changes required
+### ✅ Phase 5 — Real API Integration
+- `lib/adapters/seoul-culture.adapter.ts` — fetches and normalizes `culturalEventInfo` API (100 events, 1-hour Next.js cache)
+- `lib/adapters/seoul-citydata.adapter.ts` — fetches `citydata_ppltn` congestion data with district → hotspot mapping for all 25 districts (5-minute cache)
+- `lib/types/place.ts` — added `eventStartDate` field to `NormalizedPlace` for freshness scoring
+- `lib/scoring.ts` — freshness scoring implemented: +5 pts for events opening within 7 days, +3 pts within 30 days
+- Both route handlers updated: real API called when feature flags enabled, mock fallback on any error
+- No UI changes required — feature flags (`ENABLE_CULTURE_EVENTS_API`, `ENABLE_REALTIME_CITY_DATA`) gate the switch
 
 ---
 
@@ -75,7 +78,7 @@ score = access(0–30) + relevance(0–25) + cost(0–15) + congestion(0–15) +
 | `cost` | Free admission (15 pts); paid (5 pts); 0 pts if `freeOnly` filter is active and place is paid |
 | `congestion` | 여유 → 15, 보통 → 10, 약간붐빔 → 3, 붐빔 → 0, no signal → 8 (neutral) |
 | `timefit` | Currently open (10 pts); no hours data (5 pts) |
-| `freshness` | Event start imminence — placeholder, implemented in Phase 5 |
+| `freshness` | Event opening within 7 days → 5 pts; within 30 days → 3 pts; no date → 0 pts |
 
 ---
 
@@ -141,6 +144,9 @@ seoul-30-webapp/
 │   └── ui/                              # shadcn/ui base components
 ├── hooks/                               # localStorage hooks (bookmarks, recent views)
 ├── lib/
+│   ├── adapters/                        # Seoul Open API adapters (server-only)
+│   │   ├── seoul-culture.adapter.ts     # culturalEventInfo → NormalizedPlace[]
+│   │   └── seoul-citydata.adapter.ts   # citydata_ppltn → RealtimeSignal
 │   ├── config/                          # env.ts, feature-flags.ts (server-only)
 │   ├── types/                           # Domain type definitions
 │   ├── mock/                            # Mock places and congestion data

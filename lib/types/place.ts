@@ -18,4 +18,5 @@ export interface NormalizedPlace {
   phone?: string
   description?: string
   imageUrl?: string
+  eventStartDate?: string  // "YYYY-MM-DD" — freshness scoring용 (CULTURE_EVENT 전용)
 }

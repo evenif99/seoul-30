@@ -12,7 +12,7 @@ export function scorePlace(
   const cost = calcCost(place, input)
   const congestion = calcCongestion(realtime)
   const timefit = calcTimefit(place)
-  const freshness = 0 // TODO(P1): 문화행사 startDate 기반 freshness 계산 추가
+  const freshness = calcFreshness(place)
 
   return {
     access,
@@ -54,6 +54,18 @@ function calcCongestion(realtime: RealtimeSignal | null): number {
     붐빔: 0,
   }
   return map[realtime.congestionLevel] ?? 8
+}
+
+// 행사 시작 임박 여부 (0–5) — eventStartDate 없으면 0
+function calcFreshness(place: NormalizedPlace): number {
+  if (!place.eventStartDate) return 0
+  const now = new Date()
+  const start = new Date(place.eventStartDate)
+  const daysUntil = Math.floor((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  if (daysUntil < 0) return 0    // 이미 시작됨
+  if (daysUntil <= 7) return 5   // 7일 이내 개막
+  if (daysUntil <= 30) return 3  // 30일 이내 개막
+  return 0
 }
 
 // 현재 운영 중 여부 (0–10)
