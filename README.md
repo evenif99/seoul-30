@@ -54,12 +54,12 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/offline/page.tsx` — offline fallback page
 
 ### ✅ Phase 11 — Map View
-- `components/seoul30/MapView.tsx` — Kakao Maps JS SDK integration (Next.js `Script` + `autoload=false` pattern); markers for all places that have coordinates; bounds auto-fit when multiple markers
-- `app/page.tsx` — list / map view toggle (목록 · 지도 segmented button); both views share the same `displayResults` state; map only mounts after API response resolves
-- Marker click → bottom sheet popup with place name, district, free/paid badge, "상세 보기" link, and dismiss button
-- Places without latitude/longitude are silently excluded from map view with an inline notice
-- `NEXT_PUBLIC_KAKAO_MAP_KEY` absent → graceful fallback message (no crash, no blank screen)
-- `.env.example` — `NEXT_PUBLIC_KAKAO_MAP_KEY` added with Kakao Developers setup instructions
+- `components/seoul30/MapViewInner.tsx` — Leaflet + OpenStreetMap map (react-leaflet); brand-colored `DivIcon` markers; `BoundsController` auto-fits viewport to all markers; no API key required
+- `components/seoul30/MapView.tsx` — `next/dynamic` wrapper with `ssr: false` (Leaflet requires `window`)
+- `app/page.tsx` — list / map view segmented toggle (목록 · 지도); both views share the same `displayResults` state
+- Marker click → bottom sheet popup with place name, district, free/paid info, "상세 보기" link
+- Selected marker rendered with a darker icon for visual feedback
+- Places without coordinates excluded from map with inline notice
 
 ### ✅ Phase 5 — Real API Integration
 - `lib/adapters/seoul-culture.adapter.ts` — fetches and normalizes `culturalEventInfo` API (100 events, 1-hour Next.js cache)
