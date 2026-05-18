@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 공공시설 정적 데이터 — seed로 15~20개 입력, 관리자 없음
+model Place {
+  id             String   @id @default(cuid())
+  externalId     String?  @unique
+  name           String
+  category       String   // culture | library | park | sports | welfare
+  subcategory    String?
+  district       String   // 서울 자치구 (예: "성동구")
+  address        String?
+  lat            Float?
+  lng            Float?
+  isFree         Boolean  @default(true)
+  operatingHours String?  // "09:00-18:00"
+  phone          String?
+  website        String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  caches PlaceRealtimeCache[]
+}
+
+// 실시간 API 응답 캐시 — 요약 필드만 저장, raw response 금지
+model PlaceRealtimeCache {
+  id         String   @id @default(cuid())
+  placeId    String
+  place      Place    @relation(fields: [placeId], references: [id])
+  areaCode   String   // 서울 도시데이터 지역 코드
+  crowdLevel String?  // 여유 | 보통 | 약간붐빔 | 붐빔
+  cachedAt   DateTime @default(now())
+  expiresAt  DateTime
+
+  @@index([areaCode, expiresAt])
+}
