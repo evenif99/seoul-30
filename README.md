@@ -53,11 +53,36 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
 - `app/offline/page.tsx` — offline fallback page
 
-### ✅ Phase 10 — Production Hardening & Launch
-- `middleware.ts` — in-memory rate limiting on all `/api/*` routes (60 req/min per IP, per edge instance); returns `429` with `Retry-After: 60` header when exceeded
-- `components/ErrorBoundary.tsx` — React class-based error boundary; logs to `console.error`; `DefaultFallback` renders a Korean-language reload prompt
-- `app/layout.tsx` — skip-to-content link (`본문 바로가기`) for keyboard accessibility; children wrapped in `<main id="main-content">` inside `ErrorBoundary`
-- `.github/workflows/ci.yml` — GitHub Actions CI: install → `prisma generate` → `tsc --noEmit` → `next build` on push/PR to master/main
+### ✅ Phase 5 — Real API Integration
+- `lib/adapters/seoul-culture.adapter.ts` — fetches and normalizes `culturalEventInfo` API (100 events, 1-hour Next.js cache)
+- `lib/adapters/seoul-citydata.adapter.ts` — fetches `citydata_ppltn` congestion data with district → hotspot mapping for all 25 districts (5-minute cache)
+- `lib/types/place.ts` — added `eventStartDate` field to `NormalizedPlace` for freshness scoring
+- `lib/scoring.ts` — freshness scoring implemented: +5 pts for events opening within 7 days, +3 pts within 30 days
+- Both route handlers updated: real API called when feature flags enabled, mock fallback on any error
+- No UI changes required — feature flags (`ENABLE_CULTURE_EVENTS_API`, `ENABLE_REALTIME_CITY_DATA`) gate the switch
+
+### ✅ Phase 6 — DB Caching Layer & Travel Mode Disclosure
+- `lib/cache/recommendation.cache.ts` — `RecommendationSnapshot` read/write helpers with 1-hour TTL
+- `app/api/places/route.ts` — cache-first pattern: DB snapshot checked before Seoul API is called; result written to cache on miss
+- Mock data is never cached — DB cache activates only when `ENABLE_CULTURE_EVENTS_API=true`
+- `Hero.tsx` — added "대중교통 기준 · 자치구 단위 추천" disclosure (Option A decision: fixed to public transit, district-level granularity)
+- Cache write failures are non-fatal; service degrades gracefully to live API
+
+### ✅ Phase 7 — Search & Filter Enhancement
+- `FilterBar.tsx` — place name search input added (client-side, matches name + address)
+- `FilterBar.tsx` — "지금 운영 중" toggle added (filters to currently open places only)
+- `ActiveFilters` type extended with `search: string` and `openNow: boolean`
+- `app/page.tsx` — client-side filtering applied on API results (search + openNow are UI-layer only, no extra API call)
+- `app/page.tsx` — URL query string sync via `window.history.replaceState` (shareable filter links: `?category=park&openNow=true&search=숲`)
+- `app/page.tsx` — URL params restored on mount; filter reset clears URL
+
+### ✅ Phase 8 — My Places (Bookmarks & Recent Views)
+- `app/bookmarks/page.tsx` — single page with two internal tabs: "저장됨" (bookmarks) + "최근 본" (recent views)
+- `components/seoul30/RecentTracker.tsx` — zero-render client component that calls `useRecent.push()` on place detail mount
+- `app/place/[id]/page.tsx` — `RecentTracker` wired to automatically record viewed places
+- `BottomTabBar` + `DesktopNav` — refactored from callback-based to route-based navigation using `Link` + `usePathname`; props removed
+- `app/page.tsx` — `activeTab` state removed (navigation now handled by router)
+- Place lookup: resolves IDs against `MOCK_PLACES`; unknown IDs (ephemeral API events) are silently skipped
 
 ### ✅ Phase 9 — SEO & Share
 - `app/place/[id]/page.tsx` — `generateMetadata` exports per-place title, description, OpenGraph, Twitter card metadata
@@ -68,36 +93,11 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/robots.ts` — allow all crawlers, sitemap URL declared
 - `.env.example` — `NEXT_PUBLIC_BASE_URL` added for absolute URL generation
 
-### ✅ Phase 8 — My Places (Bookmarks & Recent Views)
-- `app/bookmarks/page.tsx` — single page with two internal tabs: "저장됨" (bookmarks) + "최근 본" (recent views)
-- `components/seoul30/RecentTracker.tsx` — zero-render client component that calls `useRecent.push()` on place detail mount
-- `app/place/[id]/page.tsx` — `RecentTracker` wired to automatically record viewed places
-- `BottomTabBar` + `DesktopNav` — refactored from callback-based to route-based navigation using `Link` + `usePathname`; props removed
-- `app/page.tsx` — `activeTab` state removed (navigation now handled by router)
-- Place lookup: resolves IDs against `MOCK_PLACES`; unknown IDs (ephemeral API events) are silently skipped
-
-### ✅ Phase 7 — Search & Filter Enhancement
-- `FilterBar.tsx` — place name search input added (client-side, matches name + address)
-- `FilterBar.tsx` — "지금 운영 중" toggle added (filters to currently open places only)
-- `ActiveFilters` type extended with `search: string` and `openNow: boolean`
-- `app/page.tsx` — client-side filtering applied on API results (search + openNow are UI-layer only, no extra API call)
-- `app/page.tsx` — URL query string sync via `window.history.replaceState` (shareable filter links: `?category=park&openNow=true&search=숲`)
-- `app/page.tsx` — URL params restored on mount; filter reset clears URL
-
-### ✅ Phase 6 — DB Caching Layer & Travel Mode Disclosure
-- `lib/cache/recommendation.cache.ts` — `RecommendationSnapshot` read/write helpers with 1-hour TTL
-- `app/api/places/route.ts` — cache-first pattern: DB snapshot checked before Seoul API is called; result written to cache on miss
-- Mock data is never cached — DB cache activates only when `ENABLE_CULTURE_EVENTS_API=true`
-- `Hero.tsx` — added "대중교통 기준 · 자치구 단위 추천" disclosure (Option A decision: fixed to public transit, district-level granularity)
-- Cache write failures are non-fatal; service degrades gracefully to live API
-
-### ✅ Phase 5 — Real API Integration
-- `lib/adapters/seoul-culture.adapter.ts` — fetches and normalizes `culturalEventInfo` API (100 events, 1-hour Next.js cache)
-- `lib/adapters/seoul-citydata.adapter.ts` — fetches `citydata_ppltn` congestion data with district → hotspot mapping for all 25 districts (5-minute cache)
-- `lib/types/place.ts` — added `eventStartDate` field to `NormalizedPlace` for freshness scoring
-- `lib/scoring.ts` — freshness scoring implemented: +5 pts for events opening within 7 days, +3 pts within 30 days
-- Both route handlers updated: real API called when feature flags enabled, mock fallback on any error
-- No UI changes required — feature flags (`ENABLE_CULTURE_EVENTS_API`, `ENABLE_REALTIME_CITY_DATA`) gate the switch
+### ✅ Phase 10 — Production Hardening & Launch
+- `middleware.ts` — in-memory rate limiting on all `/api/*` routes (60 req/min per IP, per edge instance); returns `429` with `Retry-After: 60` header when exceeded
+- `components/ErrorBoundary.tsx` — React class-based error boundary; logs to `console.error`; `DefaultFallback` renders a Korean-language reload prompt
+- `app/layout.tsx` — skip-to-content link (`본문 바로가기`) for keyboard accessibility; children wrapped in `<main id="main-content">` inside `ErrorBoundary`
+- `.github/workflows/ci.yml` — GitHub Actions CI: install → `prisma generate` → `tsc --noEmit` → `next build` on push/PR to master/main
 
 ---
 
