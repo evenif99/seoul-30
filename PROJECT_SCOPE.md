@@ -1,31 +1,61 @@
-# PROJECT_SCOPE.md
+# PROJECT_SCOPE
 
-## 목표
+Last updated: 2026-05-18 (Phase 11 complete)
 
-서울 어디서든 **지금 출발 기준 30분 내** 갈 수 있는 공공장소를 추천해주는 웹앱.
-서울시 공공데이터 기반. 저비용 운영 가능한 MVP.
+## Product Goal
 
-## 현재 구현된 범위 (Done)
+A PWA that recommends public facilities and cultural venues in Seoul reachable within 30 minutes by public transit — built for Seoul residents. Dual purpose: portfolio project + real deployable service at $0/month.
 
-- [x] 장소 카드 UI (이미지, 혼잡도, 이동시간, 날씨/교통/대기질 배지)
-- [x] 카테고리 필터 (전체/문화전시/도서관/공원/스포츠/복지시설)
-- [x] 세부 필터 (무료만, 이동시간, 혼잡도)
-- [x] 필터 초기화
-- [x] 모바일/데스크톱 반응형 레이아웃
-- [x] 모바일 하단 탭바 + 데스크톱 사이드바
-- [x] 시간대별 인사말 (오전/오후/저녁 등)
+## Completed Scope (Phase 1–11)
 
-## 명시적으로 제외된 범위 (Out of Scope)
+### Core
+- Rule-based scoring engine (access / relevance / cost / congestion / timefit / freshness)
+- Mock-first architecture — full UI works with `USE_MOCK_DATA=true`, no API keys required
+- Seoul Open Data Plaza integration gated by feature flags
 
-- 실시간 서울시 공공 API 연동 (현재 정적 mock 데이터)
-- 사용자 인증/로그인
-- 북마크 영구 저장 (현재 컴포넌트 로컬 state)
-- 장소 상세 페이지 (CTA 버튼 UI만 존재, 라우팅 미연결)
-- 지도 뷰
-- 탭별 콘텐츠 (홈 외 탭은 UI만 존재)
+### UI
+- Home page: district selector, filter bar (category, freeOnly, search, openNow), recommendation list
+- **List / Map view toggle** — Leaflet + OpenStreetMap map with brand markers
+- Place detail page (`/place/[id]`) with Kakao Map deep-link CTA, share button, bookmark
+- My Places page (bookmarks + recent views) via localStorage
+- PWA: manifest, service worker, offline fallback page
 
-## 다음 단계 후보 (미결정)
+### Data & API
+- `GET /api/places` — scored recommendation list, cache-first (1h DB snapshot)
+- `GET /api/realtime/[areaCode]` — congestion proxy
+- Seoul culturalEventInfo adapter (100 events, 1h Next.js cache)
+- Seoul citydata_ppltn adapter (congestion, 5min cache)
 
-- 장소 상세 페이지 (`/place/[id]`) 구현
-- 서울시 공공데이터 API 실연동
-- 북마크 localStorage 저장
+### Production
+- Rate limiting middleware (60 req/min/IP on /api/*)
+- React ErrorBoundary with Korean fallback UI
+- Skip-to-content accessibility link
+- GitHub Actions CI (tsc --noEmit + next build)
+- Dynamic OG images, JSON-LD structured data, sitemap, robots.txt
+
+## Excluded Scope (Intentionally Deferred)
+
+- User authentication / accounts (bookmarks are localStorage-only)
+- Phase 12: Testing suite (Vitest + Playwright) — next planned
+- Phase 13: Anonymous place rating (thumbs up/down)
+- Phase 14: PWA push notifications (district-level alerts)
+- Phase 15: i18n (Korean / English)
+
+## Key Constraints
+
+- **$0/month**: Vercel Hobby + Neon Free tier
+- No scope creep — implement only what is requested
+- Read existing code before making assumptions
+- No enterprise patterns — small, verifiable units only
+- All secrets via env vars only — never hardcoded
+
+## Environment Variables Required
+
+| Variable | Required for |
+|---|---|
+| `DATABASE_URL` | Prisma / Neon DB |
+| `SEOUL_OPEN_API_KEY` | Real API mode only (optional in mock mode) |
+| `NEXT_PUBLIC_BASE_URL` | Sitemap, OG absolute URLs |
+| `USE_MOCK_DATA` | Feature flag (default: true) |
+| `ENABLE_REALTIME_CITY_DATA` | Feature flag (default: false) |
+| `ENABLE_CULTURE_EVENTS_API` | Feature flag (default: false) |

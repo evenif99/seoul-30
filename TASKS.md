@@ -1,37 +1,38 @@
-# TASKS.md
+# TASKS
 
-마지막 업데이트: 2026-05-18
+Last updated: 2026-05-18 (Phase 11 complete)
 
-## 완료된 작업
+## Completed Phases
 
-- [x] 기본 레이아웃 (모바일/데스크톱 반응형)
-- [x] PlaceCard 컴포넌트
-- [x] FilterBar (카테고리/혼잡/시간/무료)
-- [x] Hero 섹션 (시간대별 인사말)
-- [x] BottomTabBar / DesktopNav
-- [x] EmptyState
+| Phase | Description |
+|---|---|
+| 1 | Project setup — Prisma schema, next.config, .env.example |
+| 2 | Core logic (mock-first) — types, scoring, API routes, feature flags |
+| 3 | UI build-out — district selector, place detail, bookmark hooks |
+| 4 | PWA foundation — manifest, SVG icon, offline page, service worker |
+| 5 | Real API integration — Seoul culturalEventInfo + citydata adapters |
+| 6 | DB caching layer + travel mode disclosure (Hero.tsx) |
+| 7 | Search & filter enhancement — name search, openNow toggle, URL sync |
+| 8 | My Places — bookmarks/recent tabs, RecentTracker, route-based nav |
+| 9 | SEO & Share — generateMetadata, OG image, JSON-LD, ShareButton, sitemap |
+| 10 | Production hardening — rate limiting, ErrorBoundary, a11y, CI |
+| 11 | Map view — Leaflet + OpenStreetMap, list/map toggle, marker popups |
 
-## 대기 중인 작업
+## Next Planned Phases
 
-현재 없음 — 다음 작업은 사용자 지시 대기
+| Phase | Description | Priority |
+|---|---|---|
+| 12 | Testing suite — Vitest unit tests (scoring), Playwright E2E golden paths | High |
+| 13 | Anonymous place rating — thumbs up/down, DB model, no auth required | Medium |
+| 14 | PWA push notifications — VAPID, district alerts, Vercel Cron | Medium |
+| 15 | i18n — next-intl, Korean/English, URL-based locale routing | Low |
 
-## 다음 작업 후보 (미결정, 우선순위 미정)
+## Currently Blocked
 
-- [ ] 장소 상세 페이지 `/place/[id]` (PlaceCard CTA 연결)
-- [ ] 북마크 localStorage 저장
-- [ ] 서울시 공공 API 실연동 (서울 열린데이터 광장)
-- [ ] 탭 콘텐츠 구현 (검색, 저장, 내 정보)
+- None.
 
-## Codex 핸드오프 노트
+## Do Not Touch
 
-**현재 상태**: 정적 mock 데이터로 동작하는 필터링 가능한 장소 추천 UI 완성.
-
-**다음 작업 시작점**:
-1. `lib/data.ts`의 `PLACES` 배열과 `Place` 타입을 먼저 확인할 것
-2. `app/page.tsx`의 필터 로직 구조를 파악 후 수정할 것
-3. 새 페이지는 `app/` 하위에 App Router 방식으로 추가
-
-**주의사항**:
-- `next.config.mjs`에 `ignoreBuildErrors: true` — 타입 오류가 있어도 빌드됨
-- `components/ui/` 는 건드리지 말 것 (shadcn/ui 자동 생성)
-- 신규 UI 컴포넌트는 `components/seoul30/`에 추가
+- `components/ui/` — shadcn/ui generated primitives, modify only if there is a direct UI requirement
+- `.env.local` / real API keys — never commit, never hardcode
+- `prisma/schema.prisma` — run `prisma db push` after any schema change

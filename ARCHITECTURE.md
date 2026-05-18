@@ -1,62 +1,126 @@
-# ARCHITECTURE.md
+# ARCHITECTURE
 
-## 기술 스택
+Last updated: 2026-05-18 (Phase 11 complete)
 
-| 항목 | 선택 |
-|------|------|
-| 프레임워크 | Next.js 15 (App Router) |
-| 언어 | TypeScript |
-| 스타일 | Tailwind CSS v4 |
-| 컴포넌트 라이브러리 | shadcn/ui (`components/ui/`) |
-| 빌드 | Turbopack |
+## Stack
 
-## 디렉토리 구조
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router, TypeScript strict) |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| Database | PostgreSQL via Neon Free (Singapore) + Prisma 5 |
+| Deployment | Vercel Hobby ($0/month) |
+| Map | Leaflet + OpenStreetMap (react-leaflet, no API key needed) |
+| Public Data | Seoul Open Data Plaza API |
 
-```
-seoul-30-webapp/
-├── app/
-│   ├── layout.tsx          # 루트 레이아웃, ThemeProvider
-│   ├── page.tsx            # 메인 페이지 (필터 state 관리)
-│   └── globals.css
-├── components/
-│   ├── seoul30/            # 도메인 컴포넌트
-│   │   ├── PlaceCard.tsx   # 장소 카드 (이미지, 배지, CTA)
-│   │   ├── FilterBar.tsx   # 카테고리/혼잡/시간/무료 필터
-│   │   ├── Hero.tsx        # 상단 헤딩 + 오늘 조건 칩
-│   │   ├── Header.tsx      # 모바일 헤더
-│   │   ├── BottomTabBar.tsx # 모바일 하단 탭
-│   │   ├── DesktopNav.tsx  # 데스크톱 사이드바 탭
-│   │   └── EmptyState.tsx  # 필터 결과 없음 상태
-│   └── ui/                 # shadcn/ui 기본 컴포넌트
-├── lib/
-│   ├── data.ts             # 타입 정의 + 정적 mock 데이터
-│   └── utils.ts            # cn() 유틸
-├── hooks/
-│   ├── use-mobile.ts
-│   └── use-toast.ts
-└── next.config.mjs         # ignoreBuildErrors, images.unoptimized, turbopack
-```
+## Repository
 
-## 데이터 흐름
+- Local workspace: `c:\project\seoul-30-webapp`
+- Git remote: `https://github.com/evenif99/seoul-30.git`
+- Branch: `master`
+- Deployed: Vercel (auto-deploy on push to master)
+
+## Folder Structure
 
 ```
-lib/data.ts (PLACES, 필터 옵션 상수)
-    ↓
-app/page.tsx (필터 state: useState + useMemo로 filteredPlaces 계산)
-    ↓
-FilterBar (필터 UI, onFiltersChange 콜백)
-PlaceCard (개별 카드, 북마크 로컬 state)
-EmptyState (결과 없음)
+app/
+  page.tsx                        # Home — district selector, filter bar, list/map toggle
+  place/[id]/
+    page.tsx                      # Place detail (generateMetadata, JSON-LD, ShareButton)
+    opengraph-image.tsx           # Dynamic OG image (edge runtime, 1200×630)
+  bookmarks/page.tsx              # My places — saved + recent tabs
+  offline/page.tsx                # PWA offline fallback
+  layout.tsx                      # Root layout — skip-to-content, ErrorBoundary, SW registrar
+  sitemap.ts / robots.ts          # SEO
+  api/
+    places/route.ts               # GET scored recommendation list (cache-first)
+    realtime/[areaCode]/route.ts  # GET congestion proxy
+
+components/
+  seoul30/                        # Domain UI components
+    PlaceCard.tsx                 # Place card (priority prop for LCP)
+    MapView.tsx                   # next/dynamic ssr:false wrapper
+    MapViewInner.tsx              # Leaflet map, brand DivIcon markers, BoundsController
+    FilterBar.tsx                 # search + openNow + category/freeOnly filters
+    DistrictSelector.tsx          # 25-district picker
+    BottomTabBar.tsx / DesktopNav.tsx  # Route-based navigation (usePathname)
+    BookmarkButton.tsx / ShareButton.tsx / RecentTracker.tsx
+    Hero.tsx / Header.tsx / EmptyState.tsx
+  ui/                             # shadcn/ui primitives
+  ErrorBoundary.tsx               # React class error boundary
+  ServiceWorkerRegistrar.tsx      # Registers /sw.js on client mount
+
+hooks/
+  use-bookmark.ts                 # localStorage bookmarks (max 100)
+  use-recent.ts                   # localStorage recent views (max 20)
+
+lib/
+  types/
+    place.ts                      # NormalizedPlace, PlaceSourceType
+    recommendation.ts             # RecommendationResult, ScoreBreakdown
+  mock/
+    places.ts                     # 12 sample NormalizedPlace (all with lat/lng)
+    realtime.ts                   # Per-district mock congestion signals
+  adapters/
+    seoul-culture.adapter.ts      # culturalEventInfo API → NormalizedPlace[]
+    seoul-citydata.adapter.ts     # citydata_ppltn API → RealtimeSignal
+  cache/
+    recommendation.cache.ts       # RecommendationSnapshot read/write (1h TTL)
+  config/
+    env.ts                        # Server-only env validation
+    feature-flags.ts              # USE_MOCK_DATA / ENABLE_* flags
+  scoring.ts                      # Pure scoring function (max 100 pts)
+  districts.ts                    # Seoul 25-district constants
+  prisma.ts                       # PrismaClient singleton
+
+prisma/schema.prisma              # Place, ExternalCache, RecommendationSnapshot models
+public/
+  manifest.json                   # PWA manifest
+  sw.js                           # Service worker (offline fallback)
+  icons/icon.svg                  # Branded SVG icon
+
+middleware.ts                     # Rate limiting: 60 req/min/IP on /api/*
+.github/workflows/ci.yml          # CI: tsc --noEmit + next build
 ```
 
-## 레이아웃 패턴
+## Data / API Flow
 
-- 모바일: `Header` (상단 sticky) + 스크롤 main + `BottomTabBar` (하단 fixed)
-- 데스크톱(md+): `DesktopNav` (좌측 sticky aside) + 스크롤 main
+```
+Client (browser)
+  └─ GET /api/places?district=&category=&freeOnly=
+        └─ feature flag: USE_MOCK_DATA=true  →  MOCK_PLACES (always)
+        └─ feature flag: ENABLE_CULTURE_EVENTS_API=true
+              └─ RecommendationSnapshot (DB cache, 1h TTL)  hit → return
+              └─ cache miss → fetchSeoulCultureEvents() → score → cache write
+        └─ feature flag: ENABLE_REALTIME_CITY_DATA=true
+              └─ fetchSeoulCongestion(district) → congestion score
+        └─ scorePlaces() → sort → top 10 → JSON response
+```
 
-## 주요 설계 결정
+## Scoring Formula
 
-- **필터 state는 page.tsx에 집중**: FilterBar는 UI만, 로직은 parent에서 관리
-- **북마크는 PlaceCard 로컬**: MVP 단계, persist 불필요
-- **정적 데이터**: 실 API 연동 전까지 `lib/data.ts`의 PLACES 배열 사용
-- **ignoreBuildErrors**: 빠른 개발 속도 우선, 타입 오류 무시
+```
+score = access(0-30) + relevance(0-25) + cost(0-15) + congestion(0-15) + timefit(0-10) + freshness(0-5)
+```
+
+## Feature Flags (env)
+
+| Flag | Default | Effect |
+|---|---|---|
+| `USE_MOCK_DATA` | `true` | Use MOCK_PLACES, skip API calls |
+| `ENABLE_CULTURE_EVENTS_API` | `false` | Call Seoul culturalEventInfo API |
+| `ENABLE_REALTIME_CITY_DATA` | `false` | Call Seoul citydata_ppltn API |
+
+## Security Rules
+
+- All API keys injected via `.env.local` / Vercel env vars only — never hardcoded
+- External API calls exclusively in server-side Route Handlers
+- `NEXT_PUBLIC_` prefix only for values safe to expose to browser
+- Rate limiting on all `/api/*` routes via `middleware.ts`
+
+## Known Constraints
+
+- Rate limiter is in-memory per edge instance — not shared across Vercel instances
+- DB cache activates only when `ENABLE_CULTURE_EVENTS_API=true`
+- Leaflet map uses OpenStreetMap tiles — no API key required
+- Neon Free tier: 0.5 GB storage limit
