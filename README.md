@@ -53,6 +53,14 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
 - `app/offline/page.tsx` — offline fallback page
 
+### ✅ Phase 8 — My Places (Bookmarks & Recent Views)
+- `app/bookmarks/page.tsx` — single page with two internal tabs: "저장됨" (bookmarks) + "최근 본" (recent views)
+- `components/seoul30/RecentTracker.tsx` — zero-render client component that calls `useRecent.push()` on place detail mount
+- `app/place/[id]/page.tsx` — `RecentTracker` wired to automatically record viewed places
+- `BottomTabBar` + `DesktopNav` — refactored from callback-based to route-based navigation using `Link` + `usePathname`; props removed
+- `app/page.tsx` — `activeTab` state removed (navigation now handled by router)
+- Place lookup: resolves IDs against `MOCK_PLACES`; unknown IDs (ephemeral API events) are silently skipped
+
 ### ✅ Phase 7 — Search & Filter Enhancement
 - `FilterBar.tsx` — place name search input added (client-side, matches name + address)
 - `FilterBar.tsx` — "지금 운영 중" toggle added (filters to currently open places only)
@@ -150,6 +158,7 @@ seoul-30-webapp/
 ├── app/
 │   ├── page.tsx                         # Home — district selector + recommendation list
 │   ├── place/[id]/page.tsx              # Place detail page
+│   ├── bookmarks/page.tsx               # My places — saved + recent tabs
 │   ├── offline/page.tsx                 # PWA offline fallback
 │   └── api/
 │       ├── places/route.ts              # Scored recommendation list endpoint

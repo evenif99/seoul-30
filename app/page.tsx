@@ -5,7 +5,7 @@ import { Header } from '@/components/seoul30/Header'
 import { Hero } from '@/components/seoul30/Hero'
 import { FilterBar, type ActiveFilters } from '@/components/seoul30/FilterBar'
 import { PlaceCard } from '@/components/seoul30/PlaceCard'
-import { BottomTabBar, type TabId } from '@/components/seoul30/BottomTabBar'
+import { BottomTabBar } from '@/components/seoul30/BottomTabBar'
 import { DesktopNav } from '@/components/seoul30/DesktopNav'
 import { EmptyState } from '@/components/seoul30/EmptyState'
 import { DistrictSelector } from '@/components/seoul30/DistrictSelector'
@@ -43,7 +43,6 @@ function syncUrl(district: string, filters: ActiveFilters) {
 }
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState<TabId>('home')
   const [district, setDistrict] = useState<string>('')
   const [filters, setFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
   const [results, setResults] = useState<RecommendationResult[]>([])
@@ -118,7 +117,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background flex">
       <aside className="hidden md:block sticky top-0 h-screen pl-6 pt-2">
-        <DesktopNav activeTab={activeTab} onTabChange={setActiveTab} />
+        <DesktopNav />
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -189,7 +188,7 @@ export default function HomePage() {
         </main>
       </div>
 
-      <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomTabBar />
     </div>
   )
 }

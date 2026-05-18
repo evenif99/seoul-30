@@ -1,23 +1,18 @@
 'use client'
 
-import { Home, Search, Bookmark, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Home, Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
-  { id: 'home', label: '홈', icon: Home },
-  { id: 'search', label: '탐색', icon: Search },
-  { id: 'saved', label: '저장함', icon: Bookmark },
-  { id: 'settings', label: '설정', icon: Settings },
+  { label: '홈', icon: Home, href: '/' },
+  { label: '저장함', icon: Bookmark, href: '/bookmarks' },
 ] as const
 
-type NavId = (typeof NAV_ITEMS)[number]['id']
+export function DesktopNav() {
+  const pathname = usePathname()
 
-interface DesktopNavProps {
-  activeTab: NavId
-  onTabChange: (id: NavId) => void
-}
-
-export function DesktopNav({ activeTab, onTabChange }: DesktopNavProps) {
   return (
     <nav
       aria-label="사이드 탐색"
@@ -28,24 +23,25 @@ export function DesktopNav({ activeTab, onTabChange }: DesktopNavProps) {
         <p className="text-xs text-muted-foreground mt-0.5">30분 생활권 추천</p>
       </div>
 
-      {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
-        <button
-          key={id}
-          onClick={() => onTabChange(id)}
-          aria-current={activeTab === id ? 'page' : undefined}
-          className={cn(
-            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-left',
-            activeTab === id
-              ? 'bg-accent text-primary'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-          )}
-        >
-          <Icon className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
-          {label}
-        </button>
-      ))}
+      {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
+        const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-current={isActive ? 'page' : undefined}
+            className={cn(
+              'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-accent text-primary'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
+          >
+            <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+            {label}
+          </Link>
+        )
+      })}
     </nav>
   )
 }
-
-export type { NavId }

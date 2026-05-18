@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Phone, Globe, ExternalLink } from 'lucide-react'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
+import { RecentTracker } from '@/components/seoul30/RecentTracker'
 import { notFound } from 'next/navigation'
 
 interface PageProps {
@@ -42,6 +43,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <RecentTracker placeId={place.id} />
       <div className="max-w-2xl mx-auto px-4 py-4">
         {/* 뒤로 가기 */}
         <Link

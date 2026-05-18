@@ -1,23 +1,18 @@
 'use client'
 
-import { Home, Search, Bookmark, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Home, Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TABS = [
-  { id: 'home', label: '홈', icon: Home },
-  { id: 'search', label: '탐색', icon: Search },
-  { id: 'saved', label: '저장함', icon: Bookmark },
-  { id: 'settings', label: '설정', icon: Settings },
+  { label: '홈', icon: Home, href: '/' },
+  { label: '저장함', icon: Bookmark, href: '/bookmarks' },
 ] as const
 
-type TabId = (typeof TABS)[number]['id']
+export function BottomTabBar() {
+  const pathname = usePathname()
 
-interface BottomTabBarProps {
-  activeTab: TabId
-  onTabChange: (id: TabId) => void
-}
-
-export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
   return (
     <nav
       aria-label="하단 탐색"
@@ -25,26 +20,27 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="flex items-stretch max-w-2xl mx-auto">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => onTabChange(id)}
-            aria-current={activeTab === id ? 'page' : undefined}
-            className={cn(
-              'flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors',
-              activeTab === id ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <Icon
-              className={cn('w-5 h-5 transition-colors', activeTab === id && 'stroke-[2.5]')}
-              aria-hidden="true"
-            />
-            <span>{label}</span>
-          </button>
-        ))}
+        {TABS.map(({ label, icon: Icon, href }) => {
+          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                'flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors',
+                isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Icon
+                className={cn('w-5 h-5 transition-colors', isActive && 'stroke-[2.5]')}
+                aria-hidden="true"
+              />
+              <span>{label}</span>
+            </Link>
+          )
+        })}
       </div>
     </nav>
   )
 }
-
-export type { TabId }
