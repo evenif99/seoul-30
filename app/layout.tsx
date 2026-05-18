@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Noto_Sans_KR, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
 import './globals.css'
 
 const notoSansKR = Noto_Sans_KR({
@@ -54,6 +55,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <main id="main-content">{children}</main>
         </ErrorBoundary>
+        <ServiceWorkerRegistrar />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

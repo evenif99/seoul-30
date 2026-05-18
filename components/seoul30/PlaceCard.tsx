@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 
 interface PlaceCardProps {
   place: NormalizedPlace
+  priority?: boolean
 }
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -21,7 +22,7 @@ const CATEGORY_LABEL: Record<string, string> = {
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=280&fit=crop&auto=format'
 
-export function PlaceCard({ place }: PlaceCardProps) {
+export function PlaceCard({ place, priority = false }: PlaceCardProps) {
   const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
 
   return (
@@ -40,6 +41,8 @@ export function PlaceCard({ place }: PlaceCardProps) {
               fill
               className="object-cover"
               sizes="130px"
+              priority={priority}
+              loading={priority ? 'eager' : 'lazy'}
             />
           </div>
 
