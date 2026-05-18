@@ -53,6 +53,15 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
 - `app/offline/page.tsx` — offline fallback page
 
+### ✅ Phase 9 — SEO & Share
+- `app/place/[id]/page.tsx` — `generateMetadata` exports per-place title, description, OpenGraph, Twitter card metadata
+- `app/place/[id]/opengraph-image.tsx` — dynamic OG image via Next.js `ImageResponse` (edge runtime, 1200×630, branded green layout)
+- `app/place/[id]/page.tsx` — JSON-LD `TouristAttraction` schema injected per place (name, address, geo, phone, url)
+- `components/seoul30/ShareButton.tsx` — Web Share API with clipboard fallback; shows "복사됨" confirmation on copy
+- `app/sitemap.ts` — home + all place detail URLs, served at `/sitemap.xml`
+- `app/robots.ts` — allow all crawlers, sitemap URL declared
+- `.env.example` — `NEXT_PUBLIC_BASE_URL` added for absolute URL generation
+
 ### ✅ Phase 8 — My Places (Bookmarks & Recent Views)
 - `app/bookmarks/page.tsx` — single page with two internal tabs: "저장됨" (bookmarks) + "최근 본" (recent views)
 - `components/seoul30/RecentTracker.tsx` — zero-render client component that calls `useRecent.push()` on place detail mount

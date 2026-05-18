@@ -1,15 +1,18 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Phone, Globe, ExternalLink } from 'lucide-react'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { RecentTracker } from '@/components/seoul30/RecentTracker'
+import { ShareButton } from '@/components/seoul30/ShareButton'
 import { notFound } from 'next/navigation'
 
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
-// TODO(P5): 실 DB/API 연결 후 DB에서 Place 조회로 교체
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://seoul-30.vercel.app'
+
 function getPlace(id: string) {
   return MOCK_PLACES.find((p) => p.id === id) ?? null
 }
@@ -32,6 +35,37 @@ const CATEGORY_LABEL: Record<string, string> = {
   welfare: '복지시설',
 }
 
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const place = getPlace(id)
+  if (!place) return {}
+
+  const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
+  const description = place.description ?? `${categoryLabel} · ${place.district} · 30분 이내`
+  const url = `${BASE_URL}/place/${id}`
+
+  return {
+    title: `${place.name} — Seoul 30`,
+    description,
+    openGraph: {
+      title: place.name,
+      description,
+      url,
+      siteName: 'Seoul 30',
+      locale: 'ko_KR',
+      type: 'website',
+      ...(place.imageUrl && {
+        images: [{ url: place.imageUrl, width: 800, height: 600, alt: place.name }],
+      }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: place.name,
+      description,
+    },
+  }
+}
+
 export default async function PlaceDetailPage({ params }: PageProps) {
   const { id } = await params
   const place = getPlace(id)
@@ -40,10 +74,40 @@ export default async function PlaceDetailPage({ params }: PageProps) {
 
   const kakaoUrl = buildKakaoMapUrl(place)
   const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
+  const placeUrl = `${BASE_URL}/place/${id}`
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristAttraction',
+    name: place.name,
+    description: place.description,
+    ...(place.address && {
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: place.address,
+        addressLocality: place.district,
+        addressCountry: 'KR',
+      },
+    }),
+    ...(place.phone && { telephone: place.phone }),
+    ...(place.homepageUrl && { url: place.homepageUrl }),
+    ...(place.latitude && place.longitude && {
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: place.latitude,
+        longitude: place.longitude,
+      },
+    }),
+  }
 
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <RecentTracker placeId={place.id} />
+
       <div className="max-w-2xl mx-auto px-4 py-4">
         {/* 뒤로 가기 */}
         <Link
@@ -62,7 +126,14 @@ export default async function PlaceDetailPage({ params }: PageProps) {
               {categoryLabel}{place.district ? ` · ${place.district}` : ''}
             </p>
           </div>
-          <BookmarkButton placeId={place.id} />
+          <div className="flex items-center gap-3 shrink-0">
+            <ShareButton
+              title={place.name}
+              text={`${place.name} — Seoul 30에서 확인한 30분 생활권 장소`}
+              url={placeUrl}
+            />
+            <BookmarkButton placeId={place.id} />
+          </div>
         </div>
 
         {/* 무료 여부 */}
