@@ -36,6 +36,9 @@ export function Hero() {
         <p className="mt-1.5 text-sm text-muted-foreground">
           {greeting} 곳을 지금 출발 기준으로 추천드려요
         </p>
+        <p className="mt-1 text-xs text-muted-foreground/70">
+          대중교통 기준 · 자치구 단위 추천
+        </p>
       </div>
 
       {/* Today's condition chips */}

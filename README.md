@@ -53,6 +53,13 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
 - `app/offline/page.tsx` — offline fallback page
 
+### ✅ Phase 6 — DB Caching Layer & Travel Mode Disclosure
+- `lib/cache/recommendation.cache.ts` — `RecommendationSnapshot` read/write helpers with 1-hour TTL
+- `app/api/places/route.ts` — cache-first pattern: DB snapshot checked before Seoul API is called; result written to cache on miss
+- Mock data is never cached — DB cache activates only when `ENABLE_CULTURE_EVENTS_API=true`
+- `Hero.tsx` — added "대중교통 기준 · 자치구 단위 추천" disclosure (Option A decision: fixed to public transit, district-level granularity)
+- Cache write failures are non-fatal; service degrades gracefully to live API
+
 ### ✅ Phase 5 — Real API Integration
 - `lib/adapters/seoul-culture.adapter.ts` — fetches and normalizes `culturalEventInfo` API (100 events, 1-hour Next.js cache)
 - `lib/adapters/seoul-citydata.adapter.ts` — fetches `citydata_ppltn` congestion data with district → hotspot mapping for all 25 districts (5-minute cache)
@@ -144,6 +151,8 @@ seoul-30-webapp/
 │   └── ui/                              # shadcn/ui base components
 ├── hooks/                               # localStorage hooks (bookmarks, recent views)
 ├── lib/
+│   ├── cache/                           # DB cache helpers
+│   │   └── recommendation.cache.ts      # RecommendationSnapshot read/write (1h TTL)
 │   ├── adapters/                        # Seoul Open API adapters (server-only)
 │   │   ├── seoul-culture.adapter.ts     # culturalEventInfo → NormalizedPlace[]
 │   │   └── seoul-citydata.adapter.ts   # citydata_ppltn → RealtimeSignal
