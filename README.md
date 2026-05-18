@@ -53,6 +53,14 @@ The full UI works out of the box with mock data — no API keys required to run 
 - `app/layout.tsx` — manifest link and `appleWebApp` metadata wired via Next.js Metadata API
 - `app/offline/page.tsx` — offline fallback page
 
+### ✅ Phase 7 — Search & Filter Enhancement
+- `FilterBar.tsx` — place name search input added (client-side, matches name + address)
+- `FilterBar.tsx` — "지금 운영 중" toggle added (filters to currently open places only)
+- `ActiveFilters` type extended with `search: string` and `openNow: boolean`
+- `app/page.tsx` — client-side filtering applied on API results (search + openNow are UI-layer only, no extra API call)
+- `app/page.tsx` — URL query string sync via `window.history.replaceState` (shareable filter links: `?category=park&openNow=true&search=숲`)
+- `app/page.tsx` — URL params restored on mount; filter reset clears URL
+
 ### ✅ Phase 6 — DB Caching Layer & Travel Mode Disclosure
 - `lib/cache/recommendation.cache.ts` — `RecommendationSnapshot` read/write helpers with 1-hour TTL
 - `app/api/places/route.ts` — cache-first pattern: DB snapshot checked before Seoul API is called; result written to cache on miss

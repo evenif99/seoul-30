@@ -10,12 +10,36 @@ import { DesktopNav } from '@/components/seoul30/DesktopNav'
 import { EmptyState } from '@/components/seoul30/EmptyState'
 import { DistrictSelector } from '@/components/seoul30/DistrictSelector'
 import type { RecommendationResult } from '@/lib/types/recommendation'
+import type { NormalizedPlace } from '@/lib/types/place'
 
 const DEFAULT_FILTERS: ActiveFilters = {
   category: 'all',
   crowd: 'all',
   time: '30',
   freeOnly: false,
+  search: '',
+  openNow: false,
+}
+
+function isOpenNow(place: NormalizedPlace): boolean {
+  if (!place.openTimeText || !place.closeTimeText) return true
+  const now = new Date()
+  const cur = now.getHours() * 60 + now.getMinutes()
+  const [oh, om] = place.openTimeText.split(':').map(Number)
+  const [ch, cm] = place.closeTimeText.split(':').map(Number)
+  if (oh === 0 && om === 0 && ch === 23 && cm === 59) return true
+  return cur >= oh * 60 + om && cur < ch * 60 + cm
+}
+
+function syncUrl(district: string, filters: ActiveFilters) {
+  const params = new URLSearchParams()
+  if (district) params.set('district', district)
+  if (filters.category !== 'all') params.set('category', filters.category)
+  if (filters.freeOnly) params.set('freeOnly', 'true')
+  if (filters.openNow) params.set('openNow', 'true')
+  if (filters.search.trim()) params.set('search', filters.search.trim())
+  const qs = params.toString()
+  window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
 }
 
 export default function HomePage() {
@@ -26,6 +50,23 @@ export default function HomePage() {
   const [isMock, setIsMock] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  // URL에서 초기 필터 복원 (클라이언트 마운트 후)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const initialDistrict = params.get('district') ?? ''
+    const initialFilters: ActiveFilters = {
+      category: params.get('category') ?? 'all',
+      crowd: 'all',
+      time: '30',
+      freeOnly: params.get('freeOnly') === 'true',
+      openNow: params.get('openNow') === 'true',
+      search: params.get('search') ?? '',
+    }
+    setDistrict(initialDistrict)
+    setFilters(initialFilters)
+  }, [])
+
+  // API 호출: district, category, freeOnly 변경 시
   useEffect(() => {
     const params = new URLSearchParams()
     if (district) params.set('district', district)
@@ -41,10 +82,34 @@ export default function HomePage() {
       })
       .catch(() => setResults([]))
       .finally(() => setLoading(false))
-  }, [district, filters])
+  }, [district, filters.category, filters.freeOnly])
+
+  function handleDistrictChange(next: string) {
+    setDistrict(next)
+    syncUrl(next, filters)
+  }
+
+  function handleFiltersChange(next: ActiveFilters) {
+    setFilters(next)
+    syncUrl(district, next)
+  }
+
+  // 클라이언트 사이드 필터링 (search, openNow)
+  const displayResults = results.filter(({ place }) => {
+    if (filters.search.trim()) {
+      const q = filters.search.trim().toLowerCase()
+      const nameMatch = place.name.toLowerCase().includes(q)
+      const addrMatch = place.address?.toLowerCase().includes(q) ?? false
+      if (!nameMatch && !addrMatch) return false
+    }
+    if (filters.openNow && !isOpenNow(place)) return false
+    return true
+  })
 
   const isFiltered =
     filters.freeOnly ||
+    filters.openNow ||
+    filters.search.trim() !== '' ||
     filters.crowd !== 'all' ||
     filters.time !== '30' ||
     filters.category !== 'all' ||
@@ -75,9 +140,9 @@ export default function HomePage() {
         <main id="main-content" className="flex-1 overflow-y-auto pb-24 md:pb-8">
           <Hero />
 
-          <DistrictSelector value={district} onChange={setDistrict} />
+          <DistrictSelector value={district} onChange={handleDistrictChange} />
 
-          <FilterBar filters={filters} onFiltersChange={setFilters} />
+          <FilterBar filters={filters} onFiltersChange={handleFiltersChange} />
 
           <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
@@ -85,7 +150,7 @@ export default function HomePage() {
                 <span>불러오는 중...</span>
               ) : (
                 <>
-                  <span className="font-semibold text-foreground">{results.length}개</span>의 장소를 추천드려요
+                  <span className="font-semibold text-foreground">{displayResults.length}개</span>의 장소를 추천드려요
                 </>
               )}
             </p>
@@ -94,6 +159,7 @@ export default function HomePage() {
                 onClick={() => {
                   setDistrict('')
                   setFilters(DEFAULT_FILTERS)
+                  window.history.replaceState(null, '', '/')
                 }}
                 className="text-xs text-primary hover:underline"
               >
@@ -106,16 +172,16 @@ export default function HomePage() {
             aria-label="추천 장소 목록"
             className="max-w-2xl mx-auto px-4 flex flex-col gap-3"
           >
-            {loading ? null : results.length === 0 ? (
+            {loading ? null : displayResults.length === 0 ? (
               <EmptyState />
             ) : (
-              results.map(({ place }) => (
+              displayResults.map(({ place }) => (
                 <PlaceCard key={place.id} place={place} />
               ))
             )}
           </section>
 
-          {!loading && results.length > 0 && (
+          {!loading && displayResults.length > 0 && (
             <p className="max-w-2xl mx-auto px-4 pt-6 text-center text-[11px] text-muted-foreground">
               {isMock ? 'mock 데이터 기반' : '서울시 공공데이터 기반'} · scoring 기준 정렬
             </p>
