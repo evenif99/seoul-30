@@ -6,8 +6,6 @@ Instead of trying to replace maps or transit apps, this project focuses on decis
 
 ===
 
-Why this project exists
-
 ## Why this project exists
 
 This project was built as a real-world portfolio service with two goals:
