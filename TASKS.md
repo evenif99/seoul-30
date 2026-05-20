@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-20 (Phase 15 complete)
+Last updated: 2026-05-20 (Phase 16 complete)
 
 ## Completed Phases (1–15)
 
@@ -36,9 +36,17 @@ Last updated: 2026-05-20 (Phase 15 complete)
 - [x] `app/place/[id]/page.tsx` — `getTranslations` (server)
 - [x] TypeScript check + README + commit + push
 
+### Phase 16 — Score Breakdown UI
+- [x] `components/seoul30/ScoreBadge.tsx` — total score badge + reason pills
+- [x] `PlaceCard.tsx` — accepts optional `score` prop, renders ScoreBadge
+- [x] `app/page.tsx` — passes `score` from `RecommendationResult` to PlaceCard
+- [x] `messages/ko.json` + `messages/en.json` — `score` namespace added
+- [x] `tests/components/ScoreBadge.test.tsx` — 4 tests
+- [x] TypeScript check + 16/16 tests passing + README + commit + push
+
 ## Open Items
 
-- [ ] Phase 16–20 scope TBD
+- [ ] Phase 17–20 scope TBD
 - [ ] Middleware `proxy` migration (deferred — not blocking)
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 

@@ -85,5 +85,14 @@
   },
   "lang": {
     "toggle": "한국어"
+  },
+  "score": {
+    "label": "Score",
+    "access": "Nearby",
+    "relevance": "Your category",
+    "cost": "Free",
+    "congestion": "Not crowded",
+    "timefit": "Open now",
+    "freshness": "New event"
   }
 }

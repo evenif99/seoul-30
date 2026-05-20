@@ -1,13 +1,13 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-20 (Phase 15 complete)
+Last updated: 2026-05-20 (Phase 16 complete)
 
 ## Product Goal
 
 Low-cost MVP PWA that recommends Seoul public places reachable within 30 minutes by public transit.
 Dual purpose: working portfolio piece + real deployable service at $0/month.
 
-## Completed Scope (Phase 1–15)
+## Completed Scope (Phase 1–16)
 
 | Phase | Summary |
 |---|---|
@@ -26,10 +26,11 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 13 | Anonymous place rating — PlaceFeedback model, sessionId dedup, optimistic UI |
 | 14 | PWA Web Push — VAPID, WebPushSubscription model, Vercel Cron daily trigger |
 | 15 | i18n — next-intl v4, ko/en, cookie-based locale, LanguageToggle component |
+| 16 | Score breakdown UI — ScoreBadge on PlaceCard, reason pills, ko/en labels |
 
 ## Deferred / Not Started
 
-- Phase 16–20 (TBD)
+- Phase 17–20 (TBD)
 - Authentication / user accounts
 - Admin dashboard
 - Vector DB / AI-powered recommendations

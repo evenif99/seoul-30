@@ -29,6 +29,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 13** — Anonymous place rating (👍 / 👎, PlaceFeedback DB model, optimistic UI)
 - **Phase 14** — PWA Web Push notifications (VAPID, WebPushSubscription DB model, Vercel Cron)
 - **Phase 15** — i18n with next-intl v4 (ko/en, cookie-based locale, LanguageToggle)
+- **Phase 16** — Score explanation breakdown UI (ScoreBadge on PlaceCard, ko/en labels)
 
 ## Local Run
 

@@ -85,5 +85,14 @@
   },
   "lang": {
     "toggle": "English"
+  },
+  "score": {
+    "label": "추천 점수",
+    "access": "지역 근접",
+    "relevance": "관심 카테고리",
+    "cost": "무료 이용",
+    "congestion": "한산함",
+    "timefit": "지금 운영 중",
+    "freshness": "신규 행사"
   }
 }

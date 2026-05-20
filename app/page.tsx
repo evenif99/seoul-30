@@ -223,8 +223,8 @@ export default function HomePage() {
               {loading ? null : displayResults.length === 0 ? (
                 <EmptyState />
               ) : (
-                displayResults.map(({ place }, i) => (
-                  <PlaceCard key={place.id} place={place} priority={i === 0} />
+                displayResults.map(({ place, score }, i) => (
+                  <PlaceCard key={place.id} place={place} score={score} priority={i === 0} />
                 ))
               )}
             </section>

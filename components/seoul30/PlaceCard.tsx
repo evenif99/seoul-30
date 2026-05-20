@@ -4,11 +4,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Train, Bus, Footprints, MapPin, Clock, ChevronRight } from 'lucide-react'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
+import { ScoreBadge } from '@/components/seoul30/ScoreBadge'
 import type { NormalizedPlace } from '@/lib/types/place'
+import type { ScoreBreakdown } from '@/lib/types/recommendation'
 import { cn } from '@/lib/utils'
 
 interface PlaceCardProps {
   place: NormalizedPlace
+  score?: ScoreBreakdown
   priority?: boolean
 }
 
@@ -22,7 +25,7 @@ const CATEGORY_LABEL: Record<string, string> = {
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=280&fit=crop&auto=format'
 
-export function PlaceCard({ place, priority = false }: PlaceCardProps) {
+export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
   const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
 
   return (
@@ -62,7 +65,7 @@ export function PlaceCard({ place, priority = false }: PlaceCardProps) {
               <BookmarkButton placeId={place.id} />
             </div>
 
-            {/* 뱃지: 무료 여부 */}
+            {/* 뱃지: 무료 여부 + 추천 점수 */}
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className={cn(
                 'text-[11px] font-medium px-2 py-1 rounded-full',
@@ -72,6 +75,9 @@ export function PlaceCard({ place, priority = false }: PlaceCardProps) {
               )}>
                 {place.isFree ? '무료' : (place.feeText ?? '유료')}
               </span>
+              {score && (
+                <ScoreBadge score={score} />
+              )}
             </div>
 
             {/* 운영 시간 */}

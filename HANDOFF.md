@@ -1,12 +1,12 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 15 complete)
+Last updated: 2026-05-20 (Phase 16 complete)
 
 ## Current State
 
-Phase 15 (i18n) is complete and pushed to `main`. The app is fully functional with Korean (default) and English support. All previous phases (1–14) are stable.
+Phase 16 (score breakdown UI) is complete. PlaceCards now display the recommendation score and the top contributing reasons. All previous phases (1–15) are stable.
 
-## What Was Done (Phase 13–15)
+## What Was Done (Phase 13–16)
 
 ### Phase 13 — Anonymous Place Rating
 - `PlaceFeedback` model added to `prisma/schema.prisma` (unique: placeId + sessionId)
@@ -33,6 +33,16 @@ Phase 15 (i18n) is complete and pushed to `main`. The app is fully functional wi
 - `components/seoul30/LanguageToggle.tsx` — sets cookie, reloads page
 - All key components updated: Hero, FilterBar, EmptyState, BottomTabBar, FeedbackPanel, PushSubscribeButton, MapViewInner, place detail page
 
+### Phase 16 — Score Breakdown UI
+- `components/seoul30/ScoreBadge.tsx` — new component
+  - Shows `total`점 badge with color: green (75+), blue (55+), gray (below 55)
+  - Shows reason pills for dimensions that exceed threshold (access≥20, relevance≥20, cost≥15, congestion≥10, timefit≥10, freshness≥3)
+  - Uses `useTranslations('score')` — ko/en both supported
+- `PlaceCard.tsx` — accepts optional `score?: ScoreBreakdown`, renders ScoreBadge inline with the free/paid badge
+- `app/page.tsx` — `{ place, score }` destructured from `displayResults`, `score` passed to PlaceCard
+- `messages/ko.json` + `messages/en.json` — `score` namespace with 7 keys (label + 6 dimensions)
+- `tests/components/ScoreBadge.test.tsx` — 4 tests: total display, full reasons, no reasons below threshold, low score display
+
 ## Do-Not-Touch Rules
 
 - API keys server-side only (`lib/config/env.ts` + Route Handlers)
@@ -55,13 +65,12 @@ NEXT_PUBLIC_VAPID_PUBLIC_KEY=        # same value as VAPID_PUBLIC_KEY
 CRON_SECRET=                         # arbitrary secret, guards /api/push/send
 ```
 
-## Verification Status (Phase 15)
+## Verification Status (Phase 16)
 
 - `npx tsc --noEmit` — passed
-- `npm run test` — 12/12 unit + component tests passing
+- `npm run test` — 16/16 unit + component tests passing
 - Dev server running on `localhost:3001`
-- All key UI strings render in both `ko` and `en` via LanguageToggle
 
 ## Next Action
 
-Start Phase 16 planning. See `PROJECT_SCOPE.md` for constraints before proposing scope.
+Start Phase 17 planning (stale cache fallback when Seoul Open API fails). See `PROJECT_SCOPE.md` for constraints.
