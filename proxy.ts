@@ -15,7 +15,7 @@ function getClientIp(req: NextRequest): string {
   )
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   if (!req.nextUrl.pathname.startsWith('/api/')) {
     return NextResponse.next()
   }

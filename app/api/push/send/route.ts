@@ -2,12 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { prisma } from '@/lib/prisma'
 
-webpush.setVapidDetails(
-  `mailto:${process.env.VAPID_EMAIL ?? 'admin@example.com'}`,
-  process.env.VAPID_PUBLIC_KEY ?? '',
-  process.env.VAPID_PRIVATE_KEY ?? '',
-)
-
 function checkAuth(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET
   // secret 미설정 시 개발 환경에서만 허용 — 운영에서는 반드시 CRON_SECRET 필요
@@ -16,6 +10,16 @@ function checkAuth(req: NextRequest): boolean {
 }
 
 async function sendPushToAll() {
+  const vapidPublic = process.env.VAPID_PUBLIC_KEY
+  const vapidPrivate = process.env.VAPID_PRIVATE_KEY
+  if (!vapidPublic || !vapidPrivate) return { sent: 0, total: 0 }
+
+  webpush.setVapidDetails(
+    `mailto:${process.env.VAPID_EMAIL ?? 'admin@example.com'}`,
+    vapidPublic,
+    vapidPrivate,
+  )
+
   let subscriptions: Awaited<ReturnType<typeof prisma.webPushSubscription.findMany>>
   try {
     subscriptions = await prisma.webPushSubscription.findMany()
