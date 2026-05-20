@@ -95,7 +95,11 @@
     "backToList": "Back",
     "directions": "Get directions",
     "staleData": "Seoul public API is unavailable — showing cached results ({age})",
-    "cachedData": "Updated {age}"
+    "cachedData": "Updated {age}",
+    "mapLoading": "Loading map...",
+    "mapSatellite": "Switch to satellite view",
+    "mapNormal": "Switch to normal view",
+    "mapMyLocation": "Go to my location"
   },
   "desktop": {
     "title": "Recommended now",

@@ -1,22 +1,41 @@
 'use client'
 
-import dynamic from 'next/dynamic'
+import Script from 'next/script'
+import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import type { RecommendationResult } from '@/lib/types/recommendation'
+import { MapViewInner } from './MapViewInner'
 
-// SSR 비활성화 — Leaflet은 window 객체 필요
-const MapViewInner = dynamic(() => import('./MapViewInner'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-[60vh] text-sm text-muted-foreground px-4">
-      지도 불러오는 중...
-    </div>
-  ),
-})
+const CLIENT_ID = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID ?? ''
 
 interface MapViewProps {
   results: RecommendationResult[]
 }
 
 export function MapView({ results }: MapViewProps) {
-  return <MapViewInner results={results} />
+  const t = useTranslations('common')
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.naver?.maps) {
+      setReady(true)
+    }
+  }, [])
+
+  return (
+    <div className="relative">
+      <Script
+        src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${CLIENT_ID}`}
+        strategy="afterInteractive"
+        onLoad={() => setReady(true)}
+      />
+      {ready ? (
+        <MapViewInner results={results} />
+      ) : (
+        <div className="flex items-center justify-center h-[60vh] text-sm text-muted-foreground px-4">
+          {t('mapLoading')}
+        </div>
+      )}
+    </div>
+  )
 }
