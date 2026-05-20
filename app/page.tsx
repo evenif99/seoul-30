@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { List, Map } from 'lucide-react'
+import { List, LocateFixed, Map, MapPin } from 'lucide-react'
 import { Header } from '@/components/seoul30/Header'
 import { Hero } from '@/components/seoul30/Hero'
 import { FilterBar, type ActiveFilters } from '@/components/seoul30/FilterBar'
@@ -65,6 +65,8 @@ export default function HomePage() {
   const [snapshotAt, setSnapshotAt] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [locating, setLocating] = useState(false)
 
   // URL에서 초기 필터 복원 (클라이언트 마운트 후)
   useEffect(() => {
@@ -88,6 +90,10 @@ export default function HomePage() {
     if (district) params.set('district', district)
     if (filters.category !== 'all') params.set('category', filters.category)
     if (filters.freeOnly) params.set('freeOnly', 'true')
+    if (userCoords) {
+      params.set('lat', String(userCoords.lat))
+      params.set('lng', String(userCoords.lng))
+    }
 
     setLoading(true)
     fetch(`/api/places?${params.toString()}`)
@@ -100,7 +106,21 @@ export default function HomePage() {
       })
       .catch(() => setResults([]))
       .finally(() => setLoading(false))
-  }, [district, filters.category, filters.freeOnly])
+  }, [district, filters.category, filters.freeOnly, userCoords])
+
+  function requestLocation() {
+    if (!navigator.geolocation) return
+
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setLocating(false)
+      },
+      () => setLocating(false),
+      { timeout: 8000 },
+    )
+  }
 
   function handleDistrictChange(next: string) {
     setDistrict(next)
@@ -131,7 +151,8 @@ export default function HomePage() {
     filters.crowd !== 'all' ||
     filters.time !== '30' ||
     filters.category !== 'all' ||
-    !!district
+    !!district ||
+    !!userCoords
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -161,6 +182,24 @@ export default function HomePage() {
 
         <main id="main-content" className="flex-1 overflow-y-auto pb-24 md:pb-8">
           <Hero />
+
+          <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={requestLocation}
+              disabled={locating}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <LocateFixed className="h-3.5 w-3.5" aria-hidden="true" />
+              {locating ? t('common.locating') : t('common.useMyLocation')}
+            </button>
+            {userCoords && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-600 border border-blue-100">
+                <MapPin className="h-3 w-3" aria-hidden="true" />
+                {t('common.locationActive')}
+              </span>
+            )}
+          </div>
 
           <DistrictSelector value={district} onChange={handleDistrictChange} />
 
@@ -208,6 +247,7 @@ export default function HomePage() {
                   onClick={() => {
                     setDistrict('')
                     setFilters(DEFAULT_FILTERS)
+                    setUserCoords(null)
                     window.history.replaceState(null, '', '/')
                   }}
                   className="text-xs text-primary hover:underline mr-2"

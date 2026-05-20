@@ -1,5 +1,7 @@
 # TASKS
 
+Last updated: 2026-05-20 (Additional Phase: location-based transit access)
+
 Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
 ## Completed Phases (1–15)
@@ -121,6 +123,23 @@ Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 - [x] `messages` — offline, about.backHome/intro/scoringNote, privacy.backHome 추가
 - [x] TASKS.md, PROJECT_SCOPE.md, README.md, HANDOFF.md Phase 21-25 반영
 - [x] TypeScript 오류 없음, 43/43 통과
+
+## Additional Phases After Phase 25
+
+### Additional Phase - Location-based transit access scoring
+- [x] `lib/data/ddareungi.ts` - Seoul Open API `bikeList` server-side fetcher with 10-minute cache
+- [x] `lib/utils/transit-time.ts` - Haversine distance, nearest Ddareungi station lookup, Seoul transit time estimate, access score buckets
+- [x] `lib/types/recommendation.ts` - optional `userLat`/`userLng`, `transitMinutes`, `transitMode`
+- [x] `lib/scoring.ts` - coordinate-aware access score with district fallback for non-location requests
+- [x] `app/api/places/route.ts` - `lat`/`lng` parsing, conditional Ddareungi fetch behind `ENABLE_REALTIME_CITY_DATA`, per-place bike station check
+- [x] `app/page.tsx` - geolocation request button, Near Me badge, `lat`/`lng` API query params
+- [x] `components/seoul30/PlaceCard.tsx` - transit mode/minutes badge
+- [x] `components/seoul30/ScoreBadge.tsx` - score reason type narrowed to numeric score dimensions
+- [x] `messages/ko.json` + `messages/en.json` - `transit` namespace and location button labels
+- [x] `tests/unit/transit-time.test.ts` - distance, mode selection, access bucket tests
+- [x] `npx tsc --noEmit` - passed
+- [x] `npm run test` - 48/48 passing
+- [x] `npm run build` - passed after stopping locked local Node processes on Windows
 
 ## Deferred Items
 

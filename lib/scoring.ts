@@ -1,13 +1,16 @@
 import type { NormalizedPlace } from './types/place'
 import type { RealtimeSignal } from './types/realtime'
 import type { RecommendationInput, ScoreBreakdown } from './types/recommendation'
+import { estimateTransit, haversineKm, transitAccessScore } from './utils/transit-time'
 
 export function scorePlace(
   place: NormalizedPlace,
   input: RecommendationInput,
   realtime: RealtimeSignal | null,
+  ddareungiNearUser = true,
+  ddareungiNearDest = true,
 ): ScoreBreakdown {
-  const access = calcAccess(place, input)
+  const access = calcAccess(place, input, ddareungiNearUser, ddareungiNearDest)
   const relevance = calcRelevance(place, input)
   const cost = calcCost(place, input)
   const congestion = calcCongestion(realtime)
@@ -15,21 +18,44 @@ export function scorePlace(
   const freshness = calcFreshness(place)
 
   return {
-    access,
+    access: access.score,
     relevance,
     cost,
     congestion,
     timefit,
     freshness,
-    total: access + relevance + cost + congestion + timefit + freshness,
+    total: access.score + relevance + cost + congestion + timefit + freshness,
+    transitMinutes: access.transitMinutes,
+    transitMode: access.transitMode,
   }
 }
 
 // 지역 일치도 (0–30)
-function calcAccess(place: NormalizedPlace, input: RecommendationInput): number {
-  if (!input.district) return 10
-  if (place.district === input.district) return 30
-  return 10
+function calcAccess(
+  place: NormalizedPlace,
+  input: RecommendationInput,
+  ddareungiNearUser: boolean,
+  ddareungiNearDest: boolean,
+): { score: number; transitMinutes?: number; transitMode?: ScoreBreakdown['transitMode'] } {
+  if (
+    input.userLat != null &&
+    input.userLng != null &&
+    place.latitude != null &&
+    place.longitude != null
+  ) {
+    const distKm = haversineKm(input.userLat, input.userLng, place.latitude, place.longitude)
+    const transit = estimateTransit(distKm, ddareungiNearUser, ddareungiNearDest)
+
+    return {
+      score: transitAccessScore(transit.minutes),
+      transitMinutes: transit.minutes,
+      transitMode: transit.mode,
+    }
+  }
+
+  if (!input.district) return { score: 10 }
+  if (place.district === input.district) return { score: 30 }
+  return { score: 10 }
 }
 
 // 카테고리 일치도 (0–25)

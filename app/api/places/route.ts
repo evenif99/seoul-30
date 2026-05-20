@@ -5,23 +5,34 @@ import { getMockRealtime } from '@/lib/mock/realtime'
 import { fetchSeoulCultureEvents } from '@/lib/adapters/seoul-culture.adapter'
 import { fetchSeoulCongestion } from '@/lib/adapters/seoul-citydata.adapter'
 import { getSnapshot, getStaleSnapshot, setSnapshot } from '@/lib/cache/recommendation.cache'
+import { getDdareungiStations } from '@/lib/data/ddareungi'
 import { scorePlace } from '@/lib/scoring'
+import { nearestDdareungiStation } from '@/lib/utils/transit-time'
 import type { RecommendationInput } from '@/lib/types/recommendation'
 import type { ApiResponse } from '@/lib/types/api'
 
 export async function GET(request: Request) {
   const t0 = Date.now()
   const { searchParams } = new URL(request.url)
+  const latParam = searchParams.get('lat')
+  const lngParam = searchParams.get('lng')
+  const parsedUserLat = latParam ? Number(latParam) : undefined
+  const parsedUserLng = lngParam ? Number(lngParam) : undefined
+  const userLat = Number.isFinite(parsedUserLat) ? parsedUserLat : undefined
+  const userLng = Number.isFinite(parsedUserLng) ? parsedUserLng : undefined
+  const hasUserCoords = userLat != null && userLng != null
 
   const input: RecommendationInput = {
     district: searchParams.get('district') ?? undefined,
     category: searchParams.get('category') ?? undefined,
     isFreeOnly: searchParams.get('freeOnly') === 'true',
     maxTravelMinutes: Number(searchParams.get('maxMinutes') ?? 30),
+    userLat,
+    userLng,
   }
 
   // 실 API 모드일 때만 DB 캐시 조회 (mock 결과는 캐시하지 않음)
-  if (featureFlags.cultureEventsApi) {
+  if (featureFlags.cultureEventsApi && !hasUserCoords) {
     const cached = await getSnapshot(input.district, input.category, input.isFreeOnly)
     if (cached) {
       logPlacesRequest({ source: 'cache', durationMs: Date.now() - t0, resultCount: cached.results.length, input })
@@ -70,22 +81,39 @@ export async function GET(request: Request) {
     if (liveSignal) realtime = liveSignal
   }
 
+  const stations =
+    featureFlags.realtimeCityData && userLat != null && userLng != null
+      ? await getDdareungiStations()
+      : []
+
+  const ddareungiNearUser =
+    stations.length === 0 || userLat == null || userLng == null
+      ? true
+      : nearestDdareungiStation(userLat, userLng, stations) !== null
+
   const filtered = places.filter((p) => {
     if (input.isFreeOnly && !p.isFree) return false
     return true
   })
 
   const results = filtered
-    .map((place) => ({
-      place,
-      score: scorePlace(place, input, realtime),
-      isMock,
-    }))
+    .map((place) => {
+      const ddareungiNearDest =
+        stations.length === 0 || place.latitude == null || place.longitude == null
+          ? true
+          : nearestDdareungiStation(place.latitude, place.longitude, stations) !== null
+
+      return {
+        place,
+        score: scorePlace(place, input, realtime, ddareungiNearUser, ddareungiNearDest),
+        isMock,
+      }
+    })
     .sort((a, b) => b.score.total - a.score.total)
     .slice(0, 10)
 
   // 실 API 결과만 DB에 캐시
-  if (!isMock) {
+  if (!isMock && !hasUserCoords) {
     await setSnapshot(results, input.district, input.category, input.isFreeOnly)
   }
 

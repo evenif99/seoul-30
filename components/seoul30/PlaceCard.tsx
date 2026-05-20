@@ -19,10 +19,17 @@ interface PlaceCardProps {
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=280&fit=crop&auto=format'
 
 const KNOWN_CATEGORIES = new Set(['culture', 'library', 'park', 'sports', 'welfare'])
+const TRANSIT_MODE_KEYS: Record<NonNullable<ScoreBreakdown['transitMode']>, string> = {
+  도보: 'walk',
+  따릉이: 'bike',
+  버스: 'bus',
+  지하철: 'subway',
+}
 
 export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
   const t = useTranslations('place')
   const tCommon = useTranslations('common')
+  const tTransit = useTranslations('transit')
 
   const categoryLabel = KNOWN_CATEGORIES.has(place.category)
     ? t(`category.${place.category}` as Parameters<typeof t>[0])
@@ -77,6 +84,11 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
               </span>
               {score && (
                 <ScoreBadge score={score} />
+              )}
+              {score?.transitMinutes != null && score.transitMode && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                  {tTransit(TRANSIT_MODE_KEYS[score.transitMode] as Parameters<typeof tTransit>[0])} · {score.transitMinutes}분
+                </span>
               )}
             </div>
 

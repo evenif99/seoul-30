@@ -5,6 +5,8 @@ export interface RecommendationInput {
   category?: string
   isFreeOnly?: boolean
   maxTravelMinutes?: number
+  userLat?: number
+  userLng?: number
 }
 
 export interface ScoreBreakdown {
@@ -15,6 +17,8 @@ export interface ScoreBreakdown {
   timefit: number    // 0–10: 현재 운영 중 여부
   freshness: number  // 0–5:  행사 임박/오늘 진행 여부
   total: number
+  transitMinutes?: number
+  transitMode?: import('@/lib/utils/transit-time').TransitMode
 }
 
 export interface RecommendationResult {

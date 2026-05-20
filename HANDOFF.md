@@ -1,8 +1,20 @@
 # HANDOFF
 
+Last updated: 2026-05-20 (Additional Phase: location-based transit access)
+
 Last updated: 2026-05-20 (Naver Maps 적용 완료 — Leaflet 대체)
 
 ## Current State
+
+### Additional Phase - Location-based transit access scoring
+- Current work adds user-coordinate-aware access scoring without changing the existing district fallback.
+- Browser geolocation is optional. When the user taps the Near Me button, `app/page.tsx` sends `lat` and `lng` to `/api/places`.
+- `/api/places` skips recommendation snapshot cache for coordinate-based requests because cached district/category results cannot safely represent per-user transit minutes.
+- `lib/utils/transit-time.ts` estimates the fastest candidate among walk, Ddareungi, bus, and subway using Seoul-specific speed/overhead assumptions.
+- Ddareungi station data is fetched only server-side and only when `ENABLE_REALTIME_CITY_DATA=true` and user coordinates are present.
+- If Ddareungi data is unavailable, scoring uses the optimistic assumption from the handoff spec.
+- Place cards show a small transit badge with localized mode label and estimated minutes.
+- Verification completed locally: `npx tsc --noEmit`, `npm run test` (48/48), `npm run build`.
 
 Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
 

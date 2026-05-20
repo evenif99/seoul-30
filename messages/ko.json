@@ -10,6 +10,12 @@
       "welfare": "복지시설"
     }
   },
+  "transit": {
+    "walk": "도보",
+    "bike": "따릉이",
+    "bus": "버스",
+    "subway": "지하철"
+  },
   "hero": {
     "headingPart1": "30분",
     "headingPart2": " 안에 갈 수 있는",
@@ -81,6 +87,9 @@
   },
   "common": {
     "loading": "불러오는 중...",
+    "useMyLocation": "내 위치 기반 추천",
+    "locating": "위치 확인 중...",
+    "locationActive": "내 위치 기반",
     "results": "{count}개의 장소를 추천드려요",
     "listView": "목록",
     "mapView": "지도",

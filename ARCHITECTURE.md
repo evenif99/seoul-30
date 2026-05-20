@@ -1,5 +1,7 @@
 # ARCHITECTURE
 
+Last updated: 2026-05-20 (Additional Phase: location-based transit access)
+
 Last updated: 2026-05-20 (Phase 15 complete)
 
 ## Stack
@@ -8,7 +10,7 @@ Last updated: 2026-05-20 (Phase 15 complete)
 - React 19 + TypeScript strict
 - Tailwind CSS v4 + shadcn/ui
 - Prisma 5 + Neon PostgreSQL (ap-southeast-1)
-- Leaflet + OpenStreetMap + react-leaflet + react-leaflet-cluster
+- Naver Maps JavaScript API v3
 - next-intl v4 (i18n)
 - web-push (VAPID Web Push)
 - Vitest + React Testing Library + Playwright
@@ -45,7 +47,7 @@ components/seoul30/
   Hero.tsx
   LanguageToggle.tsx                 # ko/en toggle (Phase 15)
   MapView.tsx                        # dynamic import wrapper (ssr: false)
-  MapViewInner.tsx                   # Leaflet map + clustering
+  MapViewInner.tsx                   # Naver Maps view + grid clustering
   PlaceCard.tsx
   PushSubscribeButton.tsx            # Web Push subscribe/unsubscribe (Phase 14)
   RecentTracker.tsx
@@ -63,7 +65,9 @@ messages/
   en.json                            # English strings
 
 lib/
-  scoring.ts                         # scorePlace — 6 dimensions, KST-aware timefit
+  scoring.ts                         # scorePlace — 6 dimensions, KST-aware timefit + transit access
+  data/ddareungi.ts                  # Seoul bikeList fetcher with 10-minute cache
+  utils/transit-time.ts              # Haversine + transit estimate helpers
   prisma.ts                          # singleton Prisma client
   types/place.ts
   types/recommendation.ts
@@ -118,6 +122,14 @@ Client
           USE_MOCK_DATA=false → Seoul Open API adapters → normalize
        └─ scorePlace() → sort → return top results
 
+Optional location-aware access flow:
+  app/page.tsx geolocation → GET /api/places?lat=&lng=
+       └─ route handler conditionally fetches Ddareungi stations server-side
+       └─ haversineKm(user, place) → estimateTransit()
+       └─ transitAccessScore(minutes) → ScoreBreakdown transitMinutes/transitMode
+
+Coordinate-based requests bypass RecommendationSnapshot because access minutes are user-specific.
+
 Client-side UI filters (no server round-trip):
   search (name/address substring)
   openNow (local time check)
@@ -147,7 +159,7 @@ Client-side UI filters (no server round-trip):
 
 | Dimension | Max | Source |
 |---|---|---|
-| access | 30 | district match |
+| access | 30 | district match fallback, or transit minutes when user/place coordinates exist |
 | relevance | 25 | category match |
 | cost | 15 | isFree / feeText |
 | congestion | 15 | real-time or neutral (8) |
@@ -156,6 +168,13 @@ Client-side UI filters (no server round-trip):
 | **total** | **100** | sum |
 
 `calcTimefit` uses `getUTCHours() + 9h` (fixed KST offset) — timezone-agnostic across all server environments.
+
+Transit access estimate:
+- walk: 4 km/h, 0 min overhead
+- Ddareungi: 13 km/h, 3 min overhead, only when nearby stations exist at user and destination
+- bus: 18 km/h, 5 min overhead
+- subway: 35 km/h, 7 min overhead
+- access buckets: <=10 min 30, <=20 min 25, <=30 min 18, <=40 min 10, <=50 min 4, else 0
 
 ## Env Vars
 
@@ -172,6 +191,7 @@ Client-side UI filters (no server round-trip):
 | `VAPID_PRIVATE_KEY` | server | VAPID signing |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | browser | PushManager.subscribe |
 | `CRON_SECRET` | server | guard /api/push/send |
+| `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` | browser | Naver Maps public key id (`ncpKeyId`) |
 
 ## CI Pipeline
 

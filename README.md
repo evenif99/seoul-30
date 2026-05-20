@@ -8,7 +8,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - Next.js 16 App Router + React 19 + TypeScript strict
 - Tailwind CSS + shadcn/ui
 - Prisma + Neon PostgreSQL (Singapore region)
-- Leaflet + OpenStreetMap (no API key required)
+- Naver Maps JavaScript API v3
 - Vitest + React Testing Library + Playwright
 - Vercel Hobby deployment ($0/month)
 
@@ -40,6 +40,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 24** — Performance/accessibility hardening: ignoreBuildErrors removed, cache headers, PlaceCard i18n
 - **Phase 25** — Release readiness: dead import cleanup, full i18n completion (offline/about/privacy/map), MD sync
 - **Post-25** — Naver Maps 적용: Leaflet 대체, 위성 뷰 토글, 현재 위치 버튼, 그리드 클러스터링, ncpKeyId 인증
+- **Additional Phase** - Location-based transit access scoring: optional browser geolocation, server-side Ddareungi station lookup, transit minutes/mode badges, 48/48 tests passing
 
 ## Local Run
 
@@ -85,6 +86,9 @@ VAPID_PUBLIC_KEY=
 VAPID_PRIVATE_KEY=
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=   # same as VAPID_PUBLIC_KEY
 CRON_SECRET=                    # arbitrary secret string
+
+# Naver Maps (browser-safe public key id)
+NEXT_PUBLIC_NAVER_MAP_CLIENT_ID=
 ```
 
 Security rules:

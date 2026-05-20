@@ -10,7 +10,7 @@ interface ScoreBadgeProps {
 }
 
 const SCORE_REASONS: Array<{
-  key: keyof Omit<ScoreBreakdown, 'total'>
+  key: keyof Omit<ScoreBreakdown, 'total' | 'transitMinutes' | 'transitMode'>
   threshold: number
 }> = [
   { key: 'access',     threshold: 20 },

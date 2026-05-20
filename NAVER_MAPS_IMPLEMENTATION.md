@@ -300,6 +300,29 @@ useEffect(() => { setMounted(true) }, [])
 
 ---
 
+## Additional Phase - Location-based transit access
+
+After the Naver Maps migration, recommendation access scoring was extended beyond district matching:
+
+- `app/page.tsx` adds an optional browser geolocation button and sends `lat`/`lng` to `/api/places`.
+- `app/api/places/route.ts` fetches Ddareungi stations server-side only when realtime city data is enabled and coordinates are present.
+- `lib/utils/transit-time.ts` estimates walk, Ddareungi, bus, and subway times from Haversine distance.
+- `lib/scoring.ts` uses transit minutes for the access dimension when user and place coordinates are available; otherwise it keeps the previous district fallback.
+- Place cards show localized transit mode and minutes in a compact badge.
+- Coordinate-based API requests bypass recommendation snapshot cache because access time is user-specific.
+
+Verification:
+
+```bash
+npx tsc --noEmit
+npm run test
+npm run build
+```
+
+Local result: type-check passed, 48/48 tests passed, production build passed.
+
+---
+
 ## 핵심 교훈
 
 1. **NCP 콘솔과 Naver 디벨로퍼스는 완전히 다른 플랫폼** — Maps API는 반드시 `console.ncloud.com`에서 등록

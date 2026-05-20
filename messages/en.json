@@ -10,6 +10,12 @@
       "welfare": "Welfare Center"
     }
   },
+  "transit": {
+    "walk": "Walk",
+    "bike": "Bike",
+    "bus": "Bus",
+    "subway": "Subway"
+  },
   "hero": {
     "headingPart1": "30-min",
     "headingPart2": " reachable",
@@ -81,6 +87,9 @@
   },
   "common": {
     "loading": "Loading...",
+    "useMyLocation": "Recommend Near Me",
+    "locating": "Locating...",
+    "locationActive": "Near Me",
     "results": "{count} places recommended",
     "listView": "List",
     "mapView": "Map",
