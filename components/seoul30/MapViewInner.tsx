@@ -129,10 +129,10 @@ export default function MapViewInner({ results }: Props) {
             <p className="text-xs text-muted-foreground mt-0.5">
               {selected.district}
               {selected.isFree
-                ? ' · 무료'
+                ? ` · ${t('free')}`
                 : selected.feeText
                 ? ` · ${selected.feeText}`
-                : ' · 유료'}
+                : ` · ${t('paid')}`}
             </p>
           </div>
           <Link

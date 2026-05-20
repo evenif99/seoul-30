@@ -119,15 +119,24 @@
   "lang": {
     "toggle": "한국어"
   },
+  "offline": {
+    "title": "You're offline",
+    "body": "No internet connection. Please check your connection and try again.",
+    "backHome": "Go to home"
+  },
   "about": {
     "title": "About Seoul 30",
     "scoringTitle": "How scores work",
     "dataTitle": "Data sources",
-    "footerLink": "About"
+    "footerLink": "About",
+    "backHome": "Home",
+    "intro": "Seoul 30 recommends public facilities and cultural spaces reachable within 30 minutes by public transit from anywhere in Seoul. No sign-up required — completely free.",
+    "scoringNote": "Each dimension is calculated independently and results are sorted by total score descending."
   },
   "privacy": {
     "title": "Privacy Policy",
-    "footerLink": "Privacy"
+    "footerLink": "Privacy",
+    "backHome": "Home"
   },
   "score": {
     "label": "Score",

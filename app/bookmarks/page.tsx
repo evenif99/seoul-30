@@ -33,6 +33,7 @@ function EmptyMessage({ icon: Icon, message }: { icon: React.ElementType; messag
 
 export default function BookmarksPage() {
   const t = useTranslations('bookmarks')
+  const tNav = useTranslations('nav')
   const [activeTab, setActiveTab] = useState<Tab>('saved')
   const { bookmarks } = useBookmark()
   const { recent } = useRecent()
@@ -50,7 +51,7 @@ export default function BookmarksPage() {
           <Link
             href="/"
             className="p-1.5 -ml-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label="홈으로"
+            aria-label={tNav('home')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>

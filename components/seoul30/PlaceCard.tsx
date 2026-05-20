@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Train, Bus, Footprints, MapPin, Clock, ChevronRight } from 'lucide-react'
+import { MapPin, Clock, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { ScoreBadge } from '@/components/seoul30/ScoreBadge'

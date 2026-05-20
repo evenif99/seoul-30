@@ -119,15 +119,24 @@
   "lang": {
     "toggle": "English"
   },
+  "offline": {
+    "title": "오프라인 상태입니다",
+    "body": "인터넷에 연결되지 않았습니다. 연결을 확인한 후 다시 시도해 주세요.",
+    "backHome": "홈으로 돌아가기"
+  },
   "about": {
     "title": "서비스 소개",
     "scoringTitle": "추천 점수 기준",
     "dataTitle": "데이터 출처",
-    "footerLink": "소개"
+    "footerLink": "소개",
+    "backHome": "홈으로",
+    "intro": "Seoul 30은 서울 시민이 지금 출발 기준으로 30분 이내 대중교통으로 닿을 수 있는 공공시설·문화공간을 추천하는 서비스입니다. 별도 회원가입 없이 무료로 이용할 수 있습니다.",
+    "scoringNote": "각 차원은 독립적으로 계산되며 합산 점수 기준으로 내림차순 정렬합니다."
   },
   "privacy": {
     "title": "개인정보 처리방침",
-    "footerLink": "개인정보"
+    "footerLink": "개인정보",
+    "backHome": "홈으로"
   },
   "score": {
     "label": "추천 점수",

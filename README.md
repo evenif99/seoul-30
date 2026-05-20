@@ -34,6 +34,11 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 18** — Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content link)
 - **Phase 19** — Static pages (About/Privacy) + PWA installability polish (manifest, shortcuts, maskable icon)
 - **Phase 20** — Launch hardening (env validation, /api/health, RUNBOOK.md)
+- **Phase 21** — Observability: structured JSON logs on recommendation flow, /api/diagnostics endpoint
+- **Phase 22** — Data freshness transparency: snapshotAt in API response, relative time in stale banner
+- **Phase 23** — Engagement polish: bookmark count badge, ShareButton/BookmarkButton/Bookmarks page i18n
+- **Phase 24** — Performance/accessibility hardening: ignoreBuildErrors removed, cache headers, PlaceCard i18n
+- **Phase 25** — Release readiness: dead import cleanup, full i18n completion (offline/about/privacy/map), MD sync
 
 ## Local Run
 

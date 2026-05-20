@@ -31,6 +31,11 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 18 | Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content) |
 | 19 | Static pages (About/Privacy) + PWA polish (manifest shortcuts, maskable icon, categories) |
 | 20 | Launch hardening — validateEnv(), /api/health, RUNBOOK.md |
+| 21 | Observability — structured JSON logs on recommendation flow, /api/diagnostics endpoint |
+| 22 | Data freshness transparency — snapshotAt in API response, relative time in stale banner + cache indicator |
+| 23 | Engagement polish — bookmark count badge in BottomTabBar, ShareButton/BookmarkButton/Bookmarks page i18n |
+| 24 | Performance/accessibility hardening — ignoreBuildErrors 제거, static page cache headers, PlaceCard full i18n |
+| 25 | Release readiness — dead import cleanup, MapViewInner i18n, offline/about/privacy i18n 완성, MD 전체 최신화 |
 
 ## Deferred / Not In Scope
 

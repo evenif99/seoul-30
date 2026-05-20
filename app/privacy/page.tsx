@@ -67,7 +67,7 @@ export default async function PrivacyPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          {isKo ? '홈으로' : 'Home'}
+          {t('backHome')}
         </Link>
 
         <h1 className="text-2xl font-bold text-foreground mb-1">{t('title')}</h1>

@@ -30,24 +30,16 @@ export default async function AboutPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          {isKo ? '홈으로' : 'Home'}
+          {t('backHome')}
         </Link>
 
         <h1 className="text-2xl font-bold text-foreground mb-2">{t('title')}</h1>
-        <p className="text-sm text-muted-foreground mb-8">
-          {isKo
-            ? 'Seoul 30은 서울 시민이 지금 출발 기준으로 30분 이내 대중교통으로 닿을 수 있는 공공시설·문화공간을 추천하는 서비스입니다. 별도 회원가입 없이 무료로 이용할 수 있습니다.'
-            : 'Seoul 30 recommends public facilities and cultural spaces reachable within 30 minutes by public transit from anywhere in Seoul. No sign-up required — completely free.'}
-        </p>
+        <p className="text-sm text-muted-foreground mb-8">{t('intro')}</p>
 
         {/* 추천 점수 기준 */}
         <section className="mb-8">
           <h2 className="text-base font-semibold text-foreground mb-3">{t('scoringTitle')}</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            {isKo
-              ? '각 장소는 아래 6가지 항목을 합산한 100점 만점 점수로 정렬됩니다.'
-              : 'Each place is ranked by a 100-point score combining six dimensions.'}
-          </p>
+          <p className="text-sm text-muted-foreground mb-4">{t('scoringNote')}</p>
           <div className="bg-card border border-border rounded-2xl divide-y divide-border">
             {SCORING_DIMENSIONS.map((d) => (
               <div key={d.key} className="flex items-start gap-3 px-4 py-3">

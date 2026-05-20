@@ -1,10 +1,20 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 24 complete)
+Last updated: 2026-05-20 (Phase 25 complete — Phase 21-25 전체 완료)
 
 ## Current State
 
 Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+
+### Phase 25 — Release readiness
+- `components/seoul30/PlaceCard.tsx` — `Train`, `Bus`, `Footprints` 미사용 import 제거
+- `components/seoul30/MapViewInner.tsx` — 지도 팝업 무료/유료 `t('common.free')` / `t('common.paid')` 적용
+- `app/bookmarks/page.tsx` — `aria-label="홈으로"` → `tNav('home')` 적용
+- `app/offline/page.tsx` — 전체 i18n: `getTranslations('offline')` 서버 컴포넌트로 리팩터
+- `app/about/page.tsx` + `app/privacy/page.tsx` — `isKo` 분기 제거: `t('backHome')`, `t('intro')`, `t('scoringNote')` 사용
+- `messages/ko.json` + `messages/en.json` — `offline`, `about.backHome/intro/scoringNote`, `privacy.backHome` 추가
+- TASKS.md, PROJECT_SCOPE.md, README.md Phase 21-25 전체 반영
+- TypeScript 오류 없음, 43/43 통과
 
 ### Phase 24 — 성능/접근성 하드닝
 - `next.config.mjs` — `typescript: { ignoreBuildErrors: true }` 제거 (빌드 시 타입 오류 차단)
