@@ -25,7 +25,7 @@ export function MapView({ results }: MapViewProps) {
     <div className="relative">
       {mounted && (
         <Script
-          src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${CLIENT_ID}`}
+          src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${CLIENT_ID}`}
           strategy="afterInteractive"
           onLoad={() => setReady(true)}
           onError={() => console.error('[NaverMaps] script load failed')}
