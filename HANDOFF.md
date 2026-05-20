@@ -1,10 +1,18 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 22 complete)
+Last updated: 2026-05-20 (Phase 23 complete)
 
 ## Current State
 
 Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+
+### Phase 23 — Engagement polish (저장 UX + i18n 완성)
+- `components/seoul30/BottomTabBar.tsx` — `useBookmark()` 추가, 북마크 수 배지 (0개면 숨김, 100+이면 99+)
+- `components/seoul30/ShareButton.tsx` — `useTranslations('share')` 적용 (하드코딩 제거)
+- `components/seoul30/BookmarkButton.tsx` — `useTranslations('bookmark')` 적용 (aria-label 하드코딩 제거)
+- `app/bookmarks/page.tsx` — `useTranslations('bookmarks')` 적용 (전체 한국어 하드코딩 제거)
+- `messages/ko.json` + `messages/en.json` — `share`, `bookmark`, `bookmarks`, `nav.bookmarkCount` 네임스페이스 추가
+- `tests/components/BottomTabBar.test.tsx` — 3 tests: 배지 없음 / 카운트 표시 / 99+ 처리 (43/43 통과)
 
 ### Phase 22 — 데이터 신뢰성 투명화
 - `lib/types/api.ts` — `ApiResponse`에 `snapshotAt?: string | null` 필드 추가

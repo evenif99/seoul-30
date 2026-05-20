@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Share2, Check } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface ShareButtonProps {
   title: string
@@ -10,6 +11,7 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ title, text, url }: ShareButtonProps) {
+  const t = useTranslations('share')
   const [copied, setCopied] = useState(false)
 
   async function handleShare() {
@@ -35,17 +37,17 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
     <button
       onClick={handleShare}
       className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-      aria-label="장소 링크 공유"
+      aria-label={t('ariaLabel')}
     >
       {copied ? (
         <>
           <Check className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
-          <span className="text-primary font-medium">복사됨</span>
+          <span className="text-primary font-medium">{t('copied')}</span>
         </>
       ) : (
         <>
           <Share2 className="w-3.5 h-3.5" aria-hidden="true" />
-          <span>공유</span>
+          <span>{t('button')}</span>
         </>
       )}
     </button>

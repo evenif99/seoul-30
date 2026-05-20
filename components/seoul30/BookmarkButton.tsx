@@ -1,6 +1,7 @@
 'use client'
 
 import { Bookmark } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useBookmark } from '@/hooks/use-bookmark'
 import { cn } from '@/lib/utils'
 
@@ -10,6 +11,7 @@ interface BookmarkButtonProps {
 }
 
 export function BookmarkButton({ placeId, className }: BookmarkButtonProps) {
+  const t = useTranslations('bookmark')
   const { isBookmarked, toggle } = useBookmark()
   const active = isBookmarked(placeId)
 
@@ -20,7 +22,7 @@ export function BookmarkButton({ placeId, className }: BookmarkButtonProps) {
         e.preventDefault()
         toggle(placeId)
       }}
-      aria-label={active ? '북마크 취소' : '북마크 저장'}
+      aria-label={active ? t('remove') : t('save')}
       aria-pressed={active}
       className={cn(
         'w-7 h-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors shrink-0',

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Bookmark, Clock } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useBookmark } from '@/hooks/use-bookmark'
 import { useRecent } from '@/hooks/use-recent'
 import { MOCK_PLACES } from '@/lib/mock/places'
@@ -18,18 +19,20 @@ function resolvePlaces(ids: string[]): NormalizedPlace[] {
 }
 
 function EmptyMessage({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
+  const t = useTranslations('bookmarks')
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center px-6">
       <Icon className="w-10 h-10 text-muted-foreground/40 mb-3" aria-hidden="true" />
       <p className="text-sm text-muted-foreground">{message}</p>
       <Link href="/" className="mt-4 text-sm text-primary hover:underline">
-        장소 탐색하러 가기
+        {t('backToExplore')}
       </Link>
     </div>
   )
 }
 
 export default function BookmarksPage() {
+  const t = useTranslations('bookmarks')
   const [activeTab, setActiveTab] = useState<Tab>('saved')
   const { bookmarks } = useBookmark()
   const { recent } = useRecent()
@@ -51,7 +54,7 @@ export default function BookmarksPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-base font-bold text-foreground">나의 장소</h1>
+          <h1 className="text-base font-bold text-foreground">{t('title')}</h1>
         </div>
 
         {/* 탭 */}
@@ -67,7 +70,7 @@ export default function BookmarksPage() {
             }`}
           >
             <Bookmark className="w-3.5 h-3.5" aria-hidden="true" />
-            저장됨
+            {t('saved')}
             {bookmarks.length > 0 && (
               <span className="text-[10px] bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 leading-none">
                 {bookmarks.length}
@@ -85,23 +88,17 @@ export default function BookmarksPage() {
             }`}
           >
             <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-            최근 본
+            {t('recent')}
           </button>
         </div>
 
         {/* 장소 목록 */}
-        <section aria-label={activeTab === 'saved' ? '저장된 장소 목록' : '최근 본 장소 목록'}>
+        <section aria-label={activeTab === 'saved' ? t('savedLabel') : t('recentLabel')}>
           {places.length === 0 ? (
             activeTab === 'saved' ? (
-              <EmptyMessage
-                icon={Bookmark}
-                message="저장된 장소가 없어요. 장소 카드의 북마크 버튼을 눌러보세요."
-              />
+              <EmptyMessage icon={Bookmark} message={t('emptySaved')} />
             ) : (
-              <EmptyMessage
-                icon={Clock}
-                message="최근 본 장소가 없어요. 장소를 탐색해보세요."
-              />
+              <EmptyMessage icon={Clock} message={t('emptyRecent')} />
             )
           ) : (
             <div className="flex flex-col gap-3 pb-10">

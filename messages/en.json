@@ -46,7 +46,27 @@
     "home": "Home",
     "bookmarks": "Saved",
     "bottomLabel": "Bottom navigation",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "bookmarkCount": "{count} saved"
+  },
+  "share": {
+    "button": "Share",
+    "copied": "Copied",
+    "ariaLabel": "Share place link"
+  },
+  "bookmark": {
+    "save": "Save bookmark",
+    "remove": "Remove bookmark"
+  },
+  "bookmarks": {
+    "title": "My Places",
+    "saved": "Saved",
+    "recent": "Recent",
+    "emptySaved": "No saved places yet. Tap the bookmark icon on a place card.",
+    "emptyRecent": "No recently viewed places. Start exploring.",
+    "backToExplore": "Explore places",
+    "savedLabel": "Saved places list",
+    "recentLabel": "Recently viewed list"
   },
   "common": {
     "loading": "Loading...",
