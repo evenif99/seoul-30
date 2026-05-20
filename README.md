@@ -1,81 +1,91 @@
 # Seoul 30
 
-Seoul 30 is a low-cost MVP PWA that recommends Seoul public places reachable within 30 minutes.
-It is built as a deployable portfolio app with mock-first behavior and optional real public API integration.
+Seoul 30 is a low-cost MVP PWA that recommends Seoul public places reachable within 30 minutes by public transit.
+Built as a deployable portfolio app with mock-first behavior and optional real public API integration.
 
 ## Tech Stack
-- Next.js 16 App Router
-- React 19 + TypeScript strict
+
+- Next.js 16 App Router + React 19 + TypeScript strict
 - Tailwind CSS + shadcn/ui
-- Prisma + Neon PostgreSQL
-- Leaflet + OpenStreetMap
-- Vercel Hobby deployment
+- Prisma + Neon PostgreSQL (Singapore region)
+- Leaflet + OpenStreetMap (no API key required)
+- Vitest + React Testing Library + Playwright
+- Vercel Hobby deployment ($0/month)
 
 ## Phase Status
-- Phase 1-11 complete:
-  - setup, core logic, UI, PWA, real API adapters, cache, map view, production hardening
-- Phase 12 complete:
-  - Vitest unit tests for `lib/scoring.ts`
-  - React Testing Library component tests for `PlaceCard`, `FilterBar`, `BookmarkButton`
-  - Playwright E2E golden paths:
-    - home -> place detail
-    - search filter -> results update
-  - CI expanded to run unit/component tests + E2E before build
-- Phase 13 complete:
-  - Anonymous place rating (👍 / 👎) — no login required
-  - `PlaceFeedback` DB model (Prisma + Neon), sessionId from `localStorage`
-  - `GET /api/places/[id]/feedback` — aggregate counts
-  - `POST /api/places/[id]/feedback` — upsert with toggle support
-  - `FeedbackPanel` component on place detail page with optimistic UI
-- Phase 15 complete:
-  - i18n with next-intl v4 (cookie-based, no URL restructuring)
-  - `ko` (Korean, default) / `en` (English) support
-  - `messages/ko.json` + `messages/en.json` — hero, filter, nav, common, feedback, push
-  - `LanguageToggle` button in Header (mobile) and desktop bar
-  - All key components updated: Hero, FilterBar, EmptyState, BottomTabBar, FeedbackPanel, PushSubscribeButton, MapViewInner, place detail page
-- Phase 14 complete:
-  - PWA Web Push notifications via VAPID + `web-push`
-  - `WebPushSubscription` DB model (endpoint-deduped upsert)
-  - `POST /api/push/subscribe` + `DELETE` — subscribe / unsubscribe
-  - `GET|POST /api/push/send` — broadcasts to all subscribers, auto-removes expired endpoints
-  - Vercel Cron: daily 09:00 KST trigger via `vercel.json`
-  - `PushSubscribeButton` component in Header (mobile) and desktop bar
-  - `usePush` hook — permission flow, subscribe/unsubscribe, state machine
+
+- **Phase 1** — Project setup, Next.js scaffold, Tailwind, shadcn/ui
+- **Phase 2** — Mock data, scoring model (access / relevance / cost / congestion / timefit / freshness)
+- **Phase 3** — PlaceCard UI, FilterBar (category / crowd / time / free-only)
+- **Phase 4** — PWA baseline (manifest, service worker, offline page)
+- **Phase 5** — Seoul Open API adapters (culture events, culture spaces)
+- **Phase 6** — DB caching layer (RecommendationSnapshot, ExternalCache via Prisma + Neon)
+- **Phase 7** — Search filter, open-now filter, URL query param sync
+- **Phase 8** — Bookmarks and recent views (localStorage + dedicated pages)
+- **Phase 9** — SEO (OG image, share button, sitemap, JSON-LD)
+- **Phase 10** — Production hardening (rate limiting middleware, error boundary, CI build checks)
+- **Phase 11** — Map view (Leaflet + OpenStreetMap, marker clustering, bounds controller)
+- **Phase 12** — Testing suite (Vitest unit + RTL component + Playwright E2E, CI integration)
+- **Phase 13** — Anonymous place rating (👍 / 👎, PlaceFeedback DB model, optimistic UI)
+- **Phase 14** — PWA Web Push notifications (VAPID, WebPushSubscription DB model, Vercel Cron)
+- **Phase 15** — i18n with next-intl v4 (ko/en, cookie-based locale, LanguageToggle)
 
 ## Local Run
+
 ```bash
 git clone https://github.com/evenif99/seoul-30.git
 cd seoul-30
 npm install
 cp .env.example .env.local
+# fill in .env.local values (see Environment Variables below)
 npm run dev
 ```
 
 ## Test Commands
+
 ```bash
-npm run test
-npm run test:e2e
-npx tsc --noEmit
-npm run build
+npm run test          # Vitest unit + component tests
+npm run test:e2e      # Playwright E2E
+npx tsc --noEmit      # type check
+npm run build         # production build
 ```
 
 ## Environment Variables
+
 ```bash
+# Database
 DATABASE_URL=
+
+# Seoul Open API (server-side only)
 SEOUL_OPEN_API_KEY=
+
+# Canonical URL for OG / sitemap
 NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app
+
+# Feature flags
 USE_MOCK_DATA=true
 ENABLE_REALTIME_CITY_DATA=false
 ENABLE_CULTURE_EVENTS_API=false
+
+# Phase 14 — Web Push (VAPID)
+# Generate keys: npx web-push generate-vapid-keys
+VAPID_EMAIL=admin@example.com
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=   # same as VAPID_PUBLIC_KEY
+CRON_SECRET=                    # arbitrary secret string
 ```
 
-Rules:
-- Keep secrets only in env files or deployment env vars.
-- Never expose server-only keys to client code.
+Security rules:
+- All API keys in `.env.local` or deployment env vars only — never in code
+- Server-side external API calls only (Route Handlers)
+- `NEXT_PUBLIC_` prefix only for values safe to expose to the browser
 
-## Current Known Notes
-- Next.js warns that `middleware.ts` naming is deprecated and should move to `proxy`.
-- In this local Windows environment, Playwright tests pass but process exit can sometimes hang after completion.
+## Known Notes
+
+- Next.js warns `middleware.ts` naming is deprecated (migration to `proxy` deferred).
+- On Windows, Playwright process exit can hang after tests pass — tests themselves pass correctly.
 
 ## License
+
 MIT

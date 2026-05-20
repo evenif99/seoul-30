@@ -1,54 +1,67 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 12 complete)
+Last updated: 2026-05-20 (Phase 15 complete)
 
-## Completed
-- Phase 12 testing suite implementation is complete.
-- Added Vitest unit tests for scoring logic.
-- Added component tests for `PlaceCard`, `FilterBar`, and `BookmarkButton`.
-- Added Playwright E2E golden-path tests.
-- Updated CI workflow to include test execution before build.
-- Updated `.gitignore` for generated test/build artifacts.
+## Current State
 
-## Pending
-- Phase 13 implementation (anonymous rating).
-- Optional improvement: local Playwright shutdown behavior on Windows.
+Phase 15 (i18n) is complete and pushed to `main`. The app is fully functional with Korean (default) and English support. All previous phases (1–14) are stable.
 
-## Files Changed
-- `.github/workflows/ci.yml`
-- `.gitignore`
-- `components/seoul30/BookmarkButton.tsx`
-- `components/seoul30/FilterBar.tsx`
-- `package.json`
-- `package-lock.json`
-- `playwright.config.ts`
-- `vitest.config.ts`
-- `tests/setup.tsx`
-- `tests/unit/scoring.test.ts`
-- `tests/components/PlaceCard.test.tsx`
-- `tests/components/FilterBar.test.tsx`
-- `tests/components/BookmarkButton.test.tsx`
-- `tests/e2e/home.spec.ts`
-- `README.md`
-- `PROJECT_SCOPE.md`
-- `ARCHITECTURE.md`
-- `TASKS.md`
-- `HANDOFF.md`
+## What Was Done (Phase 13–15)
 
-## Verification Run
-- `npm run test` passed (unit/component tests).
-- `npx tsc --noEmit` passed.
-- `npm run test:e2e`:
-  - test cases pass (`ok` for both scenarios),
-  - local command can time out on exit in this Windows environment.
-- `npm run build` passed when run with network access allowed (font fetch required by Next build).
+### Phase 13 — Anonymous Place Rating
+- `PlaceFeedback` model added to `prisma/schema.prisma` (unique: placeId + sessionId)
+- `GET /api/places/[id]/feedback` — returns `{ up, down }` aggregate counts
+- `POST /api/places/[id]/feedback` — upsert with toggle support (same vote = cancel)
+- `hooks/use-feedback.ts` — optimistic UI, localStorage vote cache, rollback on error
+- `components/seoul30/FeedbackPanel.tsx` — 👍/👎 buttons on place detail page
 
-## Exact Next Action
-1. Start Phase 13 by adding `PlaceFeedback` model to `prisma/schema.prisma`.
-2. Implement `POST /api/places/[id]/feedback` with session-based duplicate prevention.
-3. Add UI controls on place detail for up/down voting and aggregate display.
+### Phase 14 — PWA Web Push Notifications
+- `WebPushSubscription` model (Prisma + Neon), endpoint-unique upsert
+- `POST /api/push/subscribe` + `DELETE` — subscribe / unsubscribe
+- `GET|POST /api/push/send` — broadcast push, auto-prune 410/404 endpoints
+- `vercel.json` — Vercel Cron daily 09:00 KST
+- `hooks/use-push.ts` — permission flow, subscribe/unsubscribe state machine
+- `components/seoul30/PushSubscribeButton.tsx` — in Header (mobile) and desktop bar
+- `public/sw.js` — push + notificationclick event handlers added
 
-## Do-Not-Touch Notes
-- Keep API keys server-side only (`lib/config/env.ts` + route handlers).
-- Avoid editing `components/ui/` unless directly required.
-- Do not commit `.env.local` or real secret values.
+### Phase 15 — i18n (next-intl v4)
+- Cookie-based locale (`NEXT_LOCALE`), no URL restructuring
+- `messages/ko.json` + `messages/en.json` — all key UI namespaces
+- `i18n/request.ts` — `getRequestConfig` reads cookie, falls back to `ko`
+- `next.config.mjs` — wrapped with `createNextIntlPlugin`
+- `app/layout.tsx` — `NextIntlClientProvider` + dynamic `html lang` attribute
+- `components/seoul30/LanguageToggle.tsx` — sets cookie, reloads page
+- All key components updated: Hero, FilterBar, EmptyState, BottomTabBar, FeedbackPanel, PushSubscribeButton, MapViewInner, place detail page
+
+## Do-Not-Touch Rules
+
+- API keys server-side only (`lib/config/env.ts` + Route Handlers)
+- Do not commit `.env.local` or any real secret values
+- Do not edit `components/ui/` unless directly required by the phase
+- `NEXT_PUBLIC_` prefix only for values safe to expose to the browser
+- No scope creep beyond the requested phase
+
+## Env Vars Needed for Full Function
+
+```bash
+DATABASE_URL=                        # Neon PostgreSQL
+SEOUL_OPEN_API_KEY=                  # Seoul Open API (server-side)
+NEXT_PUBLIC_BASE_URL=                # canonical domain
+USE_MOCK_DATA=true                   # set false to use real API
+VAPID_EMAIL=                         # Web Push identity
+VAPID_PUBLIC_KEY=                    # generate: npx web-push generate-vapid-keys
+VAPID_PRIVATE_KEY=
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=        # same value as VAPID_PUBLIC_KEY
+CRON_SECRET=                         # arbitrary secret, guards /api/push/send
+```
+
+## Verification Status (Phase 15)
+
+- `npx tsc --noEmit` — passed
+- `npm run test` — 12/12 unit + component tests passing
+- Dev server running on `localhost:3001`
+- All key UI strings render in both `ko` and `en` via LanguageToggle
+
+## Next Action
+
+Start Phase 16 planning. See `PROJECT_SCOPE.md` for constraints before proposing scope.
