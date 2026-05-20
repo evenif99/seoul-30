@@ -1,10 +1,22 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 23 complete)
+Last updated: 2026-05-20 (Phase 24 complete)
 
 ## Current State
 
 Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+
+### Phase 24 — 성능/접근성 하드닝
+- `next.config.mjs` — `typescript: { ignoreBuildErrors: true }` 제거 (빌드 시 타입 오류 차단)
+- `next.config.mjs` — `/about`, `/privacy` Cache-Control 헤더 추가 (`max-age=3600, stale-while-revalidate=86400`)
+- `components/seoul30/PlaceCard.tsx` — `'use client'` + `useTranslations('place')` 적용
+  - 카테고리 레이블: ko/en 분리 (`place.category.*`)
+  - 무료/유료 뱃지: `tCommon('free')` / `tCommon('paid')`
+  - CTA "상세 보기" → `t('viewDetail')`
+  - `aria-label` → `t('ariaLabel', { name })`
+  - 알 수 없는 카테고리는 원본 값 fallback (KNOWN_CATEGORIES Set)
+- `messages/ko.json` + `messages/en.json` — `place` 네임스페이스 추가 (viewDetail, ariaLabel, category.*)
+- TypeScript 오류 없음, 43/43 통과
 
 ### Phase 23 — Engagement polish (저장 UX + i18n 완성)
 - `components/seoul30/BottomTabBar.tsx` — `useBookmark()` 추가, 북마크 수 배지 (0개면 숨김, 100+이면 99+)

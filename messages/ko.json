@@ -1,4 +1,15 @@
 {
+  "place": {
+    "viewDetail": "상세 보기",
+    "ariaLabel": "{name} 상세 보기",
+    "category": {
+      "culture": "문화/전시",
+      "library": "도서관",
+      "park": "공원",
+      "sports": "스포츠",
+      "welfare": "복지시설"
+    }
+  },
   "hero": {
     "headingPart1": "30분",
     "headingPart2": " 안에 갈 수 있는",

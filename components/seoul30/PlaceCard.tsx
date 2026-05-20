@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Train, Bus, Footprints, MapPin, Clock, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { ScoreBadge } from '@/components/seoul30/ScoreBadge'
 import type { NormalizedPlace } from '@/lib/types/place'
@@ -15,24 +16,23 @@ interface PlaceCardProps {
   priority?: boolean
 }
 
-const CATEGORY_LABEL: Record<string, string> = {
-  culture: '문화/전시',
-  library: '도서관',
-  park: '공원',
-  sports: '스포츠',
-  welfare: '복지시설',
-}
-
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=280&fit=crop&auto=format'
 
+const KNOWN_CATEGORIES = new Set(['culture', 'library', 'park', 'sports', 'welfare'])
+
 export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
-  const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
+  const t = useTranslations('place')
+  const tCommon = useTranslations('common')
+
+  const categoryLabel = KNOWN_CATEGORIES.has(place.category)
+    ? t(`category.${place.category}` as Parameters<typeof t>[0])
+    : place.category
 
   return (
     <Link
       href={`/place/${place.id}`}
       className="block bg-card rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow"
-      aria-label={`${place.name} 상세 보기`}
+      aria-label={t('ariaLabel', { name: place.name })}
     >
       <article>
         <div className="flex gap-0">
@@ -73,7 +73,7 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
                   ? 'bg-accent text-accent-foreground'
                   : 'bg-secondary text-secondary-foreground'
               )}>
-                {place.isFree ? '무료' : (place.feeText ?? '유료')}
+                {place.isFree ? tCommon('free') : (place.feeText ?? tCommon('paid'))}
               </span>
               {score && (
                 <ScoreBadge score={score} />
@@ -103,7 +103,7 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
         {/* CTA */}
         <div className="border-t border-border px-4 py-2.5">
           <span className="w-full flex items-center justify-center gap-1 text-xs font-medium text-primary">
-            상세 보기
+            {t('viewDetail')}
             <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
           </span>
         </div>

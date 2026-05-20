@@ -1,4 +1,15 @@
 {
+  "place": {
+    "viewDetail": "View details",
+    "ariaLabel": "View details for {name}",
+    "category": {
+      "culture": "Culture/Exhibition",
+      "library": "Library",
+      "park": "Park",
+      "sports": "Sports",
+      "welfare": "Welfare Center"
+    }
+  },
   "hero": {
     "headingPart1": "30-min",
     "headingPart2": " reachable",
