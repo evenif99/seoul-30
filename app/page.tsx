@@ -30,7 +30,8 @@ const DEFAULT_FILTERS: ActiveFilters = {
 function isOpenNow(place: NormalizedPlace): boolean {
   if (!place.openTimeText || !place.closeTimeText) return true
   const now = new Date()
-  const cur = now.getHours() * 60 + now.getMinutes()
+  // scoring.ts의 calcTimefit과 동일하게 KST(UTC+9) 고정 오프셋 사용
+  const cur = (now.getUTCHours() * 60 + now.getUTCMinutes() + 9 * 60) % (24 * 60)
   const [oh, om] = place.openTimeText.split(':').map(Number)
   const [ch, cm] = place.closeTimeText.split(':').map(Number)
   if (oh === 0 && om === 0 && ch === 23 && cm === 59) return true
