@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-20 (Phase 19 complete)
+Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
 ## Completed Phases (1–15)
 
@@ -80,9 +80,17 @@ Last updated: 2026-05-20 (Phase 19 complete)
 - [x] `tests/unit/manifest.test.ts` — 5 tests
 - [x] TypeScript check + 24/24 tests passing
 
-## Open Items
+### Phase 20 — Launch Hardening
+- [x] `lib/config/env.ts` — `validateEnv()` 추가 (DATABASE_URL, SEOUL_OPEN_API_KEY, VAPID 쌍 검증)
+- [x] `app/api/health/route.ts` — GET /api/health (env 검증 + DB ping)
+- [x] `RUNBOOK.md` — 헬스 체크, 시나리오별 대응, 시크릿 교체, 배포/롤백 절차
+- [x] `tests/unit/env.test.ts` — validateEnv 5 tests
+- [x] TypeScript check + 29/29 tests passing
 
-- [ ] Phase 20 scope TBD
+## Deferred Items
+
+- Middleware proxy migration — 현 rate limiter 구조로 충분, 변경 불필요
+- Playwright Windows exit-hang — 로컬 한정 이슈, CI 통과 확인됨
 - [ ] Middleware `proxy` migration (deferred — not blocking)
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 

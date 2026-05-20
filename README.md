@@ -33,6 +33,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 17** — Stale cache fallback when Seoul Open API fails + defensive hardening (feedback/push try-catch, CRON_SECRET auth, use-push error state)
 - **Phase 18** — Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content link)
 - **Phase 19** — Static pages (About/Privacy) + PWA installability polish (manifest, shortcuts, maskable icon)
+- **Phase 20** — Launch hardening (env validation, /api/health, RUNBOOK.md)
 
 ## Local Run
 

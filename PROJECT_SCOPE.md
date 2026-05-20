@@ -1,13 +1,13 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-20 (Phase 19 complete)
+Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
 ## Product Goal
 
 Low-cost MVP PWA that recommends Seoul public places reachable within 30 minutes by public transit.
 Dual purpose: working portfolio piece + real deployable service at $0/month.
 
-## Completed Scope (Phase 1–19)
+## Completed Scope (Phase 1–20)
 
 | Phase | Summary |
 |---|---|
@@ -30,10 +30,12 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 17 | Stale cache fallback (Seoul API 장애 시 만료 스냅샷 반환) + defensive hardening |
 | 18 | Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content) |
 | 19 | Static pages (About/Privacy) + PWA polish (manifest shortcuts, maskable icon, categories) |
+| 20 | Launch hardening — validateEnv(), /api/health, RUNBOOK.md |
 
-## Deferred / Not Started
+## Deferred / Not In Scope
 
-- Phase 20 (TBD)
+- Middleware proxy migration (rate limiter 현 구조로 충분, 변경 불필요)
+- Playwright Windows exit-hang (로컬 한정, CI 통과 확인됨)
 - Authentication / user accounts
 - Admin dashboard
 - Vector DB / AI-powered recommendations

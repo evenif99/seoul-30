@@ -1,0 +1,140 @@
+# RUNBOOK
+
+Seoul 30 운영 런북. 배포 후 문제 발생 시 첫 번째로 참조한다.
+
+---
+
+## 헬스 체크
+
+```
+GET /api/health
+```
+
+| 응답 | 의미 |
+|---|---|
+| `{ "status": "ok", "db": "ok" }` | 정상 |
+| `{ "status": "degraded", "db": "error" }` | DB 연결 실패 (503) |
+| `{ "status": "error", "error": "[env] ..." }` | 필수 환경변수 누락 (503) |
+
+배포 직후 반드시 확인할 것. `curl https://seoul-30.vercel.app/api/health`
+
+---
+
+## 시나리오별 대응
+
+### 1. DB 연결 실패 (`/api/health` → `db: error`)
+
+**원인**: Neon 프리 티어 슬립, 연결 풀 소진, 자격증명 만료
+
+**대응**:
+1. [Neon 콘솔](https://console.neon.tech) 접속 → 프로젝트 상태 확인
+2. Vercel 대시보드 → Settings → Environment Variables → `DATABASE_URL` 값 확인
+3. Neon에서 연결 문자열 재발급 후 Vercel에 재설정 → Redeploy
+
+### 2. 서울 Open API 장애 (데이터 오래됨 배너 노출)
+
+**Phase 17 자동 처리**: API 빈 응답 시 DB 스냅샷(캐시)으로 자동 폴백, 앰버 배너 표시
+- 캐시 TTL: 1시간. 스냅샷이 없으면 mock 데이터로 폴백
+
+**수동 확인**: `ENABLE_CULTURE_EVENTS_API=false` 로 설정하면 항상 mock 모드
+
+**API 복구 확인**: 서울 열린데이터광장(data.seoul.go.kr) 상태 페이지 참조
+
+### 3. 환경변수 오류 (`/api/health` → `status: error`)
+
+에러 메시지에 누락된 변수명이 명시됨.
+
+```
+[env] Configuration error:
+  • DATABASE_URL is required
+```
+
+Vercel → Settings → Environment Variables → 해당 변수 추가 후 Redeploy.
+
+### 4. 푸시 알림 미발송
+
+**체크리스트**:
+- Vercel Cron 설정 확인: `vercel.json` → `/api/push/send` 매일 09:00 KST
+- `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL` 환경변수 존재 여부 확인
+
+**수동 발송 테스트**:
+```bash
+curl -X POST https://seoul-30.vercel.app/api/push/send \
+  -H "Authorization: Bearer {CRON_SECRET}"
+```
+
+응답: `{ "sent": N, "total": M }`
+
+**구독자가 0명인 경우**: 정상 (`sent: 0, total: 0`)
+
+### 5. 높은 오류율 (Vercel Functions)
+
+1. Vercel 대시보드 → Observability → Functions → 오류 로그 확인
+2. 오류가 Prisma 연결이면 → 시나리오 1
+3. 오류가 외부 API이면 → 시나리오 2
+4. 오류가 `validateEnv`이면 → 시나리오 3
+
+---
+
+## 시크릿 교체 절차
+
+### CRON_SECRET 교체
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+```
+
+1. Vercel → Environment Variables → `CRON_SECRET` 업데이트
+2. Redeploy
+3. 기존 Cron 요청은 다음 실행 시 자동 적용
+
+### VAPID 키 교체
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+주의: 키를 교체하면 **모든 기존 푸시 구독이 무효화**된다.
+구독자는 재구독 필요. DB의 `WebPushSubscription` 테이블을 먼저 비울 것.
+
+```sql
+TRUNCATE "WebPushSubscription";
+```
+
+---
+
+## 배포 절차
+
+```bash
+git push origin master
+# → Vercel 자동 배포 (약 2~3분)
+# → 배포 후: curl /api/health 확인
+```
+
+### 롤백
+
+Vercel 대시보드 → Deployments → 직전 배포 → `...` → **Promote to Production**
+
+---
+
+## 로컬 개발
+
+```bash
+npm run dev          # localhost:3001 (3000은 다른 프로젝트 사용 중)
+npm run test         # Vitest unit + component (29 tests)
+npx tsc --noEmit     # 타입 체크
+npx prisma studio    # DB GUI
+```
+
+### 필수 환경변수 (.env.local)
+
+| 변수 | 필수 | 설명 |
+|---|---|---|
+| `DATABASE_URL` | ✅ | Neon PostgreSQL 연결 문자열 |
+| `SEOUL_OPEN_API_KEY` | 조건부 | `ENABLE_CULTURE_EVENTS_API=true` 시 필수 |
+| `NEXT_PUBLIC_BASE_URL` | 권장 | OG/sitemap 절대 URL |
+| `VAPID_EMAIL` | 푸시 사용 시 | `mailto:` 형식 |
+| `VAPID_PUBLIC_KEY` | 푸시 사용 시 | `npx web-push generate-vapid-keys` |
+| `VAPID_PRIVATE_KEY` | 푸시 사용 시 | 위와 동일 커맨드 |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | 푸시 사용 시 | `VAPID_PUBLIC_KEY`와 동일 값 |
+| `CRON_SECRET` | 푸시 사용 시 | 임의 32바이트 base64url 문자열 |

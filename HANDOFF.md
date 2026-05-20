@@ -1,10 +1,10 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 19 complete)
+Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
 ## Current State
 
-Phase 19 (static pages + PWA polish) is complete. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
 
 ## What Was Done (Phase 13–17)
 
@@ -97,12 +97,22 @@ CRON_SECRET=                         # arbitrary secret, guards /api/push/send
 - `app/page.tsx` — 리스트 하단 About · Privacy 푸터 링크
 - `tests/unit/manifest.test.ts` — 5 tests (24/24 통과)
 
-## Verification Status (Phase 19)
+### Phase 20 — Launch Hardening
+- `lib/config/env.ts` — `validateEnv()`: DATABASE_URL 필수 확인, ENABLE_CULTURE_EVENTS_API=true 시 SEOUL_OPEN_API_KEY 확인, VAPID 키 쌍 일치 확인. process.env 직접 읽어 vi.stubEnv 테스트 가능
+- `app/api/health/route.ts` — `GET /api/health`: validateEnv() → DB `SELECT 1` ping → `{ status, db, timestamp }` 반환. 503 on failure.
+- `RUNBOOK.md` — 헬스 체크 명령, 5개 장애 시나리오 대응, 시크릿 교체 절차, 배포/롤백 방법, 로컬 개발 환경변수 표
+- `tests/unit/env.test.ts` — 5 tests (29/29 통과)
+
+## Verification Status (Phase 20 — Final)
 
 - `npx tsc --noEmit` — passed
-- `npm run test` — 24/24 unit + component tests passing
+- `npm run test` — 29/29 unit + component tests passing
+- `GET /api/health` — env + DB 상태 확인 엔드포인트 가동
 - Dev server running on `localhost:3001`
 
-## Next Action
+## 운영 시작 체크리스트
 
-Start Phase 20 planning (launch hardening: env validation, runbook). See `PROJECT_SCOPE.md` for constraints.
+1. `curl https://seoul-30.vercel.app/api/health` → `{"status":"ok","db":"ok"}`
+2. VAPID 키, CRON_SECRET, DATABASE_URL Vercel 환경변수 확인
+3. 첫 날 09:00 KST Vercel Cron 발송 여부 확인 (`/api/push/send` 로그)
+4. `/about`, `/privacy` 페이지 접근 가능 여부 확인
