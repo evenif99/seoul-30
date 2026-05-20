@@ -88,7 +88,6 @@ Security rules:
 
 ## Known Notes
 
-- Next.js warns `middleware.ts` naming is deprecated (migration to `proxy` deferred).
 - On Windows, Playwright process exit can hang after tests pass — tests themselves pass correctly.
 
 ## License

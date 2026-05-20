@@ -90,7 +90,7 @@ tests/
   e2e/home.spec.ts
   setup.tsx
 
-middleware.ts                        # rate limiting (/api/* only)
+proxy.ts                             # rate limiting (/api/* only)
 vercel.json                          # Vercel Cron (daily 09:00 KST → /api/push/send)
 next.config.mjs                      # createNextIntlPlugin + headers
 vitest.config.ts
@@ -181,6 +181,6 @@ install → prisma generate → tsc --noEmit → vitest → playwright → next 
 
 ## Known Runtime Notes
 
-- Next.js warns `middleware.ts` naming is deprecated (migration to `proxy` deferred).
+- `proxy.ts` (formerly `middleware.ts`) — rate limiting, Next.js 16 proxy convention 적용 완료.
 - Playwright process exit can hang on Windows after all tests pass.
 - Prisma generate requires dev server to be stopped on Windows (DLL file lock).

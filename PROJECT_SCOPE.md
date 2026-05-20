@@ -34,7 +34,6 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 
 ## Deferred / Not In Scope
 
-- Middleware proxy migration (rate limiter 현 구조로 충분, 변경 불필요)
 - Playwright Windows exit-hang (로컬 한정, CI 통과 확인됨)
 - Authentication / user accounts
 - Admin dashboard

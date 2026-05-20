@@ -89,10 +89,13 @@ Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
 ## Deferred Items
 
-- Middleware proxy migration — 현 rate limiter 구조로 충분, 변경 불필요
 - Playwright Windows exit-hang — 로컬 한정 이슈, CI 통과 확인됨
-- [ ] Middleware `proxy` migration (deferred — not blocking)
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
+
+## Completed Post-Phase-20 Fixes
+
+- [x] `middleware.ts` → `proxy.ts` 리네임, export `middleware` → `proxy` (Next.js 16 deprecation 해결)
+- [x] `app/api/push/send/route.ts` — `webpush.setVapidDetails()` 모듈 최상위 → `sendPushToAll()` 내부 이동 (Vercel build 오류 해결)
 
 ## Constraints Reminder
 
