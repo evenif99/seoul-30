@@ -15,6 +15,7 @@ export function BookmarkButton({ placeId, className }: BookmarkButtonProps) {
 
   return (
     <button
+      data-testid={`bookmark-button-${placeId}`}
       onClick={(e) => {
         e.preventDefault()
         toggle(placeId)

@@ -28,6 +28,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" aria-hidden="true" />
           <input
             type="search"
+            data-testid="place-search-input"
             placeholder="장소 이름으로 검색"
             value={filters.search}
             onChange={(e) => set({ search: e.target.value })}
@@ -67,6 +68,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
       >
         {/* 무료만 */}
         <button
+          data-testid="free-only-filter"
           onClick={() => set({ freeOnly: !filters.freeOnly })}
           aria-pressed={filters.freeOnly}
           className={`shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
@@ -80,6 +82,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
 
         {/* 지금 운영 중 */}
         <button
+          data-testid="open-now-filter"
           onClick={() => set({ openNow: !filters.openNow })}
           aria-pressed={filters.openNow}
           className={`shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors whitespace-nowrap ${

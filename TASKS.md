@@ -1,38 +1,36 @@
 # TASKS
 
-Last updated: 2026-05-18 (Phase 11 complete)
+Last updated: 2026-05-20 (Phase 12 complete)
 
-## Completed Phases
+## Completed In This Task
+- Installed test stack:
+  - `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`
+  - `@playwright/test`, `jsdom`, `@vitejs/plugin-react`
+- Added test configs:
+  - `vitest.config.ts`
+  - `playwright.config.ts`
+  - `tests/setup.tsx`
+- Added test suites:
+  - `tests/unit/scoring.test.ts` (6 dimensions + total)
+  - `tests/components/PlaceCard.test.tsx`
+  - `tests/components/FilterBar.test.tsx`
+  - `tests/components/BookmarkButton.test.tsx`
+  - `tests/e2e/home.spec.ts` (2 golden paths)
+- Added test scripts in `package.json`:
+  - `test`, `test:unit`, `test:e2e`
+- Updated CI workflow to run Vitest and Playwright before build.
+- Added stable test hooks (`data-testid`) in `FilterBar` and `BookmarkButton`.
+- Added test artifact ignores in `.gitignore`.
 
-| Phase | Description |
-|---|---|
-| 1 | Project setup — Prisma schema, next.config, .env.example |
-| 2 | Core logic (mock-first) — types, scoring, API routes, feature flags |
-| 3 | UI build-out — district selector, place detail, bookmark hooks |
-| 4 | PWA foundation — manifest, SVG icon, offline page, service worker |
-| 5 | Real API integration — Seoul culturalEventInfo + citydata adapters |
-| 6 | DB caching layer + travel mode disclosure (Hero.tsx) |
-| 7 | Search & filter enhancement — name search, openNow toggle, URL sync |
-| 8 | My Places — bookmarks/recent tabs, RecentTracker, route-based nav |
-| 9 | SEO & Share — generateMetadata, OG image, JSON-LD, ShareButton, sitemap |
-| 10 | Production hardening — rate limiting, ErrorBoundary, a11y, CI |
-| 11 | Map view — Leaflet + OpenStreetMap, list/map toggle, marker popups |
+## Next Recommended Tasks
+- Phase 13: add anonymous rating data model and feedback route.
+- Add one API route integration test for `/api/places` scoring order and `isMock`.
+- Investigate local Playwright process shutdown issue on Windows to remove timeout noise.
 
-## Next Planned Phases
+## Blocked Items
+- None for implementation.
+- Local-only issue: Playwright command can hang on process exit even when tests pass.
 
-| Phase | Description | Priority |
-|---|---|---|
-| 12 | Testing suite — Vitest unit tests (scoring), Playwright E2E golden paths | High |
-| 13 | Anonymous place rating — thumbs up/down, DB model, no auth required | Medium |
-| 14 | PWA push notifications — VAPID, district alerts, Vercel Cron | Medium |
-| 15 | i18n — next-intl, Korean/English, URL-based locale routing | Low |
-
-## Currently Blocked
-
-- None.
-
-## Do Not Touch
-
-- `components/ui/` — shadcn/ui generated primitives, modify only if there is a direct UI requirement
-- `.env.local` / real API keys — never commit, never hardcode
-- `prisma/schema.prisma` — run `prisma db push` after any schema change
+## Intentional TODOs
+- Middleware -> proxy migration not included in Phase 12 scope.
+- No changes to product features outside testing suite.
