@@ -133,6 +133,15 @@ Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 - [x] `app/api/push/send/route.ts` — `webpush.setVapidDetails()` 모듈 최상위 → `sendPushToAll()` 내부 이동 (Vercel build 오류 해결)
 - [x] `vercel.json` cron — `0 9 * * *` (UTC 09:00 = KST 18:00) → `0 0 * * *` (UTC 00:00 = KST 09:00)
 - [x] `app/api/realtime/[areaCode]/route.ts` 삭제 — 클라이언트에서 호출되지 않는 데드 라우트
+- [x] Leaflet → Naver Maps 교체 (위성 뷰 토글, 현재 위치, 그리드 클러스터링, ncpKeyId 인증)
+- [x] `lib/types/naver-maps.d.ts` — Naver Maps v3 TypeScript 타입 선언
+- [x] `MapView.tsx` — mounted 상태로 hydration 안전 보장, React #418 해결
+- [x] `MapViewInner.tsx` — 완전 재작성 (imperative Naver Maps, satellite toggle, geolocation)
+- [x] `messages` — mapLoading/mapSatellite/mapNormal/mapMyLocation i18n 추가
+- [x] `.env.example` — NEXT_PUBLIC_NAVER_MAP_CLIENT_ID 추가
+- [x] `package.json` — dev 포트 3001 고정 (`-p 3001`)
+- [x] `playwright.config.ts` — baseURL + webServer.url 3001 동기화 (CI 수정)
+- [x] TypeScript 오류 없음, 43/43 통과, 로컬 + Vercel 배포 정상
 
 ## Constraints Reminder
 

@@ -1,10 +1,28 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 25 complete — Phase 21-25 전체 완료)
+Last updated: 2026-05-20 (Naver Maps 적용 완료 — Leaflet 대체)
 
 ## Current State
 
 Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+
+### Naver Maps 적용 (Post-Phase-25)
+- `leaflet`, `react-leaflet`, `react-leaflet-cluster`, `@types/leaflet` 패키지 제거
+- `lib/types/naver-maps.d.ts` — Naver Maps JavaScript API v3 TypeScript 타입 선언 추가
+- `components/seoul30/MapView.tsx` — `next/script` + `mounted` 상태로 hydration 안전하게 로드
+  - `strategy="afterInteractive"` + `onLoad` → `setReady(true)` 패턴
+  - `ncpKeyId` 파라미터 사용 (NCP 신규 콘솔 X-NCP-APIGW-API-KEY-ID 형식)
+- `components/seoul30/MapViewInner.tsx` — 완전 재작성:
+  - 위성/하이브리드 뷰 토글 (`Layers` 버튼)
+  - 현재 위치 이동 버튼 (`LocateFixed` 버튼, Geolocation API)
+  - 그리드 기반 마커 클러스터링 (외부 라이브러리 없음, zoom 레벨 연동)
+  - 마커 클릭 시 장소 팝업, 클러스터 클릭 시 줌인
+  - `m.setMap(null)` try-catch 방어 (인증 실패 상태에서 SDK 내부 오류 방지)
+- `messages/ko.json` + `messages/en.json` — `common.mapLoading/mapSatellite/mapNormal/mapMyLocation` 추가
+- `.env.example` — `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` 항목 추가
+- `package.json` — dev 포트 3001 고정 (`next dev -p 3001`)
+- `playwright.config.ts` — baseURL + webServer.url 3001로 수정
+- TypeScript 오류 없음, 43/43 통과, Vercel 배포 정상
 
 ### Phase 25 — Release readiness
 - `components/seoul30/PlaceCard.tsx` — `Train`, `Bus`, `Footprints` 미사용 import 제거
@@ -149,16 +167,27 @@ CRON_SECRET=                         # arbitrary secret, guards /api/push/send
 - `RUNBOOK.md` — 헬스 체크 명령, 5개 장애 시나리오 대응, 시크릿 교체 절차, 배포/롤백 방법, 로컬 개발 환경변수 표
 - `tests/unit/env.test.ts` — 5 tests (29/29 통과)
 
-## Verification Status (Phase 20 — Final)
+## Verification Status (최종)
 
 - `npx tsc --noEmit` — passed
-- `npm run test` — 29/29 unit + component tests passing
+- `npm run test` — 43/43 unit + component tests passing
 - `GET /api/health` — env + DB 상태 확인 엔드포인트 가동
-- Dev server running on `localhost:3001`
+- Dev server: `http://localhost:3001` (포트 고정)
+- Naver Maps: 로컬 + Vercel 배포 모두 정상 동작 확인
+
+## Completed Post-Phase-20 Fixes
+
+- [x] `middleware.ts` → `proxy.ts` 리네임, export `middleware` → `proxy` (Next.js 16 deprecation 해결)
+- [x] `app/api/push/send/route.ts` — `webpush.setVapidDetails()` 모듈 최상위 → `sendPushToAll()` 내부 이동 (Vercel build 오류 해결)
+- [x] `vercel.json` cron — `0 9 * * *` → `0 0 * * *` (UTC 00:00 = KST 09:00 정정)
+- [x] `app/api/realtime/[areaCode]/route.ts` 삭제 — 클라이언트에서 호출되지 않는 데드 라우트
+- [x] Leaflet → Naver Maps 교체 (위성 뷰, 현재 위치, 그리드 클러스터링, ncpKeyId 인증)
+- [x] `package.json` dev 포트 3001 고정, `playwright.config.ts` 포트 동기화 (CI 수정)
 
 ## 운영 시작 체크리스트
 
 1. `curl https://seoul-30.vercel.app/api/health` → `{"status":"ok","db":"ok"}`
-2. VAPID 키, CRON_SECRET, DATABASE_URL Vercel 환경변수 확인
+2. VAPID 키, CRON_SECRET, DATABASE_URL, NEXT_PUBLIC_NAVER_MAP_CLIENT_ID Vercel 환경변수 확인
 3. 첫 날 09:00 KST Vercel Cron 발송 여부 확인 (`/api/push/send` 로그)
 4. `/about`, `/privacy` 페이지 접근 가능 여부 확인
+5. 지도 탭 → Naver Maps 타일 정상 출력 확인

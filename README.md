@@ -39,6 +39,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 23** — Engagement polish: bookmark count badge, ShareButton/BookmarkButton/Bookmarks page i18n
 - **Phase 24** — Performance/accessibility hardening: ignoreBuildErrors removed, cache headers, PlaceCard i18n
 - **Phase 25** — Release readiness: dead import cleanup, full i18n completion (offline/about/privacy/map), MD sync
+- **Post-25** — Naver Maps 적용: Leaflet 대체, 위성 뷰 토글, 현재 위치 버튼, 그리드 클러스터링, ncpKeyId 인증
 
 ## Local Run
 
