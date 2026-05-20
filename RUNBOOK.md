@@ -54,7 +54,7 @@ Vercel → Settings → Environment Variables → 해당 변수 추가 후 Redep
 ### 4. 푸시 알림 미발송
 
 **체크리스트**:
-- Vercel Cron 설정 확인: `vercel.json` → `/api/push/send` 매일 09:00 KST
+- Vercel Cron 설정 확인: `vercel.json` → `/api/push/send` 매일 09:00 KST (UTC 00:00 = `"0 0 * * *"`)
 - `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL` 환경변수 존재 여부 확인
 
 **수동 발송 테스트**:
