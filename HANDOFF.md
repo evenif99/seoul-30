@@ -1,10 +1,17 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 20 complete — all phases done)
+Last updated: 2026-05-20 (Phase 21 complete)
 
 ## Current State
 
 Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+
+### Phase 21 — Observability (무료)
+- `app/api/places/route.ts` — 결과 출처(api/cache/stale/mock), 소요시간, 결과 수를 `console.info` JSON 로그로 출력 (Vercel Function 로그에서 확인 가능)
+- `app/api/places/route.ts` — Seoul API 빈 응답 + 스냅샷 없음 시 `console.error` JSON 로그 추가
+- `app/api/diagnostics/route.ts` — `GET /api/diagnostics`: 마지막 스냅샷 시각, 피드백 수, 푸시 구독자 수 반환 (DB 조회, 비용 0)
+- `tests/unit/diagnostics.test.ts` — 3 tests (32/32 통과)
+- 외부 APM 서비스 없음, Vercel 내장 로그 + 기존 Neon DB만 사용
 
 ## What Was Done (Phase 13–17)
 

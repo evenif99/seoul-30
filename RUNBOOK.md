@@ -4,6 +4,22 @@ Seoul 30 운영 런북. 배포 후 문제 발생 시 첫 번째로 참조한다.
 
 ---
 
+## 운영 상태 확인 (Phase 21 추가)
+
+```
+GET /api/diagnostics
+```
+
+| 필드 | 설명 |
+|---|---|
+| `lastSnapshotAt` | 마지막 Seoul API 캐시 시각 (null이면 한 번도 API 호출 없음) |
+| `feedbackCount` | 누적 👍/👎 피드백 수 |
+| `pushSubscriberCount` | 현재 웹 푸시 구독자 수 |
+
+DB 장애 시 503 반환.
+
+---
+
 ## 헬스 체크
 
 ```

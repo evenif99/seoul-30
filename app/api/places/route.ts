@@ -10,6 +10,7 @@ import type { RecommendationInput } from '@/lib/types/recommendation'
 import type { ApiResponse } from '@/lib/types/api'
 
 export async function GET(request: Request) {
+  const t0 = Date.now()
   const { searchParams } = new URL(request.url)
 
   const input: RecommendationInput = {
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
   if (featureFlags.cultureEventsApi) {
     const cached = await getSnapshot(input.district, input.category, input.isFreeOnly)
     if (cached) {
+      logPlacesRequest({ source: 'cache', durationMs: Date.now() - t0, resultCount: cached.length, input })
       const body: ApiResponse<typeof cached> = { data: cached, isMock: false }
       return NextResponse.json(body)
     }
@@ -42,10 +44,12 @@ export async function GET(request: Request) {
       // Seoul API 장애 또는 빈 응답 → 만료된 스냅샷이라도 반환
       const stale = await getStaleSnapshot(input.district, input.category, input.isFreeOnly)
       if (stale) {
+        logPlacesRequest({ source: 'stale', durationMs: Date.now() - t0, resultCount: stale.length, input })
         const body: ApiResponse<typeof stale> = { data: stale, isMock: false, isStale: true }
         return NextResponse.json(body)
       }
       // 스냅샷도 없으면 mock으로 폴백
+      console.error(JSON.stringify({ event: 'places_api_empty_no_snapshot', district: input.district ?? null }))
     }
   }
 
@@ -76,6 +80,31 @@ export async function GET(request: Request) {
     await setSnapshot(results, input.district, input.category, input.isFreeOnly)
   }
 
+  logPlacesRequest({ source: isMock ? 'mock' : 'api', durationMs: Date.now() - t0, resultCount: results.length, input })
   const body: ApiResponse<typeof results> = { data: results, isMock, isStale }
   return NextResponse.json(body)
+}
+
+function logPlacesRequest({
+  source,
+  durationMs,
+  resultCount,
+  input,
+}: {
+  source: 'api' | 'cache' | 'stale' | 'mock'
+  durationMs: number
+  resultCount: number
+  input: RecommendationInput
+}) {
+  console.info(
+    JSON.stringify({
+      event: 'places_request',
+      source,
+      durationMs,
+      resultCount,
+      district: input.district ?? null,
+      category: input.category ?? null,
+      isFreeOnly: input.isFreeOnly,
+    }),
+  )
 }
