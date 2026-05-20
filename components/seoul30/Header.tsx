@@ -20,7 +20,12 @@ export function Header({ onSearchOpen }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-        <span className="sr-only">{t('skip')}</span>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:text-sm focus:font-medium"
+        >
+          {t('skip')}
+        </a>
         {/* Logo */}
         <span className="text-xl font-bold text-primary tracking-tight shrink-0">
           Seoul 30

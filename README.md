@@ -31,6 +31,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 15** — i18n with next-intl v4 (ko/en, cookie-based locale, LanguageToggle)
 - **Phase 16** — Score explanation breakdown UI (ScoreBadge on PlaceCard, ko/en labels)
 - **Phase 17** — Stale cache fallback when Seoul Open API fails + defensive hardening (feedback/push try-catch, CRON_SECRET auth, use-push error state)
+- **Phase 18** — Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content link)
 
 ## Local Run
 

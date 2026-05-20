@@ -1,10 +1,10 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 17 complete)
+Last updated: 2026-05-20 (Phase 18 complete)
 
 ## Current State
 
-Phase 17 (stale cache fallback + hardening) is complete. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+Phase 18 (skeleton loading + accessibility) is complete. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
 
 ## What Was Done (Phase 13–17)
 
@@ -80,12 +80,20 @@ CRON_SECRET=                         # arbitrary secret, guards /api/push/send
 - `app/page.tsx` — `isStale` 수신, 필터 위 앰버 배너 표시
 - `messages/ko.json` + `messages/en.json` — `common.staleData` 추가
 
-## Verification Status (Phase 17)
+### Phase 18 — Skeleton Loading + Accessibility
+- `components/seoul30/PlaceCardSkeleton.tsx` — shimmer 카드, `aria-hidden="true"`, PlaceCard 레이아웃 동일
+- `app/page.tsx` — 로딩 중 빈 화면(`null`) 대신 3개 PlaceCardSkeleton 표시
+- `app/page.tsx` — 결과 카운트 `<p>`에 `aria-live="polite"` + `aria-atomic="true"` (스크린리더 카운트 변경 알림)
+- `app/page.tsx` — 리스트 섹션에 `aria-busy={loading}` (로딩 중 busy 상태 명시)
+- `components/seoul30/Header.tsx` — skip-to-content `<span>` → `<a href="#main-content">` (키보드 포커스 시 visible)
+- `tests/components/PlaceCardSkeleton.test.tsx` — 3 tests (19/19 통과)
+
+## Verification Status (Phase 18)
 
 - `npx tsc --noEmit` — passed
-- `npm run test` — 16/16 unit + component tests passing
+- `npm run test` — 19/19 unit + component tests passing
 - Dev server running on `localhost:3001`
 
 ## Next Action
 
-Start Phase 18 planning (accessibility + skeleton loading states). See `PROJECT_SCOPE.md` for constraints.
+Start Phase 19 planning (static pages + PWA installability polish). See `PROJECT_SCOPE.md` for constraints.

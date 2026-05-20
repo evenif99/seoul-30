@@ -10,6 +10,7 @@ import { MapView } from '@/components/seoul30/MapView'
 import { BottomTabBar } from '@/components/seoul30/BottomTabBar'
 import { DesktopNav } from '@/components/seoul30/DesktopNav'
 import { EmptyState } from '@/components/seoul30/EmptyState'
+import { PlaceCardSkeleton } from '@/components/seoul30/PlaceCardSkeleton'
 import { DistrictSelector } from '@/components/seoul30/DistrictSelector'
 import { PushSubscribeButton } from '@/components/seoul30/PushSubscribeButton'
 import { LanguageToggle } from '@/components/seoul30/LanguageToggle'
@@ -171,7 +172,11 @@ export default function HomePage() {
 
           {/* 결과 카운트 + 뷰 토글 */}
           <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
+            <p
+              className="text-xs text-muted-foreground"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               {loading ? (
                 <span>{t('common.loading')}</span>
               ) : (
@@ -230,9 +235,12 @@ export default function HomePage() {
           {viewMode === 'list' && (
             <section
               aria-label="추천 장소 목록"
+              aria-busy={loading}
               className="max-w-2xl mx-auto px-4 flex flex-col gap-3"
             >
-              {loading ? null : displayResults.length === 0 ? (
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => <PlaceCardSkeleton key={i} />)
+              ) : displayResults.length === 0 ? (
                 <EmptyState />
               ) : (
                 displayResults.map(({ place, score }, i) => (

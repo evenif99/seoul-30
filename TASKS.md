@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-20 (Phase 17 complete)
+Last updated: 2026-05-20 (Phase 18 complete)
 
 ## Completed Phases (1–15)
 
@@ -61,9 +61,18 @@ Last updated: 2026-05-20 (Phase 17 complete)
 - [x] `messages/ko.json` + `messages/en.json` — `common.staleData` 추가
 - [x] TypeScript check + 16/16 tests passing
 
+### Phase 18 — Skeleton Loading + Accessibility
+- [x] `components/seoul30/PlaceCardSkeleton.tsx` — shimmer skeleton (aria-hidden)
+- [x] `app/page.tsx` — 로딩 중 `null` → 3개 PlaceCardSkeleton 표시
+- [x] `app/page.tsx` — 결과 카운트 `<p>` 에 `aria-live="polite"` + `aria-atomic="true"`
+- [x] `app/page.tsx` — 리스트 섹션에 `aria-busy={loading}`
+- [x] `components/seoul30/Header.tsx` — skip-to-content `<span>` → `<a>` (focus 시 visible)
+- [x] `tests/components/PlaceCardSkeleton.test.tsx` — 3 tests
+- [x] TypeScript check + 19/19 tests passing
+
 ## Open Items
 
-- [ ] Phase 18–20 scope TBD
+- [ ] Phase 19–20 scope TBD
 - [ ] Middleware `proxy` migration (deferred — not blocking)
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 
