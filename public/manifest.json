@@ -9,18 +9,28 @@
   "lang": "ko",
   "orientation": "portrait",
   "scope": "/",
+  "prefer_related_applications": false,
+  "categories": ["lifestyle", "travel", "navigation"],
   "icons": [
     {
       "src": "/icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/apple-icon.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "저장한 장소",
+      "short_name": "저장함",
+      "url": "/bookmarks",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
     }
   ]
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { List, Map } from 'lucide-react'
 import { Header } from '@/components/seoul30/Header'
 import { Hero } from '@/components/seoul30/Hero'
@@ -265,6 +266,17 @@ export default function HomePage() {
             <p className="max-w-2xl mx-auto px-4 pt-6 text-center text-[11px] text-muted-foreground">
               {isMock ? 'mock 데이터 기반' : '서울시 공공데이터 기반'} · scoring 기준 정렬
             </p>
+          )}
+
+          {!loading && viewMode === 'list' && (
+            <div className="max-w-2xl mx-auto px-4 pt-4 pb-2 flex justify-center gap-4">
+              <Link href="/about" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+                {t('about.footerLink')}
+              </Link>
+              <Link href="/privacy" className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+                {t('privacy.footerLink')}
+              </Link>
+            </div>
           )}
         </main>
       </div>

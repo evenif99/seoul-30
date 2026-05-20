@@ -1,10 +1,10 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 18 complete)
+Last updated: 2026-05-20 (Phase 19 complete)
 
 ## Current State
 
-Phase 18 (skeleton loading + accessibility) is complete. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+Phase 19 (static pages + PWA polish) is complete. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
 
 ## What Was Done (Phase 13–17)
 
@@ -88,12 +88,21 @@ CRON_SECRET=                         # arbitrary secret, guards /api/push/send
 - `components/seoul30/Header.tsx` — skip-to-content `<span>` → `<a href="#main-content">` (키보드 포커스 시 visible)
 - `tests/components/PlaceCardSkeleton.test.tsx` — 3 tests (19/19 통과)
 
-## Verification Status (Phase 18)
+### Phase 19 — Static Pages + PWA Installability
+- `app/about/page.tsx` — 서비스 소개 (점수 기준 6개 항목 표, 데이터 출처 목록), ko/en 자동 전환
+- `app/privacy/page.tsx` — 개인정보 처리방침 (수집 없음, localStorage, 푸시, 외부 서비스), ko/en
+- `messages/ko.json` + `messages/en.json` — `about`/`privacy` 네임스페이스 (제목, 섹션 레이블)
+- `public/manifest.json` — `purpose: "any maskable"`, `shortcuts` (저장한 장소 바로가기), `categories`, `prefer_related_applications: false`
+- `app/sitemap.ts` — /about (priority 0.4), /privacy (priority 0.2) 추가
+- `app/page.tsx` — 리스트 하단 About · Privacy 푸터 링크
+- `tests/unit/manifest.test.ts` — 5 tests (24/24 통과)
+
+## Verification Status (Phase 19)
 
 - `npx tsc --noEmit` — passed
-- `npm run test` — 19/19 unit + component tests passing
+- `npm run test` — 24/24 unit + component tests passing
 - Dev server running on `localhost:3001`
 
 ## Next Action
 
-Start Phase 19 planning (static pages + PWA installability polish). See `PROJECT_SCOPE.md` for constraints.
+Start Phase 20 planning (launch hardening: env validation, runbook). See `PROJECT_SCOPE.md` for constraints.

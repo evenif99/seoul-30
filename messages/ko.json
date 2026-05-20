@@ -87,6 +87,16 @@
   "lang": {
     "toggle": "English"
   },
+  "about": {
+    "title": "서비스 소개",
+    "scoringTitle": "추천 점수 기준",
+    "dataTitle": "데이터 출처",
+    "footerLink": "소개"
+  },
+  "privacy": {
+    "title": "개인정보 처리방침",
+    "footerLink": "개인정보"
+  },
   "score": {
     "label": "추천 점수",
     "access": "지역 근접",

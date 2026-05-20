@@ -87,6 +87,16 @@
   "lang": {
     "toggle": "한국어"
   },
+  "about": {
+    "title": "About Seoul 30",
+    "scoringTitle": "How scores work",
+    "dataTitle": "Data sources",
+    "footerLink": "About"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "footerLink": "Privacy"
+  },
   "score": {
     "label": "Score",
     "access": "Nearby",

@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-20 (Phase 18 complete)
+Last updated: 2026-05-20 (Phase 19 complete)
 
 ## Completed Phases (1–15)
 
@@ -70,9 +70,19 @@ Last updated: 2026-05-20 (Phase 18 complete)
 - [x] `tests/components/PlaceCardSkeleton.test.tsx` — 3 tests
 - [x] TypeScript check + 19/19 tests passing
 
+### Phase 19 — Static Pages + PWA Installability
+- [x] `app/about/page.tsx` — 서비스 소개, 점수 기준, 데이터 출처 (ko/en)
+- [x] `app/privacy/page.tsx` — 개인정보 처리방침 (ko/en)
+- [x] `messages/ko.json` + `messages/en.json` — about/privacy 네임스페이스 추가
+- [x] `public/manifest.json` — maskable 아이콘 목적 추가, shortcuts, categories, prefer_related_applications: false
+- [x] `app/sitemap.ts` — /about, /privacy 추가
+- [x] `app/page.tsx` — 리스트 하단 About/Privacy 푸터 링크
+- [x] `tests/unit/manifest.test.ts` — 5 tests
+- [x] TypeScript check + 24/24 tests passing
+
 ## Open Items
 
-- [ ] Phase 19–20 scope TBD
+- [ ] Phase 20 scope TBD
 - [ ] Middleware `proxy` migration (deferred — not blocking)
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 
