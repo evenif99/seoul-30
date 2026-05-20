@@ -1,15 +1,18 @@
 'use client'
 
 import 'leaflet/dist/leaflet.css'
+import 'react-leaflet-cluster/lib/assets/MarkerCluster.css'
+import 'react-leaflet-cluster/lib/assets/MarkerCluster.Default.css'
 import { useEffect, useState, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
+import MarkerClusterGroup from 'react-leaflet-cluster'
 import L from 'leaflet'
 import Link from 'next/link'
 import { X } from 'lucide-react'
 import type { NormalizedPlace } from '@/lib/types/place'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 
-// Seoul 30 브랜드 컬러 원형 마커 (PNG 경로 문제 회피)
+// Seoul 30 브랜드 컬러 원형 마커
 const brandMarker = L.divIcon({
   className: '',
   html: '<div style="width:14px;height:14px;background:#1A6B5A;border:2.5px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.35)"></div>',
@@ -23,6 +26,18 @@ const selectedMarker = L.divIcon({
   iconSize: [18, 18],
   iconAnchor: [9, 9],
 })
+
+// 클러스터 아이콘 — 브랜드 컬러 원형
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createClusterIcon(cluster: any) {
+  const count = cluster.getChildCount()
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:36px;height:36px;background:#1A6B5A;border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;">${count}</div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+  })
+}
 
 type PlaceWithCoords = NormalizedPlace & { latitude: number; longitude: number }
 
@@ -85,14 +100,20 @@ export default function MapViewInner({ results }: Props) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {places.map((place) => (
-          <Marker
-            key={place.id}
-            position={[place.latitude, place.longitude]}
-            icon={selected?.id === place.id ? selectedMarker : brandMarker}
-            eventHandlers={{ click: () => setSelected(place) }}
-          />
-        ))}
+        <MarkerClusterGroup
+          iconCreateFunction={createClusterIcon}
+          showCoverageOnHover={false}
+          maxClusterRadius={60}
+        >
+          {places.map((place) => (
+            <Marker
+              key={place.id}
+              position={[place.latitude, place.longitude]}
+              icon={selected?.id === place.id ? selectedMarker : brandMarker}
+              eventHandlers={{ click: () => setSelected(place) }}
+            />
+          ))}
+        </MarkerClusterGroup>
 
         <BoundsController places={places} />
       </MapContainer>
