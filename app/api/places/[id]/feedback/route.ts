@@ -9,12 +9,15 @@ interface RouteContext {
 export async function GET(_req: NextRequest, { params }: RouteContext) {
   const { id: placeId } = await params
 
-  const [up, down] = await Promise.all([
-    prisma.placeFeedback.count({ where: { placeId, vote: 'UP' } }),
-    prisma.placeFeedback.count({ where: { placeId, vote: 'DOWN' } }),
-  ])
-
-  return NextResponse.json({ up, down })
+  try {
+    const [up, down] = await Promise.all([
+      prisma.placeFeedback.count({ where: { placeId, vote: 'UP' } }),
+      prisma.placeFeedback.count({ where: { placeId, vote: 'DOWN' } }),
+    ])
+    return NextResponse.json({ up, down })
+  } catch {
+    return NextResponse.json({ error: 'DB error' }, { status: 500 })
+  }
 }
 
 // POST /api/places/[id]/feedback — 투표 (upsert)
@@ -37,16 +40,20 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: 'Invalid sessionId' }, { status: 400 })
   }
 
-  await prisma.placeFeedback.upsert({
-    where: { placeId_sessionId: { placeId, sessionId } },
-    create: { placeId, sessionId, vote },
-    update: { vote },
-  })
+  try {
+    await prisma.placeFeedback.upsert({
+      where: { placeId_sessionId: { placeId, sessionId } },
+      create: { placeId, sessionId, vote },
+      update: { vote },
+    })
 
-  const [up, down] = await Promise.all([
-    prisma.placeFeedback.count({ where: { placeId, vote: 'UP' } }),
-    prisma.placeFeedback.count({ where: { placeId, vote: 'DOWN' } }),
-  ])
+    const [up, down] = await Promise.all([
+      prisma.placeFeedback.count({ where: { placeId, vote: 'UP' } }),
+      prisma.placeFeedback.count({ where: { placeId, vote: 'DOWN' } }),
+    ])
 
-  return NextResponse.json({ up, down })
+    return NextResponse.json({ up, down })
+  } catch {
+    return NextResponse.json({ error: 'DB error' }, { status: 500 })
+  }
 }

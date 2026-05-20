@@ -10,12 +10,18 @@ webpush.setVapidDetails(
 
 function checkAuth(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET
-  if (!secret) return true
+  // secret 미설정 시 개발 환경에서만 허용 — 운영에서는 반드시 CRON_SECRET 필요
+  if (!secret) return process.env.NODE_ENV === 'development'
   return req.headers.get('authorization') === `Bearer ${secret}`
 }
 
 async function sendPushToAll() {
-  const subscriptions = await prisma.webPushSubscription.findMany()
+  let subscriptions: Awaited<ReturnType<typeof prisma.webPushSubscription.findMany>>
+  try {
+    subscriptions = await prisma.webPushSubscription.findMany()
+  } catch {
+    return { sent: 0, total: 0 }
+  }
   if (subscriptions.length === 0) return { sent: 0, total: 0 }
 
   const payload = JSON.stringify({
@@ -49,11 +55,19 @@ async function sendPushToAll() {
 // GET /api/push/send — Vercel Cron (매일 09:00 KST)
 export async function GET(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  return NextResponse.json(await sendPushToAll())
+  try {
+    return NextResponse.json(await sendPushToAll())
+  } catch {
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  }
 }
 
 // POST /api/push/send — 수동 트리거
 export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  return NextResponse.json(await sendPushToAll())
+  try {
+    return NextResponse.json(await sendPushToAll())
+  } catch {
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  }
 }

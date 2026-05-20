@@ -23,39 +23,50 @@ export function usePush() {
   }, [])
 
   const subscribe = useCallback(async () => {
-    const reg = await navigator.serviceWorker.ready
-    const permission = await Notification.requestPermission()
-    if (permission !== 'granted') {
-      setState('denied')
-      return
+    setState('loading')
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const permission = await Notification.requestPermission()
+      if (permission !== 'granted') {
+        setState('denied')
+        return
+      }
+
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '',
+        ),
+      })
+
+      const res = await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub.toJSON()),
+      })
+      if (!res.ok) throw new Error('subscribe api failed')
+      setState('subscribed')
+    } catch {
+      setState('unsubscribed')
     }
-
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '',
-      ),
-    })
-
-    await fetch('/api/push/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sub.toJSON()),
-    })
-    setState('subscribed')
   }, [])
 
   const unsubscribe = useCallback(async () => {
-    const reg = await navigator.serviceWorker.ready
-    const sub = await reg.pushManager.getSubscription()
-    if (!sub) return
-    await fetch('/api/push/subscribe', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ endpoint: sub.endpoint }),
-    })
-    await sub.unsubscribe()
-    setState('unsubscribed')
+    setState('loading')
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const sub = await reg.pushManager.getSubscription()
+      if (!sub) { setState('unsubscribed'); return }
+      await fetch('/api/push/subscribe', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: sub.endpoint }),
+      })
+      await sub.unsubscribe()
+      setState('unsubscribed')
+    } catch {
+      setState('subscribed')
+    }
   }, [])
 
   return { state, subscribe, unsubscribe }
