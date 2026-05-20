@@ -68,12 +68,12 @@ function calcFreshness(place: NormalizedPlace): number {
   return 0
 }
 
-// 현재 운영 중 여부 (0–10)
+// 현재 운영 중 여부 (0–10) — 서울 서비스이므로 KST(UTC+9) 기준으로 계산
 function calcTimefit(place: NormalizedPlace): number {
   if (!place.openTimeText || !place.closeTimeText) return 5
 
   const now = new Date()
-  const cur = now.getHours() * 60 + now.getMinutes()
+  const kstMinutes = (now.getUTCHours() * 60 + now.getUTCMinutes() + 9 * 60) % (24 * 60)
 
   const [oh, om] = place.openTimeText.split(':').map(Number)
   const [ch, cm] = place.closeTimeText.split(':').map(Number)
@@ -81,5 +81,5 @@ function calcTimefit(place: NormalizedPlace): number {
   // 자정 운영(00:00–23:59)은 항상 운영 중
   if (oh === 0 && om === 0 && ch === 23 && cm === 59) return 10
 
-  return cur >= oh * 60 + om && cur < ch * 60 + cm ? 10 : 0
+  return kstMinutes >= oh * 60 + om && kstMinutes < ch * 60 + cm ? 10 : 0
 }

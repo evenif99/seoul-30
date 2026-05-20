@@ -16,7 +16,8 @@ const basePlace: NormalizedPlace = {
 
 describe('scorePlace', () => {
   beforeEach(() => {
-    vi.setSystemTime(new Date('2026-05-18T10:00:00+09:00'))
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-05-18T01:00:00Z')) // 01:00 UTC = 10:00 KST, within 09:00-18:00
   })
 
   afterEach(() => {
