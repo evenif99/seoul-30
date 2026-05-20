@@ -1,10 +1,19 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 21 complete)
+Last updated: 2026-05-20 (Phase 22 complete)
 
 ## Current State
 
 Phase 20 (launch hardening) is complete. Phase 1–20 전체 완료. 운영 가능 상태. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
+
+### Phase 22 — 데이터 신뢰성 투명화
+- `lib/types/api.ts` — `ApiResponse`에 `snapshotAt?: string | null` 필드 추가
+- `lib/cache/recommendation.cache.ts` — `getSnapshot()` / `getStaleSnapshot()` 반환 타입을 `SnapshotResult | null`로 변경 (`results` + `snapshotAt` 포함)
+- `app/api/places/route.ts` — 캐시 히트 / stale 응답에 `snapshotAt` ISO 문자열 포함
+- `lib/utils/relative-time.ts` — 외부 라이브러리 없이 ko/en 상대 시간 포매터 (방금 전 / N분 전 / N시간 전 / N일 전)
+- `app/page.tsx` — stale 배너: "N시간 전 기준" 문구 삽입 / 정상 캐시 히트: "N분 전 업데이트" subtle 표시
+- `messages/ko.json` + `messages/en.json` — `common.staleData` `{age}` 파라미터 추가, `common.cachedData` 신규
+- `tests/unit/relative-time.test.ts` — 8 tests (40/40 통과)
 
 ### Phase 21 — Observability (무료)
 - `app/api/places/route.ts` — 결과 출처(api/cache/stale/mock), 소요시간, 결과 수를 `console.info` JSON 로그로 출력 (Vercel Function 로그에서 확인 가능)

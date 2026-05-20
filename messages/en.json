@@ -63,7 +63,8 @@
     "viewDetail": "View details",
     "backToList": "Back",
     "directions": "Get directions",
-    "staleData": "Seoul public API is unavailable — showing cached results"
+    "staleData": "Seoul public API is unavailable — showing cached results ({age})",
+    "cachedData": "Updated {age}"
   },
   "desktop": {
     "title": "Recommended now",

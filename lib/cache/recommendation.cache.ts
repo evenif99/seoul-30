@@ -7,17 +7,22 @@ function buildQueryKey(district?: string, category?: string, freeOnly?: boolean)
   return [district ?? '_', category ?? 'all', freeOnly ? '1' : '0'].join('|')
 }
 
+export interface SnapshotResult {
+  results: RecommendationResult[]
+  snapshotAt: Date
+}
+
 export async function getSnapshot(
   district?: string,
   category?: string,
   freeOnly?: boolean,
-): Promise<RecommendationResult[] | null> {
+): Promise<SnapshotResult | null> {
   try {
     const snapshot = await prisma.recommendationSnapshot.findUnique({
       where: { queryKey: buildQueryKey(district, category, freeOnly) },
     })
     if (!snapshot || snapshot.expiresAt < new Date()) return null
-    return snapshot.resultJson as unknown as RecommendationResult[]
+    return { results: snapshot.resultJson as unknown as RecommendationResult[], snapshotAt: snapshot.createdAt }
   } catch {
     return null
   }
@@ -28,13 +33,13 @@ export async function getStaleSnapshot(
   district?: string,
   category?: string,
   freeOnly?: boolean,
-): Promise<RecommendationResult[] | null> {
+): Promise<SnapshotResult | null> {
   try {
     const snapshot = await prisma.recommendationSnapshot.findUnique({
       where: { queryKey: buildQueryKey(district, category, freeOnly) },
     })
     if (!snapshot) return null
-    return snapshot.resultJson as unknown as RecommendationResult[]
+    return { results: snapshot.resultJson as unknown as RecommendationResult[], snapshotAt: snapshot.createdAt }
   } catch {
     return null
   }

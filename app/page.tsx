@@ -15,7 +15,8 @@ import { PlaceCardSkeleton } from '@/components/seoul30/PlaceCardSkeleton'
 import { DistrictSelector } from '@/components/seoul30/DistrictSelector'
 import { PushSubscribeButton } from '@/components/seoul30/PushSubscribeButton'
 import { LanguageToggle } from '@/components/seoul30/LanguageToggle'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
+import { relativeTime } from '@/lib/utils/relative-time'
 import { cn } from '@/lib/utils'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 import type { NormalizedPlace } from '@/lib/types/place'
@@ -55,11 +56,13 @@ type ViewMode = 'list' | 'map'
 
 export default function HomePage() {
   const t = useTranslations()
+  const locale = useLocale() as 'ko' | 'en'
   const [district, setDistrict] = useState<string>('')
   const [filters, setFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
   const [results, setResults] = useState<RecommendationResult[]>([])
   const [isMock, setIsMock] = useState(false)
   const [isStale, setIsStale] = useState(false)
+  const [snapshotAt, setSnapshotAt] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
 
@@ -93,6 +96,7 @@ export default function HomePage() {
         setResults(body.data ?? [])
         setIsMock(body.isMock ?? false)
         setIsStale(body.isStale ?? false)
+        setSnapshotAt(body.snapshotAt ?? null)
       })
       .catch(() => setResults([]))
       .finally(() => setLoading(false))
@@ -166,7 +170,18 @@ export default function HomePage() {
           {isStale && (
             <div className="max-w-2xl mx-auto px-4 mb-1">
               <p className="text-[11px] text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center">
-                {t('common.staleData')}
+                {t('common.staleData', {
+                  age: snapshotAt ? relativeTime(snapshotAt, locale) : '—',
+                })}
+              </p>
+            </div>
+          )}
+
+          {/* 캐시 히트 시 데이터 기준 시각 */}
+          {!isMock && !isStale && snapshotAt && (
+            <div className="max-w-2xl mx-auto px-4 mb-1">
+              <p className="text-[10px] text-muted-foreground text-center">
+                {t('common.cachedData', { age: relativeTime(snapshotAt, locale) })}
               </p>
             </div>
           )}

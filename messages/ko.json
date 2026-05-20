@@ -63,7 +63,8 @@
     "viewDetail": "상세 보기",
     "backToList": "목록으로",
     "directions": "카카오맵으로 길찾기",
-    "staleData": "서울 공공 API에 연결할 수 없어 이전 캐시 데이터를 표시하고 있습니다"
+    "staleData": "서울 공공 API에 연결할 수 없어 이전 캐시 데이터를 표시하고 있습니다 ({age} 기준)",
+    "cachedData": "{age} 업데이트된 데이터"
   },
   "desktop": {
     "title": "지금 출발 추천",

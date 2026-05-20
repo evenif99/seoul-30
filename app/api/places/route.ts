@@ -24,8 +24,12 @@ export async function GET(request: Request) {
   if (featureFlags.cultureEventsApi) {
     const cached = await getSnapshot(input.district, input.category, input.isFreeOnly)
     if (cached) {
-      logPlacesRequest({ source: 'cache', durationMs: Date.now() - t0, resultCount: cached.length, input })
-      const body: ApiResponse<typeof cached> = { data: cached, isMock: false }
+      logPlacesRequest({ source: 'cache', durationMs: Date.now() - t0, resultCount: cached.results.length, input })
+      const body: ApiResponse<typeof cached.results> = {
+        data: cached.results,
+        isMock: false,
+        snapshotAt: cached.snapshotAt.toISOString(),
+      }
       return NextResponse.json(body)
     }
   }
@@ -44,8 +48,13 @@ export async function GET(request: Request) {
       // Seoul API 장애 또는 빈 응답 → 만료된 스냅샷이라도 반환
       const stale = await getStaleSnapshot(input.district, input.category, input.isFreeOnly)
       if (stale) {
-        logPlacesRequest({ source: 'stale', durationMs: Date.now() - t0, resultCount: stale.length, input })
-        const body: ApiResponse<typeof stale> = { data: stale, isMock: false, isStale: true }
+        logPlacesRequest({ source: 'stale', durationMs: Date.now() - t0, resultCount: stale.results.length, input })
+        const body: ApiResponse<typeof stale.results> = {
+          data: stale.results,
+          isMock: false,
+          isStale: true,
+          snapshotAt: stale.snapshotAt.toISOString(),
+        }
         return NextResponse.json(body)
       }
       // 스냅샷도 없으면 mock으로 폴백
