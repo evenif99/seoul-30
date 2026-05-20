@@ -4,7 +4,7 @@ import { MOCK_PLACES } from '@/lib/mock/places'
 import { getMockRealtime } from '@/lib/mock/realtime'
 import { fetchSeoulCultureEvents } from '@/lib/adapters/seoul-culture.adapter'
 import { fetchSeoulCongestion } from '@/lib/adapters/seoul-citydata.adapter'
-import { getSnapshot, setSnapshot } from '@/lib/cache/recommendation.cache'
+import { getSnapshot, getStaleSnapshot, setSnapshot } from '@/lib/cache/recommendation.cache'
 import { scorePlace } from '@/lib/scoring'
 import type { RecommendationInput } from '@/lib/types/recommendation'
 import type { ApiResponse } from '@/lib/types/api'
@@ -31,12 +31,21 @@ export async function GET(request: Request) {
   // Places 소스 결정
   let places = MOCK_PLACES
   let isMock = true
+  let isStale = false
 
   if (featureFlags.cultureEventsApi) {
     const apiPlaces = await fetchSeoulCultureEvents()
     if (apiPlaces.length > 0) {
       places = apiPlaces
       isMock = false
+    } else {
+      // Seoul API 장애 또는 빈 응답 → 만료된 스냅샷이라도 반환
+      const stale = await getStaleSnapshot(input.district, input.category, input.isFreeOnly)
+      if (stale) {
+        const body: ApiResponse<typeof stale> = { data: stale, isMock: false, isStale: true }
+        return NextResponse.json(body)
+      }
+      // 스냅샷도 없으면 mock으로 폴백
     }
   }
 
@@ -67,6 +76,6 @@ export async function GET(request: Request) {
     await setSnapshot(results, input.district, input.category, input.isFreeOnly)
   }
 
-  const body: ApiResponse<typeof results> = { data: results, isMock }
+  const body: ApiResponse<typeof results> = { data: results, isMock, isStale }
   return NextResponse.json(body)
 }

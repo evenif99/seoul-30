@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-20 (Phase 16 complete)
+Last updated: 2026-05-20 (Phase 17 complete)
 
 ## Completed Phases (1–15)
 
@@ -44,9 +44,26 @@ Last updated: 2026-05-20 (Phase 16 complete)
 - [x] `tests/components/ScoreBadge.test.tsx` — 4 tests
 - [x] TypeScript check + 16/16 tests passing + README + commit + push
 
+### Phase 17 — Stale Cache Fallback + Hardening
+
+#### Hardening (커밋 1)
+- [x] `feedback/route.ts` GET/POST — Prisma 호출 try-catch, DB 장애 시 500 반환
+- [x] `push/send/route.ts` — CRON_SECRET 미설정 시 운영 환경 인증 차단 (개발만 허용)
+- [x] `push/send/route.ts` — sendPushToAll Prisma findMany try-catch
+- [x] `push/send/route.ts` — GET/POST 핸들러 try-catch
+- [x] `hooks/use-push.ts` — subscribe/unsubscribe try-catch; 오류 시 상태 복구
+
+#### Phase 17 Stale Fallback (커밋 2)
+- [x] `lib/types/api.ts` — `isStale?: boolean` 추가
+- [x] `lib/cache/recommendation.cache.ts` — `getStaleSnapshot()` (TTL 무시)
+- [x] `app/api/places/route.ts` — Seoul API 빈 응답 시 stale 스냅샷 반환 (`isStale: true`)
+- [x] `app/page.tsx` — `isStale` 상태 수신, 앰버 배너 표시
+- [x] `messages/ko.json` + `messages/en.json` — `common.staleData` 추가
+- [x] TypeScript check + 16/16 tests passing
+
 ## Open Items
 
-- [ ] Phase 17–20 scope TBD
+- [ ] Phase 18–20 scope TBD
 - [ ] Middleware `proxy` migration (deferred — not blocking)
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 

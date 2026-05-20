@@ -56,6 +56,7 @@ export default function HomePage() {
   const [filters, setFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
   const [results, setResults] = useState<RecommendationResult[]>([])
   const [isMock, setIsMock] = useState(false)
+  const [isStale, setIsStale] = useState(false)
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
 
@@ -88,6 +89,7 @@ export default function HomePage() {
       .then((body) => {
         setResults(body.data ?? [])
         setIsMock(body.isMock ?? false)
+        setIsStale(body.isStale ?? false)
       })
       .catch(() => setResults([]))
       .finally(() => setLoading(false))
@@ -156,6 +158,15 @@ export default function HomePage() {
           <DistrictSelector value={district} onChange={handleDistrictChange} />
 
           <FilterBar filters={filters} onFiltersChange={handleFiltersChange} />
+
+          {/* Stale cache 배너 */}
+          {isStale && (
+            <div className="max-w-2xl mx-auto px-4 mb-1">
+              <p className="text-[11px] text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-center">
+                {t('common.staleData')}
+              </p>
+            </div>
+          )}
 
           {/* 결과 카운트 + 뷰 토글 */}
           <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center justify-between">

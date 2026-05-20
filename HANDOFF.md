@@ -1,12 +1,12 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Phase 16 complete)
+Last updated: 2026-05-20 (Phase 17 complete)
 
 ## Current State
 
-Phase 16 (score breakdown UI) is complete. PlaceCards now display the recommendation score and the top contributing reasons. All previous phases (1–15) are stable.
+Phase 17 (stale cache fallback + hardening) is complete. The app gracefully degrades when the Seoul Open API is unavailable by returning the most recent cached snapshot with an amber banner. All HIGH-severity error risks from the audit have been resolved.
 
-## What Was Done (Phase 13–16)
+## What Was Done (Phase 13–17)
 
 ### Phase 13 — Anonymous Place Rating
 - `PlaceFeedback` model added to `prisma/schema.prisma` (unique: placeId + sessionId)
@@ -65,7 +65,22 @@ NEXT_PUBLIC_VAPID_PUBLIC_KEY=        # same value as VAPID_PUBLIC_KEY
 CRON_SECRET=                         # arbitrary secret, guards /api/push/send
 ```
 
-## Verification Status (Phase 16)
+### Phase 17 — Stale Cache Fallback + Hardening
+
+**Hardening (커밋 1 — 독립 방어 수정):**
+- `feedback/route.ts` GET/POST Prisma 호출 → try-catch, DB 장애 시 500 반환
+- `push/send/route.ts` `checkAuth` → CRON_SECRET 미설정 시 운영 인증 차단 (`NODE_ENV === 'development'`에서만 허용)
+- `push/send/route.ts` `sendPushToAll` Prisma findMany + 핸들러 → try-catch
+- `hooks/use-push.ts` subscribe/unsubscribe → try-catch; 실패 시 상태 자동 복구
+
+**Phase 17 Stale Fallback (커밋 2):**
+- `lib/types/api.ts` — `isStale?: boolean` 필드 추가
+- `lib/cache/recommendation.cache.ts` — `getStaleSnapshot()` 추가 (TTL 무시, 만료 스냅샷도 반환)
+- `app/api/places/route.ts` — `fetchSeoulCultureEvents()` 반환값이 빈 배열이면 stale 스냅샷 조회 후 `isStale: true`로 반환, 스냅샷도 없으면 mock 폴백
+- `app/page.tsx` — `isStale` 수신, 필터 위 앰버 배너 표시
+- `messages/ko.json` + `messages/en.json` — `common.staleData` 추가
+
+## Verification Status (Phase 17)
 
 - `npx tsc --noEmit` — passed
 - `npm run test` — 16/16 unit + component tests passing
@@ -73,4 +88,4 @@ CRON_SECRET=                         # arbitrary secret, guards /api/push/send
 
 ## Next Action
 
-Start Phase 17 planning (stale cache fallback when Seoul Open API fails). See `PROJECT_SCOPE.md` for constraints.
+Start Phase 18 planning (accessibility + skeleton loading states). See `PROJECT_SCOPE.md` for constraints.

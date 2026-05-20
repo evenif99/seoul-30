@@ -62,7 +62,8 @@
     "paid": "Paid",
     "viewDetail": "View details",
     "backToList": "Back",
-    "directions": "Get directions"
+    "directions": "Get directions",
+    "staleData": "Seoul public API is unavailable — showing cached results"
   },
   "desktop": {
     "title": "Recommended now",

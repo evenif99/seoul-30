@@ -23,6 +23,23 @@ export async function getSnapshot(
   }
 }
 
+// TTL 무시하고 만료된 스냅샷도 반환 — Seoul API 장애 시 stale fallback용
+export async function getStaleSnapshot(
+  district?: string,
+  category?: string,
+  freeOnly?: boolean,
+): Promise<RecommendationResult[] | null> {
+  try {
+    const snapshot = await prisma.recommendationSnapshot.findUnique({
+      where: { queryKey: buildQueryKey(district, category, freeOnly) },
+    })
+    if (!snapshot) return null
+    return snapshot.resultJson as unknown as RecommendationResult[]
+  } catch {
+    return null
+  }
+}
+
 export async function setSnapshot(
   results: RecommendationResult[],
   district?: string,
