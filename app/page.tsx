@@ -11,6 +11,7 @@ import { BottomTabBar } from '@/components/seoul30/BottomTabBar'
 import { DesktopNav } from '@/components/seoul30/DesktopNav'
 import { EmptyState } from '@/components/seoul30/EmptyState'
 import { DistrictSelector } from '@/components/seoul30/DistrictSelector'
+import { PushSubscribeButton } from '@/components/seoul30/PushSubscribeButton'
 import { cn } from '@/lib/utils'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 import type { NormalizedPlace } from '@/lib/types/place'
@@ -136,9 +137,12 @@ export default function HomePage() {
             <h2 className="text-lg font-bold text-foreground">지금 출발 추천</h2>
             <p className="text-xs text-muted-foreground">서울 기준 · 실시간 업데이트</p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className={`inline-block w-1.5 h-1.5 rounded-full ${isMock ? 'bg-yellow-400' : 'bg-green-500'}`} aria-hidden="true" />
-            <span>{isMock ? 'mock 데이터' : '공공데이터 연동 중'}</span>
+          <div className="flex items-center gap-3">
+            <PushSubscribeButton />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className={`inline-block w-1.5 h-1.5 rounded-full ${isMock ? 'bg-yellow-400' : 'bg-green-500'}`} aria-hidden="true" />
+              <span>{isMock ? 'mock 데이터' : '공공데이터 연동 중'}</span>
+            </div>
           </div>
         </div>
 

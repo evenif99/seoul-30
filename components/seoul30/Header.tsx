@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { MapPin, ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
+import { PushSubscribeButton } from '@/components/seoul30/PushSubscribeButton'
 
 const LOCATIONS = ['성수동, 서울', '홍대입구, 서울', '강남역, 서울', '종로, 서울', '여의도, 서울']
 
@@ -59,6 +60,8 @@ export function Header({ onSearchOpen }: HeaderProps) {
               </ul>
             )}
           </div>
+
+          <PushSubscribeButton />
 
           {/* Search button */}
           <button

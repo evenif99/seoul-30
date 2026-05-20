@@ -59,6 +59,15 @@ model RecommendationSnapshot {
   expiresAt        DateTime
 }
 
+// PWA Push 구독 — endpoint 기준 upsert, PII 없음
+model WebPushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
+
 // 익명 장소 평가 — sessionId로 중복 방지, PII 없음
 model PlaceFeedback {
   id        String     @id @default(cuid())

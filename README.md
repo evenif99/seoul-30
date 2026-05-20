@@ -27,6 +27,14 @@ It is built as a deployable portfolio app with mock-first behavior and optional 
   - `GET /api/places/[id]/feedback` — aggregate counts
   - `POST /api/places/[id]/feedback` — upsert with toggle support
   - `FeedbackPanel` component on place detail page with optimistic UI
+- Phase 14 complete:
+  - PWA Web Push notifications via VAPID + `web-push`
+  - `WebPushSubscription` DB model (endpoint-deduped upsert)
+  - `POST /api/push/subscribe` + `DELETE` — subscribe / unsubscribe
+  - `GET|POST /api/push/send` — broadcasts to all subscribers, auto-removes expired endpoints
+  - Vercel Cron: daily 09:00 KST trigger via `vercel.json`
+  - `PushSubscribeButton` component in Header (mobile) and desktop bar
+  - `usePush` hook — permission flow, subscribe/unsubscribe, state machine
 
 ## Local Run
 ```bash
