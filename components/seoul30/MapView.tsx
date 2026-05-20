@@ -1,7 +1,7 @@
 'use client'
 
 import Script from 'next/script'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 import { MapViewInner } from './MapViewInner'
@@ -16,23 +16,21 @@ export function MapView({ results }: MapViewProps) {
   const t = useTranslations('common')
   const [ready, setReady] = useState(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.naver?.maps) {
-      setReady(true)
-    }
-  }, [])
-
   return (
     <div className="relative">
       <Script
-        src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${CLIENT_ID}`}
+        src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${CLIENT_ID}`}
         strategy="afterInteractive"
         onLoad={() => setReady(true)}
+        onError={() => console.error('[NaverMaps] script load failed')}
       />
       {ready ? (
         <MapViewInner results={results} />
       ) : (
-        <div className="flex items-center justify-center h-[60vh] text-sm text-muted-foreground px-4">
+        <div
+          className="flex items-center justify-center h-[60vh] text-sm text-muted-foreground px-4"
+          suppressHydrationWarning
+        >
           {t('mapLoading')}
         </div>
       )}
