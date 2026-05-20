@@ -59,6 +59,23 @@ model RecommendationSnapshot {
   expiresAt        DateTime
 }
 
+// 익명 장소 평가 — sessionId로 중복 방지, PII 없음
+model PlaceFeedback {
+  id        String     @id @default(cuid())
+  placeId   String                          // NormalizedPlace.id (mock or API)
+  sessionId String                          // localStorage UUID — 서버에 PII 없음
+  vote      FeedbackVote
+  createdAt DateTime   @default(now())
+
+  @@unique([placeId, sessionId])            // 세션당 장소 1표
+  @@index([placeId])
+}
+
+enum FeedbackVote {
+  UP
+  DOWN
+}
+
 enum PlaceSourceType {
   CULTURE_EVENT
   CULTURE_SPACE

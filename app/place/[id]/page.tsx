@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Phone, Globe, ExternalLink } from 'lucide-react'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
+import { FeedbackPanel } from '@/components/seoul30/FeedbackPanel'
 import { RecentTracker } from '@/components/seoul30/RecentTracker'
 import { ShareButton } from '@/components/seoul30/ShareButton'
 import { notFound } from 'next/navigation'
@@ -186,6 +187,9 @@ export default async function PlaceDetailPage({ params }: PageProps) {
             </div>
           )}
         </div>
+
+        {/* 평가 */}
+        <FeedbackPanel placeId={place.id} />
 
         {/* 길찾기 버튼 */}
         {kakaoUrl && (

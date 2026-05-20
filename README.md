@@ -21,6 +21,12 @@ It is built as a deployable portfolio app with mock-first behavior and optional 
     - home -> place detail
     - search filter -> results update
   - CI expanded to run unit/component tests + E2E before build
+- Phase 13 complete:
+  - Anonymous place rating (👍 / 👎) — no login required
+  - `PlaceFeedback` DB model (Prisma + Neon), sessionId from `localStorage`
+  - `GET /api/places/[id]/feedback` — aggregate counts
+  - `POST /api/places/[id]/feedback` — upsert with toggle support
+  - `FeedbackPanel` component on place detail page with optimistic UI
 
 ## Local Run
 ```bash
