@@ -80,7 +80,7 @@ export function MapViewInner({ results }: Props) {
   const noCoordCount = results.filter((r) => r.place.latitude == null).length
 
   function rebuildMarkers(map: naver.maps.Map, currentPlaces: PlaceWithCoords[]) {
-    markersRef.current.forEach((m) => m.setMap(null))
+    markersRef.current.forEach((m) => { try { m.setMap(null) } catch {} })
     markersRef.current = []
 
     const zoom = map.getZoom()
