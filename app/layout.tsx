@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Noto_Sans_KR, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
 import './globals.css'
@@ -38,25 +40,30 @@ export const viewport: Viewport = {
   userScalable: false,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
-    <html lang="ko" className={`${notoSansKR.variable} ${inter.variable} bg-background`}>
+    <html lang={locale} className={`${notoSansKR.variable} ${inter.variable} bg-background`}>
       <body className="font-sans antialiased">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
-        >
-          본문 바로가기
-        </a>
-        <ErrorBoundary>
-          <main id="main-content">{children}</main>
-        </ErrorBoundary>
-        <ServiceWorkerRegistrar />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <NextIntlClientProvider messages={messages}>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+          >
+            {locale === 'ko' ? '본문 바로가기' : 'Skip to content'}
+          </a>
+          <ErrorBoundary>
+            <main id="main-content">{children}</main>
+          </ErrorBoundary>
+          <ServiceWorkerRegistrar />
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </NextIntlClientProvider>
       </body>
     </html>
   )

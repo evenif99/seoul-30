@@ -7,6 +7,7 @@ import MarkerClusterGroup from 'react-leaflet-cluster'
 import L from 'leaflet'
 import Link from 'next/link'
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { NormalizedPlace } from '@/lib/types/place'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 
@@ -62,6 +63,7 @@ function BoundsController({ places }: { places: PlaceWithCoords[] }) {
 }
 
 export default function MapViewInner({ results }: Props) {
+  const t = useTranslations('common')
   const [selected, setSelected] = useState<NormalizedPlace | null>(null)
 
   const places = useMemo<PlaceWithCoords[]>(
@@ -137,7 +139,7 @@ export default function MapViewInner({ results }: Props) {
             href={`/place/${selected.id}`}
             className="shrink-0 text-xs font-medium text-primary-foreground bg-primary px-3 py-1.5 rounded-full hover:bg-primary/90 transition-colors"
           >
-            상세 보기
+            {t('viewDetail')}
           </Link>
           <button
             onClick={() => setSelected(null)}
@@ -151,7 +153,7 @@ export default function MapViewInner({ results }: Props) {
 
       {noCoordCount > 0 && (
         <p className="mt-2 text-[11px] text-muted-foreground text-center">
-          일부 장소는 좌표 정보가 없어 지도에 표시되지 않습니다
+          {t('noCoords')}
         </p>
       )}
     </div>

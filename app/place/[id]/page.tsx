@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Phone, Globe, ExternalLink } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { FeedbackPanel } from '@/components/seoul30/FeedbackPanel'
@@ -73,6 +74,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
 
   if (!place) notFound()
 
+  const t = await getTranslations('common')
   const kakaoUrl = buildKakaoMapUrl(place)
   const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
   const placeUrl = `${BASE_URL}/place/${id}`
@@ -116,7 +118,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
-          목록으로
+          {t('backToList')}
         </Link>
 
         {/* 헤더 */}
@@ -141,7 +143,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
         <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full mb-5 ${
           place.isFree ? 'bg-accent text-accent-foreground' : 'bg-secondary text-secondary-foreground'
         }`}>
-          {place.isFree ? '무료 이용' : (place.feeText ?? '유료')}
+          {place.isFree ? t('free') : (place.feeText ?? t('paid'))}
         </span>
 
         {/* 설명 */}
@@ -199,7 +201,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground rounded-xl py-3 text-sm font-semibold hover:bg-primary/90 transition-colors"
           >
-            카카오맵으로 길찾기
+            {t('directions')}
             <ExternalLink className="w-4 h-4" aria-hidden="true" />
           </a>
         )}

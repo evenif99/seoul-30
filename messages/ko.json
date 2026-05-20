@@ -1,0 +1,89 @@
+{
+  "hero": {
+    "headingPart1": "30분",
+    "headingPart2": " 안에 갈 수 있는",
+    "headingLine2": "추천 장소를 만나보세요",
+    "byline": "대중교통 기준 · 자치구 단위 추천",
+    "conditionsLabel": "오늘의 조건",
+    "greetings": {
+      "dawn": "새벽에도 갈 수 있는",
+      "morning": "오전에 가기 좋은",
+      "lunch": "점심 시간에 가기 좋은",
+      "afternoon": "오후에 가기 좋은",
+      "evening": "저녁에 가기 좋은",
+      "night": "지금 출발해도 좋은"
+    },
+    "greetingSuffix": " 곳을 지금 출발 기준으로 추천드려요"
+  },
+  "filter": {
+    "searchPlaceholder": "장소 이름으로 검색",
+    "searchLabel": "장소 검색",
+    "categoryLabel": "카테고리 필터",
+    "detailLabel": "세부 필터",
+    "freeOnly": "무료만",
+    "openNow": "지금 운영 중",
+    "resetFilters": "필터 초기화",
+    "categories": {
+      "all": "전체",
+      "culture": "문화/전시",
+      "library": "도서관",
+      "park": "공원",
+      "sports": "스포츠",
+      "welfare": "복지시설"
+    },
+    "crowd": {
+      "relaxed": "여유로움",
+      "moderate": "보통",
+      "busy": "혼잡 제외"
+    },
+    "time": {
+      "30": "30분 이내",
+      "20": "20분 이내",
+      "15": "15분 이내"
+    }
+  },
+  "nav": {
+    "home": "홈",
+    "bookmarks": "저장함",
+    "bottomLabel": "하단 탐색",
+    "skip": "본문 바로가기"
+  },
+  "common": {
+    "loading": "불러오는 중...",
+    "results": "{count}개의 장소를 추천드려요",
+    "listView": "목록",
+    "mapView": "지도",
+    "listViewLabel": "리스트 뷰",
+    "mapViewLabel": "지도 뷰",
+    "mockData": "mock 데이터",
+    "liveData": "공공데이터 연동 중",
+    "noCoords": "일부 장소는 좌표 정보가 없어 지도에 표시되지 않습니다",
+    "free": "무료 이용",
+    "paid": "유료",
+    "viewDetail": "상세 보기",
+    "backToList": "목록으로",
+    "directions": "카카오맵으로 길찾기"
+  },
+  "desktop": {
+    "title": "지금 출발 추천",
+    "subtitle": "서울 기준 · 실시간 업데이트"
+  },
+  "empty": {
+    "title": "조건에 맞는 장소가 없어요",
+    "subtitle": "필터를 조정해 보세요"
+  },
+  "feedback": {
+    "question": "이 장소가 도움이 됐나요?",
+    "helpful": "도움됨",
+    "notHelpful": "도움안됨"
+  },
+  "push": {
+    "subscribe": "추천 알림 받기",
+    "subscribed": "알림 구독 중",
+    "denied": "알림 차단됨",
+    "deniedTitle": "브라우저에서 알림이 차단되어 있습니다"
+  },
+  "lang": {
+    "toggle": "English"
+  }
+}

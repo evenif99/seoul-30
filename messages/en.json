@@ -1,0 +1,89 @@
+{
+  "hero": {
+    "headingPart1": "30-min",
+    "headingPart2": " reachable",
+    "headingLine2": "places, just for you",
+    "byline": "By public transit · District-based",
+    "conditionsLabel": "Today's conditions",
+    "greetings": {
+      "dawn": "open late night",
+      "morning": "great for mornings",
+      "lunch": "perfect for lunch breaks",
+      "afternoon": "good for afternoons",
+      "evening": "nice for evenings",
+      "night": "ready to go right now"
+    },
+    "greetingSuffix": " — recommendations from now"
+  },
+  "filter": {
+    "searchPlaceholder": "Search by place name",
+    "searchLabel": "Search places",
+    "categoryLabel": "Category filter",
+    "detailLabel": "Detail filter",
+    "freeOnly": "Free only",
+    "openNow": "Open now",
+    "resetFilters": "Reset filters",
+    "categories": {
+      "all": "All",
+      "culture": "Culture",
+      "library": "Library",
+      "park": "Park",
+      "sports": "Sports",
+      "welfare": "Welfare"
+    },
+    "crowd": {
+      "relaxed": "Relaxed",
+      "moderate": "Moderate",
+      "busy": "Not busy"
+    },
+    "time": {
+      "30": "Within 30 min",
+      "20": "Within 20 min",
+      "15": "Within 15 min"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "bookmarks": "Saved",
+    "bottomLabel": "Bottom navigation",
+    "skip": "Skip to content"
+  },
+  "common": {
+    "loading": "Loading...",
+    "results": "{count} places recommended",
+    "listView": "List",
+    "mapView": "Map",
+    "listViewLabel": "List view",
+    "mapViewLabel": "Map view",
+    "mockData": "mock data",
+    "liveData": "Live public data",
+    "noCoords": "Some places are not shown on the map due to missing coordinates",
+    "free": "Free",
+    "paid": "Paid",
+    "viewDetail": "View details",
+    "backToList": "Back",
+    "directions": "Get directions"
+  },
+  "desktop": {
+    "title": "Recommended now",
+    "subtitle": "Seoul · Real-time updates"
+  },
+  "empty": {
+    "title": "No places match your filters",
+    "subtitle": "Try adjusting the filters"
+  },
+  "feedback": {
+    "question": "Was this place helpful?",
+    "helpful": "Helpful",
+    "notHelpful": "Not helpful"
+  },
+  "push": {
+    "subscribe": "Get recommendations",
+    "subscribed": "Subscribed",
+    "denied": "Notifications blocked",
+    "deniedTitle": "Notifications are blocked in your browser"
+  },
+  "lang": {
+    "toggle": "한국어"
+  }
+}

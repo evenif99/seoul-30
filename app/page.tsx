@@ -12,6 +12,8 @@ import { DesktopNav } from '@/components/seoul30/DesktopNav'
 import { EmptyState } from '@/components/seoul30/EmptyState'
 import { DistrictSelector } from '@/components/seoul30/DistrictSelector'
 import { PushSubscribeButton } from '@/components/seoul30/PushSubscribeButton'
+import { LanguageToggle } from '@/components/seoul30/LanguageToggle'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 import type { NormalizedPlace } from '@/lib/types/place'
@@ -49,6 +51,7 @@ function syncUrl(district: string, filters: ActiveFilters) {
 type ViewMode = 'list' | 'map'
 
 export default function HomePage() {
+  const t = useTranslations()
   const [district, setDistrict] = useState<string>('')
   const [filters, setFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
   const [results, setResults] = useState<RecommendationResult[]>([])
@@ -134,14 +137,15 @@ export default function HomePage() {
 
         <div className="hidden md:flex items-center justify-between px-6 pt-5 pb-2 border-b border-border">
           <div>
-            <h2 className="text-lg font-bold text-foreground">지금 출발 추천</h2>
-            <p className="text-xs text-muted-foreground">서울 기준 · 실시간 업데이트</p>
+            <h2 className="text-lg font-bold text-foreground">{t('desktop.title')}</h2>
+            <p className="text-xs text-muted-foreground">{t('desktop.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <PushSubscribeButton />
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className={`inline-block w-1.5 h-1.5 rounded-full ${isMock ? 'bg-yellow-400' : 'bg-green-500'}`} aria-hidden="true" />
-              <span>{isMock ? 'mock 데이터' : '공공데이터 연동 중'}</span>
+              <span>{isMock ? t('common.mockData') : t('common.liveData')}</span>
             </div>
           </div>
         </div>
@@ -157,11 +161,11 @@ export default function HomePage() {
           <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
               {loading ? (
-                <span>불러오는 중...</span>
+                <span>{t('common.loading')}</span>
               ) : (
-                <>
-                  <span className="font-semibold text-foreground">{displayResults.length}개</span>의 장소를 추천드려요
-                </>
+                <span>
+                  {t('common.results', { count: displayResults.length })}
+                </span>
               )}
             </p>
 
@@ -175,14 +179,14 @@ export default function HomePage() {
                   }}
                   className="text-xs text-primary hover:underline mr-2"
                 >
-                  필터 초기화
+                  {t('filter.resetFilters')}
                 </button>
               )}
               {/* 리스트 / 지도 토글 */}
               <div className="flex rounded-lg border border-border overflow-hidden">
                 <button
                   onClick={() => setViewMode('list')}
-                  aria-label="리스트 뷰"
+                  aria-label={t('common.listViewLabel')}
                   className={cn(
                     'flex items-center gap-1 px-2.5 py-1.5 text-xs transition-colors',
                     viewMode === 'list'
@@ -191,11 +195,11 @@ export default function HomePage() {
                   )}
                 >
                   <List className="w-3.5 h-3.5" />
-                  <span>목록</span>
+                  <span>{t('common.listView')}</span>
                 </button>
                 <button
                   onClick={() => setViewMode('map')}
-                  aria-label="지도 뷰"
+                  aria-label={t('common.mapViewLabel')}
                   className={cn(
                     'flex items-center gap-1 px-2.5 py-1.5 text-xs transition-colors border-l border-border',
                     viewMode === 'map'
@@ -204,7 +208,7 @@ export default function HomePage() {
                   )}
                 >
                   <Map className="w-3.5 h-3.5" />
-                  <span>지도</span>
+                  <span>{t('common.mapView')}</span>
                 </button>
               </div>
             </div>

@@ -27,6 +27,12 @@ It is built as a deployable portfolio app with mock-first behavior and optional 
   - `GET /api/places/[id]/feedback` — aggregate counts
   - `POST /api/places/[id]/feedback` — upsert with toggle support
   - `FeedbackPanel` component on place detail page with optimistic UI
+- Phase 15 complete:
+  - i18n with next-intl v4 (cookie-based, no URL restructuring)
+  - `ko` (Korean, default) / `en` (English) support
+  - `messages/ko.json` + `messages/en.json` — hero, filter, nav, common, feedback, push
+  - `LanguageToggle` button in Header (mobile) and desktop bar
+  - All key components updated: Hero, FilterBar, EmptyState, BottomTabBar, FeedbackPanel, PushSubscribeButton, MapViewInner, place detail page
 - Phase 14 complete:
   - PWA Web Push notifications via VAPID + `web-push`
   - `WebPushSubscription` DB model (endpoint-deduped upsert)

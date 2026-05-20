@@ -1,6 +1,7 @@
 'use client'
 
 import { Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { CATEGORY_FILTERS, CROWD_FILTERS, TIME_FILTERS } from '@/lib/data'
 
 export interface ActiveFilters {
@@ -17,7 +18,14 @@ interface FilterBarProps {
   onFiltersChange: (filters: ActiveFilters) => void
 }
 
+const CROWD_KEY_MAP: Record<string, 'relaxed' | 'moderate' | 'busy'> = {
+  '여유로움': 'relaxed',
+  '보통': 'moderate',
+  '혼잡': 'busy',
+}
+
 export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
+  const t = useTranslations('filter')
   const set = (patch: Partial<ActiveFilters>) => onFiltersChange({ ...filters, ...patch })
 
   return (
@@ -29,11 +37,11 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
           <input
             type="search"
             data-testid="place-search-input"
-            placeholder="장소 이름으로 검색"
+            placeholder={t('searchPlaceholder')}
             value={filters.search}
             onChange={(e) => set({ search: e.target.value })}
             className="w-full pl-9 pr-4 py-2 text-sm bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary placeholder:text-muted-foreground/60"
-            aria-label="장소 검색"
+            aria-label={t('searchLabel')}
           />
         </div>
       </div>
@@ -42,7 +50,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
       <div
         className="flex gap-2 overflow-x-auto px-4 pb-2 scrollbar-hide"
         role="group"
-        aria-label="카테고리 필터"
+        aria-label={t('categoryLabel')}
       >
         {CATEGORY_FILTERS.map((f) => (
           <button
@@ -55,7 +63,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
                 : 'bg-card text-foreground border-border hover:border-primary/40'
             }`}
           >
-            {f.label}
+            {t(`categories.${f.id}`)}
           </button>
         ))}
       </div>
@@ -64,9 +72,8 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
       <div
         className="flex items-center gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide"
         role="group"
-        aria-label="세부 필터"
+        aria-label={t('detailLabel')}
       >
-        {/* 무료만 */}
         <button
           data-testid="free-only-filter"
           onClick={() => set({ freeOnly: !filters.freeOnly })}
@@ -77,10 +84,9 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
               : 'bg-card text-muted-foreground border-border hover:border-primary/40'
           }`}
         >
-          무료만
+          {t('freeOnly')}
         </button>
 
-        {/* 지금 운영 중 */}
         <button
           data-testid="open-now-filter"
           onClick={() => set({ openNow: !filters.openNow })}
@@ -91,10 +97,9 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
               : 'bg-card text-muted-foreground border-border hover:border-primary/40'
           }`}
         >
-          지금 운영 중
+          {t('openNow')}
         </button>
 
-        {/* 이동시간 */}
         {TIME_FILTERS.map((f) => (
           <button
             key={f.id}
@@ -106,11 +111,10 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
                 : 'bg-card text-muted-foreground border-border hover:border-primary/40'
             }`}
           >
-            {f.label}
+            {t(`time.${f.id}`)}
           </button>
         ))}
 
-        {/* 혼잡도 */}
         {CROWD_FILTERS.filter((f) => f.id !== 'all').map((f) => (
           <button
             key={f.id}
@@ -122,7 +126,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
                 : 'bg-card text-muted-foreground border-border hover:border-primary/40'
             }`}
           >
-            {f.label}
+            {t(`crowd.${CROWD_KEY_MAP[f.id] ?? 'moderate'}`)}
           </button>
         ))}
       </div>

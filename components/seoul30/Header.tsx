@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { MapPin, ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { PushSubscribeButton } from '@/components/seoul30/PushSubscribeButton'
+import { LanguageToggle } from '@/components/seoul30/LanguageToggle'
 
 const LOCATIONS = ['성수동, 서울', '홍대입구, 서울', '강남역, 서울', '종로, 서울', '여의도, 서울']
 
@@ -11,12 +13,14 @@ interface HeaderProps {
 }
 
 export function Header({ onSearchOpen }: HeaderProps) {
+  const t = useTranslations('nav')
   const [location, setLocation] = useState(LOCATIONS[0])
   const [locationOpen, setLocationOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+        <span className="sr-only">{t('skip')}</span>
         {/* Logo */}
         <span className="text-xl font-bold text-primary tracking-tight shrink-0">
           Seoul 30
@@ -61,6 +65,7 @@ export function Header({ onSearchOpen }: HeaderProps) {
             )}
           </div>
 
+          <LanguageToggle />
           <PushSubscribeButton />
 
           {/* Search button */}
