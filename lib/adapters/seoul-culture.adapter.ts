@@ -3,6 +3,7 @@ import type { NormalizedPlace } from '@/lib/types/place'
 import { fetchSeoulLibraries } from '@/lib/data/seoulLibrary'
 import { fetchSeoulParks } from '@/lib/data/seoulParks'
 import { fetchSeoulSports } from '@/lib/data/seoulSports'
+import { toSeoulLatLng } from '@/lib/utils/coords'
 
 interface CultureEventRow {
   CODENAME: string   // 카테고리 (뮤지컬·오페라, 전시, 연극 등)
@@ -124,8 +125,7 @@ export async function fetchSeoulPlaces(): Promise<NormalizedPlace[]> {
 
 function normalizeEventRow(row: CultureEventRow, index: number): NormalizedPlace {
   const isFree = row.IS_FREE === 'Y' || row.USE_FEE?.includes('무료')
-  const lat = parseFloat(row.LAT)
-  const lon = parseFloat(row.LOT)
+  const { latitude, longitude } = toSeoulLatLng(row.LAT, row.LOT)
   const startDate = row.STRTDATE ? row.STRTDATE.split(' ')[0] : undefined
 
   return {
@@ -136,8 +136,8 @@ function normalizeEventRow(row: CultureEventRow, index: number): NormalizedPlace
     category: CODENAME_TO_CATEGORY[row.CODENAME] ?? 'culture',
     district: row.GUNAME,
     address: row.PLACE || undefined,
-    latitude: isNaN(lat) ? undefined : lat,
-    longitude: isNaN(lon) ? undefined : lon,
+    latitude,
+    longitude,
     isFree,
     feeText: isFree ? undefined : (row.USE_FEE || undefined),
     homepageUrl: row.HMPG_ADDR || row.ORG_LINK || undefined,
@@ -149,8 +149,8 @@ function normalizeEventRow(row: CultureEventRow, index: number): NormalizedPlace
 
 function normalizeSpaceRow(row: CultureSpaceRow, index: number): NormalizedPlace {
   const isFree = row.IS_FREE === 'Y' || row.USE_FEE?.includes('무료')
-  const lat = parseFloat(row.Y_COORD)
-  const lon = parseFloat(row.X_COORD)
+  // culturalSpaceInfo currently returns X_COORD as latitude and Y_COORD as longitude.
+  const { latitude, longitude } = toSeoulLatLng(row.X_COORD, row.Y_COORD)
 
   return {
     id: `cs-${index}-${row.FAC_NAME.slice(0, 12).replace(/\W/g, '')}`,
@@ -160,8 +160,8 @@ function normalizeSpaceRow(row: CultureSpaceRow, index: number): NormalizedPlace
     category: SPACE_CODENAME_TO_CATEGORY[row.CODENAME] ?? 'culture',
     district: row.GUNAME,
     address: row.ADDR || undefined,
-    latitude: isNaN(lat) ? undefined : lat,
-    longitude: isNaN(lon) ? undefined : lon,
+    latitude,
+    longitude,
     isFree,
     feeText: isFree ? undefined : (row.USE_FEE || undefined),
     homepageUrl: row.HMPG_ADDR || undefined,

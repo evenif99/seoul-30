@@ -230,6 +230,11 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `cmd /c npm run test` passed (53/53)
 - [x] `cmd /c npm run build` passed
 
+### Phase 33.5 — Mock Place Audit & Pin Accuracy Prep
+- [x] `MOCK_PLACE_AUDIT.md` — key rotation guidance, coordinate source priority, initial suspect mock-place list
+- [x] `lib/adapters/seoul-culture.adapter.ts` — route culture event/space coordinates through `toSeoulLatLng()`, fix `culturalSpaceInfo` X/Y direction
+- [x] `tests/unit/mock-places.test.ts` — unique id/slug, required fields, Seoul bounds checks
+
 ## Deferred Items
 
 - Playwright Windows exit-hang — 로컬 한정 이슈, CI 통과 확인됨

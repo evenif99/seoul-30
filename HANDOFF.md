@@ -1,15 +1,15 @@
 # HANDOFF
 
-Last updated: 2026-05-21 (Phase 33 — TourAPI Image Integration)
+Last updated: 2026-05-21 (Phase 33.5 — Mock Place Audit Prep)
 
 ## 인계 요약
 
-Phase 33까지 완료. Phase 34부터 Codex가 이어받는다.
+Phase 33.5 준비 작업까지 완료. Phase 34 전에 mock 장소 삭제/대체/좌표 보정 본작업 필요.
 
 **배포 URL**: https://seoul-30-webapp.vercel.app  
 **레포**: https://github.com/evenif99/seoul-30  
 **현재 브랜치**: master  
-**테스트**: 53/53 통과 (Vitest unit + component)
+**테스트**: 56/56 통과 (Vitest unit + component)
 
 ---
 
@@ -79,6 +79,14 @@ Phase 33까지 완료. Phase 34부터 Codex가 이어받는다.
 
 ## Phase 34+ Codex 작업 계획
 
+### Phase 33.5 — Mock Place Audit & Pin Accuracy Prep
+- `MOCK_PLACE_AUDIT.md` 신규: TourAPI 키 재발급 가이드, 좌표 출처 우선순위, 삭제/대체 의심 mock 목록 정리
+- `tests/unit/mock-places.test.ts` 신규: mock place id/slug 중복, 필수 표시 필드, Seoul bounds 좌표 검증
+- `lib/adapters/seoul-culture.adapter.ts`: culture event/space 좌표를 `toSeoulLatLng()`로 검증
+- 공식 API 조회 결과 `culturalSpaceInfo`의 DDP가 `X_COORD=37.567...`, `Y_COORD=127.009...` 형태임을 확인하여 문화공간 좌표 방향 수정
+- Phase 34 전에 `mock-1`, `mock-2`, `mock-14`, `mock-15`, `mock-29`, `mock-31`, `mock-35`~`mock-38`은 삭제/대체/좌표 보정 검토 필요
+- 중요: 노출된 `TOUR_API_KEY`는 data.go.kr에서 재발급 후 `.env.local` + Vercel env 교체 필요
+
 ### Phase 34 — 근처 장소 추천 + 복지시설 API
 - 상세 페이지 하단 "근처 다른 장소" 섹션
 - 서울시 복지시설 API (`WelfareService` 또는 유사 엔드포인트)
@@ -125,7 +133,7 @@ Phase 33까지 완료. Phase 34부터 Codex가 이어받는다.
 ## 검증 상태 (Phase 33 완료 기준)
 
 - `cmd /c npx tsc --noEmit` — 통과 (0 오류)
-- `cmd /c npm run test` — 53/53 통과
+- `cmd /c npm run test` — 56/56 통과
 - `cmd /c npm run build` — 통과
 - Vercel 배포 — 정상 (https://seoul-30-webapp.vercel.app)
 - Naver Maps 핀포인트 — 38개 mock 좌표 보정 완료

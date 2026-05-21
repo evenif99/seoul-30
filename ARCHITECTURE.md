@@ -135,6 +135,8 @@ Seoul 경계 검증 + 0값 거부 유틸리티:
 - Seoul 경계: lat 37.413–37.715, lng 126.734–127.270
 - NaN, 0, 경계 밖 좌표는 `{}` 반환 → map 핀 미표시 처리
 - seoulLibrary/Parks/Sports 3개 fetcher 모두 이 유틸리티 사용
+- seoul-culture.adapter also validates culture event/space coordinates through this utility
+- Seoul `culturalSpaceInfo`: observed `X_COORD=latitude`, `Y_COORD=longitude`; do not assume conventional X=longitude for that service
 - Naver Maps API 좌표 순서: `new naver.maps.LatLng(lat, lng)` (위도 먼저)
 - Seoul Sports API: X=경도(longitude), Y=위도(latitude)
 
