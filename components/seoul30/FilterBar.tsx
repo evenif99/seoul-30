@@ -3,6 +3,7 @@
 import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { CATEGORY_FILTERS, CROWD_FILTERS, TIME_FILTERS } from '@/lib/data'
+import type { PlaceTag } from '@/lib/types/place'
 
 export interface ActiveFilters {
   category: string
@@ -11,7 +12,10 @@ export interface ActiveFilters {
   freeOnly: boolean
   search: string
   openNow: boolean
+  tags: PlaceTag[]
 }
+
+const TAG_OPTIONS: PlaceTag[] = ['indoor', 'outdoor', 'wheelchair', 'family', 'pet', 'parking', 'wifi']
 
 interface FilterBarProps {
   filters: ActiveFilters
@@ -129,6 +133,36 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
             {t(`crowd.${CROWD_KEY_MAP[f.id] ?? 'moderate'}`)}
           </button>
         ))}
+      </div>
+
+      {/* 태그 필터 */}
+      <div
+        className="flex items-center gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide"
+        role="group"
+        aria-label={t('tags.label')}
+      >
+        {TAG_OPTIONS.map((tag) => {
+          const active = filters.tags.includes(tag)
+          return (
+            <button
+              key={tag}
+              onClick={() => {
+                const next = active
+                  ? filters.tags.filter((existing) => existing !== tag)
+                  : [...filters.tags, tag]
+                set({ tags: next })
+              }}
+              aria-pressed={active}
+              className={`shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors whitespace-nowrap ${
+                active
+                  ? 'bg-emerald-600 text-white border-emerald-600'
+                  : 'bg-card text-muted-foreground border-border hover:border-emerald-400/60'
+              }`}
+            >
+              {t(`tags.${tag}`)}
+            </button>
+          )
+        })}
       </div>
     </div>
   )

@@ -10,6 +10,7 @@ const baseFilters: ActiveFilters = {
   freeOnly: false,
   search: '',
   openNow: false,
+  tags: [],
 }
 
 describe('FilterBar', () => {

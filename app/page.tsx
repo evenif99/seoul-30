@@ -29,6 +29,7 @@ const DEFAULT_FILTERS: ActiveFilters = {
   freeOnly: false,
   search: '',
   openNow: false,
+  tags: [],
 }
 
 function isOpenNow(place: NormalizedPlace): boolean {
@@ -49,6 +50,7 @@ function syncUrl(district: string, filters: ActiveFilters) {
   if (filters.freeOnly) params.set('freeOnly', 'true')
   if (filters.openNow) params.set('openNow', 'true')
   if (filters.search.trim()) params.set('search', filters.search.trim())
+  if (filters.tags.length > 0) params.set('tags', filters.tags.join(','))
   const qs = params.toString()
   window.history.replaceState(null, '', qs ? `/?${qs}` : '/')
 }
@@ -76,6 +78,7 @@ export default function HomePage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const initialDistrict = params.get('district') ?? ''
+    const rawTags = params.get('tags') ?? ''
     const initialFilters: ActiveFilters = {
       category: params.get('category') ?? 'all',
       crowd: 'all',
@@ -83,6 +86,7 @@ export default function HomePage() {
       freeOnly: params.get('freeOnly') === 'true',
       openNow: params.get('openNow') === 'true',
       search: params.get('search') ?? '',
+      tags: rawTags ? (rawTags.split(',') as ActiveFilters['tags']) : [],
     }
     setDistrict(initialDistrict)
     setFilters(initialFilters)
@@ -172,6 +176,10 @@ export default function HomePage() {
       if (filters.openNow && !isOpenNow(place)) return false
       // GPS 활성 시에만 시간 필터 적용
       if (userCoords && score?.transitMinutes != null && score.transitMinutes > maxMinutes) return false
+      // 태그 필터: tags 있는 장소에만 적용, 없는 장소(실 API)는 통과
+      if (filters.tags.length > 0 && place.tags && place.tags.length > 0) {
+        if (!filters.tags.every((tag) => place.tags!.includes(tag))) return false
+      }
       return true
     })
     .sort((a, b) => {
@@ -191,6 +199,7 @@ export default function HomePage() {
     filters.crowd !== 'all' ||
     filters.time !== '30' ||
     filters.category !== 'all' ||
+    filters.tags.length > 0 ||
     !!district ||
     !!userCoords
 

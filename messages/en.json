@@ -57,6 +57,16 @@
       "30": "Within 30 min",
       "20": "Within 20 min",
       "15": "Within 15 min"
+    },
+    "tags": {
+      "label": "Facilities",
+      "indoor": "Indoor",
+      "outdoor": "Outdoor",
+      "wheelchair": "Accessible",
+      "family": "Family",
+      "pet": "Pet-friendly",
+      "parking": "Parking",
+      "wifi": "Wi-Fi"
     }
   },
   "nav": {
