@@ -10,6 +10,7 @@ import { scorePlace } from '@/lib/scoring'
 import { nearestDdareungiStation } from '@/lib/utils/transit-time'
 import type { RecommendationInput } from '@/lib/types/recommendation'
 import type { ApiResponse } from '@/lib/types/api'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: Request) {
   const t0 = Date.now()
@@ -71,7 +72,7 @@ export async function GET(request: Request) {
         return NextResponse.json(body)
       }
       // 스냅샷도 없으면 mock으로 폴백
-      console.error(JSON.stringify({ event: 'places_api_empty_no_snapshot', district: input.district ?? null }))
+      logger.error({ event: 'places_api_empty_no_snapshot', district: input.district ?? null })
     }
   }
 
@@ -135,15 +136,13 @@ function logPlacesRequest({
   resultCount: number
   input: RecommendationInput
 }) {
-  console.info(
-    JSON.stringify({
-      event: 'places_request',
-      source,
-      durationMs,
-      resultCount,
-      district: input.district ?? null,
-      category: input.category ?? null,
-      isFreeOnly: input.isFreeOnly,
-    }),
-  )
+  logger.info({
+    event: 'places_request',
+    source,
+    durationMs,
+    resultCount,
+    district: input.district ?? null,
+    category: input.category ?? null,
+    isFreeOnly: input.isFreeOnly,
+  })
 }

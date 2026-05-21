@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Phase 29: UX & Filter Improvements)
+Last updated: 2026-05-21 (Phase 30: Operational Readiness)
 
 ## Product Goal
 
@@ -44,6 +44,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 27 | Data Source Expansion — 도서관/공원/체육시설 Seoul Open API fetcher, PlaceSourceType 확장(LIBRARY/PARK/SPORTS), fetchSeoulPlaces 5소스 통합 |
 | 28 | Place Detail Enrichment — PlaceCard 카테고리 placeholder, PlaceMiniMap(단일 마커 Naver Maps), 상세 페이지 미니맵/대중교통 노트/homepage i18n |
 | 29 | UX & Filter Improvements — GPS 시간 필터 실동작, 거리순/추천순 정렬 토글, EmptyState 대체 추천, 지도 팝업 "목록에서 보기" 연동 |
+| 30 | Operational Readiness — lib/logger.ts 구조화 로그 공통화, global-error.tsx, diagnostics 강화(snapshotCount/flags), Analytics 확인, RUNBOOK 최신화 |
 
 ## Deferred / Not In Scope
 

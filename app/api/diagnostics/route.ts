@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { env } from '@/lib/config/env'
 
 export const dynamic = 'force-dynamic'
 
@@ -7,19 +8,23 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   const timestamp = new Date().toISOString()
   try {
-    const [lastSnapshot, feedbackCount, pushSubscriberCount] = await Promise.all([
+    const [lastSnapshot, snapshotCount, feedbackCount, pushSubscriberCount] = await Promise.all([
       prisma.recommendationSnapshot.findFirst({
         orderBy: { createdAt: 'desc' },
         select: { createdAt: true },
       }),
+      prisma.recommendationSnapshot.count(),
       prisma.placeFeedback.count(),
       prisma.webPushSubscription.count(),
     ])
 
     return NextResponse.json({
       lastSnapshotAt: lastSnapshot?.createdAt ?? null,
+      snapshotCount,
       feedbackCount,
       pushSubscriberCount,
+      seoulApiEnabled: env.ENABLE_CULTURE_EVENTS_API,
+      realtimeCityDataEnabled: env.ENABLE_REALTIME_CITY_DATA,
       timestamp,
     })
   } catch {

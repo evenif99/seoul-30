@@ -4,7 +4,7 @@ Seoul 30 운영 런북. 배포 후 문제 발생 시 첫 번째로 참조한다.
 
 ---
 
-## 운영 상태 확인 (Phase 21 추가)
+## 운영 상태 확인
 
 ```
 GET /api/diagnostics
@@ -13,8 +13,11 @@ GET /api/diagnostics
 | 필드 | 설명 |
 |---|---|
 | `lastSnapshotAt` | 마지막 Seoul API 캐시 시각 (null이면 한 번도 API 호출 없음) |
+| `snapshotCount` | DB에 저장된 스냅샷 총 개수 |
 | `feedbackCount` | 누적 👍/👎 피드백 수 |
 | `pushSubscriberCount` | 현재 웹 푸시 구독자 수 |
+| `seoulApiEnabled` | `ENABLE_CULTURE_EVENTS_API` 플래그 상태 |
+| `realtimeCityDataEnabled` | `ENABLE_REALTIME_CITY_DATA` 플래그 상태 |
 
 DB 장애 시 503 반환.
 
@@ -28,7 +31,8 @@ GET /api/health
 
 | 응답 | 의미 |
 |---|---|
-| `{ "status": "ok", "db": "ok" }` | 정상 |
+| `{ "status": "ok", "db": "ok", "seoulApi": "ok" }` | 정상 |
+| `{ "status": "ok", "db": "ok", "seoulApi": "skipped" }` | Seoul API 키 미설정 (mock 모드) |
 | `{ "status": "degraded", "db": "error" }` | DB 연결 실패 (503) |
 | `{ "status": "error", "error": "[env] ..." }` | 필수 환경변수 누락 (503) |
 
@@ -49,12 +53,17 @@ GET /api/health
 
 ### 2. 서울 Open API 장애 (데이터 오래됨 배너 노출)
 
-**Phase 17 자동 처리**: API 빈 응답 시 DB 스냅샷(캐시)으로 자동 폴백, 앰버 배너 표시
+**자동 처리**: API 빈 응답 시 DB 스냅샷(캐시)으로 자동 폴백, 앰버 배너 표시
 - 캐시 TTL: 1시간. 스냅샷이 없으면 mock 데이터로 폴백
+
+**Phase 26 이후 데이터 소스**: 문화행사(culturalEventInfo) + 문화공간(culturalSpaceInfo) + 도서관(SeoulPublicLibraryInfo) + 공원(ListParkService) + 체육시설(ListPublicReservationSport)
+
+**개별 소스 장애 시**: 해당 소스만 빈 배열 반환, 나머지 소스 결과는 정상 반환
 
 **수동 확인**: `ENABLE_CULTURE_EVENTS_API=false` 로 설정하면 항상 mock 모드
 
 **API 복구 확인**: 서울 열린데이터광장(data.seoul.go.kr) 상태 페이지 참조
+- `/api/health` → `seoulApi: error` 이면 Seoul API 연결 문제
 
 ### 3. 환경변수 오류 (`/api/health` → `status: error`)
 
@@ -137,10 +146,22 @@ Vercel 대시보드 → Deployments → 직전 배포 → `...` → **Promote to
 
 ```bash
 npm run dev          # localhost:3001 (3000은 다른 프로젝트 사용 중)
-npm run test         # Vitest unit + component (29 tests)
+npm run test         # Vitest unit + component (48 tests)
+npm run test:e2e     # Playwright E2E
 npx tsc --noEmit     # 타입 체크
+npm run build        # 프로덕션 빌드 검증
 npx prisma studio    # DB GUI
 ```
+
+### 로그 확인 (Phase 30 통합)
+
+모든 서버 사이드 로그는 `lib/logger.ts` 공통 유틸을 통해 JSON 구조화 포맷으로 출력됩니다.
+
+```json
+{ "level": "info", "ts": "2026-05-21T...", "event": "places_request", "source": "api", "durationMs": 312 }
+```
+
+Vercel 대시보드 → Observability → Logs 에서 확인 가능.
 
 ### 필수 환경변수 (.env.local)
 

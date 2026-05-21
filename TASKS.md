@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 29: UX & Filter Improvements)
+Last updated: 2026-05-21 (Phase 30: Operational Readiness)
 
 ## Completed Phases (1–15)
 
@@ -181,6 +181,16 @@ Last updated: 2026-05-21 (Phase 29: UX & Filter Improvements)
 - [x] `components/seoul30/MapView.tsx` — `onSelectPlace` prop 전달
 - [x] `components/seoul30/MapViewInner.tsx` — `onSelectPlace` prop, 팝업에 "목록에서 보기" 버튼 추가
 - [x] `messages/ko.json` + `messages/en.json` — sortByScore/sortByDistance/showInList/empty.suggestions 추가
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
+
+### Phase 30 — Operational Readiness
+- [x] `lib/logger.ts` — 구조화 JSON 로그 공통 유틸 (info/warn/error, level+ts 필드 포함)
+- [x] `app/api/places/route.ts` — console.info/error → logger.info/error 교체
+- [x] `app/global-error.tsx` — App Router 루트 레벨 에러 UI (reset 버튼, 한국어)
+- [x] `app/api/diagnostics/route.ts` — snapshotCount, seoulApiEnabled, realtimeCityDataEnabled 필드 추가
+- [x] `tests/unit/diagnostics.test.ts` — snapshotCount mock + env mock 추가 (48/48 통과)
+- [x] `RUNBOOK.md` — health 응답 표 업데이트, Phase 26-30 신규 API 소스 설명, 로그 포맷 안내
+- [x] Vercel Analytics — layout.tsx에 이미 적용됨 확인 (@vercel/analytics v1.6.1)
 - [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
 ## Deferred Items
