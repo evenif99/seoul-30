@@ -123,8 +123,16 @@ export async function fetchSeoulPlaces(): Promise<NormalizedPlace[]> {
   return [...events, ...spaces, ...libraries, ...parks, ...sports]
 }
 
+const FREE_FEE_EXACT = new Set(['무료', '0원', '없음', '0', 'free'])
+
+function isDefinitelyFree(isFreeFlagY: boolean, useFeeText?: string): boolean {
+  if (isFreeFlagY) return true
+  const normalized = useFeeText?.trim().toLowerCase()
+  return !!normalized && FREE_FEE_EXACT.has(normalized)
+}
+
 function normalizeEventRow(row: CultureEventRow, index: number): NormalizedPlace {
-  const isFree = row.IS_FREE === 'Y' || row.USE_FEE?.includes('무료')
+  const isFree = isDefinitelyFree(row.IS_FREE === 'Y', row.USE_FEE)
   const { latitude, longitude } = toSeoulLatLng(row.LAT, row.LOT)
   const startDate = row.STRTDATE ? row.STRTDATE.split(' ')[0] : undefined
 
@@ -148,7 +156,7 @@ function normalizeEventRow(row: CultureEventRow, index: number): NormalizedPlace
 }
 
 function normalizeSpaceRow(row: CultureSpaceRow, index: number): NormalizedPlace {
-  const isFree = row.IS_FREE === 'Y' || row.USE_FEE?.includes('무료')
+  const isFree = isDefinitelyFree(row.IS_FREE === 'Y', row.USE_FEE)
   // culturalSpaceInfo currently returns X_COORD as latitude and Y_COORD as longitude.
   const { latitude, longitude } = toSeoulLatLng(row.X_COORD, row.Y_COORD)
 
