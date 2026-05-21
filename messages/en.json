@@ -173,6 +173,9 @@
   },
   "detail": {
     "nearestStation": "Nearest station",
+    "nearbyPlaces": "Nearby places",
+    "nearbyDistance": "{distance}km away",
+    "nearbyPinNote": "Only places with verified coordinates",
     "tags": {
       "indoor": "Indoor",
       "outdoor": "Outdoor",

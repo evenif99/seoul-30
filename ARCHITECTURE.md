@@ -70,11 +70,13 @@ lib/
   scoring.ts                         # scorePlace — 6 dimensions, KST-aware timefit + transit access
   data/ddareungi.ts                  # Seoul bikeList fetcher with 10-minute cache
   data/tourImages.ts                 # TourAPI 4.0 image enrichment (searchKeyword2 + detailImage2)
+  data/place-detail.ts               # real API detail lookup with mock fallback
   data/seoulLibrary.ts               # SeoulPublicLibraryInfo fetcher (Phase 27)
   data/seoulParks.ts                 # ListParkService fetcher (Phase 27)
   data/seoulSports.ts                # ListPublicReservationSport fetcher (Phase 27)
   utils/transit-time.ts              # Haversine + transit estimate helpers
   utils/coords.ts                    # toSeoulLatLng() — Seoul bounds validation utility
+  utils/place-distance.ts            # nearby places, coordinate-only Haversine ranking
   prisma.ts                          # singleton Prisma client
   types/place.ts                     # NormalizedPlace, PlaceSourceType, PlaceTag
   types/recommendation.ts

@@ -173,6 +173,9 @@
   },
   "detail": {
     "nearestStation": "가장 가까운 역",
+    "nearbyPlaces": "근처 다른 장소",
+    "nearbyDistance": "직선거리 {distance}km",
+    "nearbyPinNote": "좌표 검증된 장소만 표시",
     "tags": {
       "indoor": "실내",
       "outdoor": "야외",

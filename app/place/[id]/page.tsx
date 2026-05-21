@@ -7,14 +7,16 @@ import {
   BookOpen, Trees, Dumbbell, Landmark,
 } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
-import { MOCK_PLACES } from '@/lib/mock/places'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { FeedbackPanel } from '@/components/seoul30/FeedbackPanel'
 import { RecentTracker } from '@/components/seoul30/RecentTracker'
 import { ShareButton } from '@/components/seoul30/ShareButton'
 import { PlaceMiniMap } from '@/components/seoul30/PlaceMiniMap'
+import { PlaceCard } from '@/components/seoul30/PlaceCard'
 import { notFound } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { getPlaceDetailData } from '@/lib/data/place-detail'
+import { nearbyPlacesFor } from '@/lib/utils/place-distance'
 import type { PlaceTag } from '@/lib/types/place'
 
 interface PageProps {
@@ -22,10 +24,6 @@ interface PageProps {
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://seoul-30.vercel.app'
-
-function getPlace(id: string) {
-  return MOCK_PLACES.find((p) => p.id === id) ?? null
-}
 
 function buildKakaoMapUrl(place: { name: string; address?: string; latitude?: number; longitude?: number }) {
   if (place.latitude && place.longitude) {
@@ -65,7 +63,7 @@ const TAG_CONFIG: Record<PlaceTag, { icon: React.ReactNode; className: string }>
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
-  const place = getPlace(id)
+  const { place } = await getPlaceDetailData(id)
   if (!place) return {}
 
   const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
@@ -96,7 +94,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PlaceDetailPage({ params }: PageProps) {
   const { id } = await params
-  const place = getPlace(id)
+  const { place, places } = await getPlaceDetailData(id)
 
   if (!place) notFound()
 
@@ -106,6 +104,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
   const categoryLabel = CATEGORY_LABEL[place.category] ?? place.category
   const placeUrl = `${BASE_URL}/place/${id}`
   const heroPlaceholder = CATEGORY_HERO[place.category]
+  const nearby = nearbyPlacesFor(place, places)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -284,6 +283,27 @@ export default async function PlaceDetailPage({ params }: PageProps) {
           {/* 미니 지도 */}
           {place.latitude && place.longitude && (
             <PlaceMiniMap lat={place.latitude} lng={place.longitude} name={place.name} />
+          )}
+
+          {nearby.length > 0 && (
+            <section className="mb-6" aria-labelledby="nearby-places-title">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <h2 id="nearby-places-title" className="text-sm font-bold text-foreground">
+                  {tDetail('nearbyPlaces')}
+                </h2>
+                <p className="text-[11px] text-muted-foreground">{tDetail('nearbyPinNote')}</p>
+              </div>
+              <div className="flex flex-col gap-3">
+                {nearby.map(({ place: nearbyPlace, distanceKm }) => (
+                  <div key={nearbyPlace.id}>
+                    <PlaceCard place={nearbyPlace} />
+                    <p className="mt-1 text-[11px] text-muted-foreground text-right">
+                      {tDetail('nearbyDistance', { distance: distanceKm.toFixed(1) })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
 
           {/* 평가 */}

@@ -49,12 +49,13 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 32 | Detail Page Enrichment — 상세 페이지 hero image, tag chips, nearest station, CATEGORY_HERO / TAG_CONFIG 맵, 레이아웃 전면 재설계 |
 | Pin Accuracy | 핀포인트 오차 최소화 — toSeoulLatLng() 유틸리티(Seoul bounds guard), 3개 API fetcher 통일, 38개 mock 좌표 전면 보정, PlaceMiniMap zoom 16→15 |
 | 33 | TourAPI Image Integration — TourAPI 4.0 `searchKeyword2` + `detailImage2`, real API image enrichment, server-only `TOUR_API_KEY` |
+| 33.5 | Mock Place Audit Prep — mock 좌표/존재 감사 문서, 문화공간 좌표 방향 수정, mock data 품질 테스트 |
+| 34 | Nearby Places + Pin Accuracy First — 실제 API 상세 페이지 연결, 좌표 검증된 근처 장소 추천, 좌표 없는 복지시설 API 지도 통합 보류 |
 
-## Pending (Phase 34+, Codex 인계)
+## Pending (Phase 35+, Codex 인계)
 
 | Phase | 계획 |
 |---|---|
-| 34 | 근처 장소 추천 + 복지시설 API 연동 |
 | 35 | 포트폴리오 폴리시 (성능 측정, Lighthouse, 접근성 감사, 메타 완성) |
 
 ## Deferred / Not In Scope

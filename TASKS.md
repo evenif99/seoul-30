@@ -235,14 +235,25 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `lib/adapters/seoul-culture.adapter.ts` — route culture event/space coordinates through `toSeoulLatLng()`, fix `culturalSpaceInfo` X/Y direction
 - [x] `tests/unit/mock-places.test.ts` — unique id/slug, required fields, Seoul bounds checks
 
+### Phase 34 — Nearby Places + Pin Accuracy First
+- [x] `lib/data/place-detail.ts` — detail page now resolves real Seoul API place ids (`ce-*`, `cs-*`, `lib-*`, `park-*`, `sport-*`) before mock fallback
+- [x] `lib/utils/place-distance.ts` — coordinate-only nearby place selection using Haversine distance
+- [x] `app/place/[id]/page.tsx` — nearby places section added under the minimap, only for places with usable coordinates
+- [x] `messages/ko.json` + `messages/en.json` — nearby-place detail strings added
+- [x] `tests/unit/place-distance.test.ts` — nearby sorting and missing-coordinate guard tests
+- [x] Welfare API probe: `fcltOpenInfo_DJ` has facility address fields but no lat/lng, so map integration deferred to preserve pin accuracy
+- [x] Local 3001 check: real API first result detail page returned 200 (`isMock=false`)
+- [x] `cmd /c npx tsc --noEmit` passed
+- [x] `cmd /c npm run test` passed (58/58)
+- [x] `cmd /c npm run build` passed
+
 ## Deferred Items
 
 - Playwright Windows exit-hang — 로컬 한정 이슈, CI 통과 확인됨
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 
-## Pending (Phase 34+, Codex 인계)
+## Pending (Phase 35+, Codex 인계)
 
-- [ ] Phase 34 — 근처 장소 추천 + 복지시설 API 연동
 - [ ] Phase 35 — 포트폴리오 폴리시 (성능 측정, 접근성 감사, 메타 완성)
 
 ## Completed Post-Phase-20 Fixes
