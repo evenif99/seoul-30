@@ -1,6 +1,6 @@
 # HANDOFF
 
-Last updated: 2026-05-21 (Phase 34 + PlaceMiniMap navigation fix)
+Last updated: 2026-05-21 (Phase 39 — Seoul Realtime Congestion test coverage)
 
 ## Current Status (Clean Summary)
 
@@ -12,7 +12,7 @@ Last updated: 2026-05-21 (Phase 34 + PlaceMiniMap navigation fix)
 
 ## Required Next Step
 
-Phase 35 can start only after user approval. Before starting, confirm the Phase 35 scope: portfolio polish, Lighthouse/performance/accessibility audit, and metadata completion.
+Phase 40 (개인화 + 피드백 루프) is the next pending phase. Phase 36–39 are complete.
 
 Last updated: 2026-05-21 (Phase 34 — Nearby Places + Pin Accuracy First)
 
