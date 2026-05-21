@@ -46,6 +46,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 26** — Real Data Transition: fetchSeoulCultureSpaces 추가, 문화행사+문화공간 병합(fetchSeoulPlaces), /api/health Seoul API ping, 실 데이터 품질 방어
 - **Phase 27** — Data Source Expansion: 도서관(SeoulPublicLibraryInfo)/공원(ListParkService)/체육시설(ListPublicReservationSport) fetcher 추가, fetchSeoulPlaces 5개 소스 통합, PlaceSourceType 확장, mock sports 3개 추가
 - **Phase 28** — Place Detail Enrichment: PlaceCard 카테고리별 이미지 placeholder, PlaceMiniMap 컴포넌트(Naver Maps 단일 마커), 상세 페이지 미니맵/대중교통 접근성 노트/homepage i18n
+- **Phase 29** — UX & Filter Improvements: GPS 활성 시 시간 필터 실제 동작, 거리순/추천순 정렬 토글, EmptyState 대체 추천 2개, 지도 팝업 "목록에서 보기" 버튼 → 리스트 뷰 전환+스크롤
 
 ## Local Run
 

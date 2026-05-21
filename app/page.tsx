@@ -66,6 +66,7 @@ export default function HomePage() {
   const [snapshotAt, setSnapshotAt] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [sortByDistance, setSortByDistance] = useState(false)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locating, setLocating] = useState(false)
   const [showLocationModal, setShowLocationModal] = useState(false)
@@ -158,17 +159,30 @@ export default function HomePage() {
     syncUrl(district, next)
   }
 
-  // 클라이언트 사이드 필터링 (search, openNow)
-  const displayResults = results.filter(({ place }) => {
-    if (filters.search.trim()) {
-      const q = filters.search.trim().toLowerCase()
-      const nameMatch = place.name.toLowerCase().includes(q)
-      const addrMatch = place.address?.toLowerCase().includes(q) ?? false
-      if (!nameMatch && !addrMatch) return false
-    }
-    if (filters.openNow && !isOpenNow(place)) return false
-    return true
-  })
+  // 클라이언트 사이드 필터링 (search, openNow, 시간 필터)
+  const maxMinutes = parseInt(filters.time) || 30
+  const displayResults = results
+    .filter(({ place, score }) => {
+      if (filters.search.trim()) {
+        const q = filters.search.trim().toLowerCase()
+        const nameMatch = place.name.toLowerCase().includes(q)
+        const addrMatch = place.address?.toLowerCase().includes(q) ?? false
+        if (!nameMatch && !addrMatch) return false
+      }
+      if (filters.openNow && !isOpenNow(place)) return false
+      // GPS 활성 시에만 시간 필터 적용
+      if (userCoords && score?.transitMinutes != null && score.transitMinutes > maxMinutes) return false
+      return true
+    })
+    .sort((a, b) => {
+      // GPS + 거리순 정렬
+      if (sortByDistance && userCoords) {
+        const tA = a.score?.transitMinutes ?? 999
+        const tB = b.score?.transitMinutes ?? 999
+        return tA - tB
+      }
+      return b.score.total - a.score.total
+    })
 
   const isFiltered =
     filters.freeOnly ||
@@ -266,7 +280,7 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* 결과 카운트 + 뷰 토글 */}
+          {/* 결과 카운트 + 정렬 토글 + 뷰 토글 */}
           <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center justify-between">
             <p
               className="text-xs text-muted-foreground"
@@ -283,12 +297,36 @@ export default function HomePage() {
             </p>
 
             <div className="flex items-center gap-1">
+              {/* GPS 활성 시 정렬 토글 */}
+              {userCoords && (
+                <div className="flex rounded-lg border border-border overflow-hidden mr-1">
+                  <button
+                    onClick={() => setSortByDistance(false)}
+                    className={cn(
+                      'px-2 py-1 text-[11px] transition-colors',
+                      !sortByDistance ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted'
+                    )}
+                  >
+                    {t('common.sortByScore')}
+                  </button>
+                  <button
+                    onClick={() => setSortByDistance(true)}
+                    className={cn(
+                      'px-2 py-1 text-[11px] border-l border-border transition-colors',
+                      sortByDistance ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted'
+                    )}
+                  >
+                    {t('common.sortByDistance')}
+                  </button>
+                </div>
+              )}
               {isFiltered && (
                 <button
                   onClick={() => {
                     setDistrict('')
                     setFilters(DEFAULT_FILTERS)
                     setUserCoords(null)
+                    setSortByDistance(false)
                     window.history.replaceState(null, '', '/')
                   }}
                   className="text-xs text-primary hover:underline mr-2"
@@ -338,10 +376,12 @@ export default function HomePage() {
               {loading ? (
                 Array.from({ length: 3 }).map((_, i) => <PlaceCardSkeleton key={i} />)
               ) : displayResults.length === 0 ? (
-                <EmptyState />
+                <EmptyState suggestions={results.slice(0, 2).map((r) => r.place)} />
               ) : (
                 displayResults.map(({ place, score }, i) => (
-                  <PlaceCard key={place.id} place={place} score={score} priority={i === 0} />
+                  <div key={place.id} id={`place-card-${place.id}`}>
+                    <PlaceCard place={place} score={score} priority={i === 0} />
+                  </div>
                 ))
               )}
             </section>
@@ -351,9 +391,18 @@ export default function HomePage() {
           {viewMode === 'map' && !loading && (
             <div className="max-w-2xl mx-auto w-full">
               {displayResults.length === 0 ? (
-                <EmptyState />
+                <EmptyState suggestions={results.slice(0, 2).map((r) => r.place)} />
               ) : (
-                <MapView results={displayResults} />
+                <MapView
+                  results={displayResults}
+                  onSelectPlace={(place) => {
+                    setViewMode('list')
+                    // 리스트 뷰 전환 후 해당 카드로 스크롤
+                    setTimeout(() => {
+                      document.getElementById(`place-card-${place.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    }, 100)
+                  }}
+                />
               )}
             </div>
           )}

@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 28: Place Detail Enrichment)
+Last updated: 2026-05-21 (Phase 29: UX & Filter Improvements)
 
 ## Completed Phases (1–15)
 
@@ -170,6 +170,17 @@ Last updated: 2026-05-21 (Phase 28: Place Detail Enrichment)
 - [x] `components/seoul30/PlaceMiniMap.tsx` — 신규 클라이언트 컴포넌트 (Naver Maps 단일 마커, h-48 미니맵)
 - [x] `app/place/[id]/page.tsx` — PlaceMiniMap 통합 (lat/lng 있을 때만), 대중교통 접근성 노트, homepage i18n
 - [x] `messages/ko.json` + `messages/en.json` — `detailHomepage`, `detailTransitAccess` 추가
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
+
+### Phase 29 — UX & Filter Improvements
+- [x] `app/page.tsx` — `sortByDistance` state, GPS 활성 시 시간 필터(transitMinutes) 실제 동작
+- [x] `app/page.tsx` — 추천순/가까운순 정렬 토글 버튼 (GPS 활성 시만 표시)
+- [x] `app/page.tsx` — EmptyState에 `results.slice(0,2)` fallback suggestions 전달
+- [x] `app/page.tsx` — MapView `onSelectPlace` 콜백: 리스트 뷰 전환 + `place-card-{id}` scrollIntoView
+- [x] `components/seoul30/EmptyState.tsx` — `suggestions` prop 추가, 대체 추천 링크 카드 표시
+- [x] `components/seoul30/MapView.tsx` — `onSelectPlace` prop 전달
+- [x] `components/seoul30/MapViewInner.tsx` — `onSelectPlace` prop, 팝업에 "목록에서 보기" 버튼 추가
+- [x] `messages/ko.json` + `messages/en.json` — sortByScore/sortByDistance/showInList/empty.suggestions 추가
 - [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
 ## Deferred Items

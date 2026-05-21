@@ -110,7 +110,10 @@
     "mapNormal": "Switch to normal view",
     "mapMyLocation": "Go to my location",
     "detailHomepage": "Visit Homepage",
-    "detailTransitAccess": "Accessible within 30 min by transit"
+    "detailTransitAccess": "Accessible within 30 min by transit",
+    "sortByScore": "Best match",
+    "sortByDistance": "Nearest first",
+    "showInList": "Show in list"
   },
   "desktop": {
     "title": "Recommended now",
@@ -118,7 +121,8 @@
   },
   "empty": {
     "title": "No places match your filters",
-    "subtitle": "Try adjusting the filters"
+    "subtitle": "Try adjusting the filters",
+    "suggestions": "How about these places?"
   },
   "feedback": {
     "question": "Was this place helpful?",

@@ -11,6 +11,7 @@ type PlaceWithCoords = NormalizedPlace & { latitude: number; longitude: number }
 
 interface Props {
   results: RecommendationResult[]
+  onSelectPlace?: (place: NormalizedPlace) => void
 }
 
 interface Cluster {
@@ -59,7 +60,7 @@ function selectedIcon(): naver.maps.MarkerIcon {
   }
 }
 
-export function MapViewInner({ results }: Props) {
+export function MapViewInner({ results, onSelectPlace }: Props) {
   const t = useTranslations('common')
   const mapDivRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<naver.maps.Map | null>(null)
@@ -236,12 +237,22 @@ export function MapViewInner({ results }: Props) {
                   : ` · ${t('paid')}`}
             </p>
           </div>
-          <Link
-            href={`/place/${selected.id}`}
-            className="shrink-0 text-xs font-medium text-primary-foreground bg-primary px-3 py-1.5 rounded-full hover:bg-primary/90 transition-colors"
-          >
-            {t('viewDetail')}
-          </Link>
+          <div className="shrink-0 flex flex-col gap-1.5">
+            {onSelectPlace && (
+              <button
+                onClick={() => { onSelectPlace(selected); setSelected(null) }}
+                className="text-xs font-medium text-primary border border-primary px-3 py-1.5 rounded-full hover:bg-primary/10 transition-colors whitespace-nowrap"
+              >
+                {t('showInList')}
+              </button>
+            )}
+            <Link
+              href={`/place/${selected.id}`}
+              className="text-xs font-medium text-center text-primary-foreground bg-primary px-3 py-1.5 rounded-full hover:bg-primary/90 transition-colors"
+            >
+              {t('viewDetail')}
+            </Link>
+          </div>
           <button
             onClick={() => setSelected(null)}
             className="shrink-0 text-muted-foreground hover:text-foreground"

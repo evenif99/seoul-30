@@ -4,15 +4,17 @@ import Script from 'next/script'
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import type { RecommendationResult } from '@/lib/types/recommendation'
+import type { NormalizedPlace } from '@/lib/types/place'
 import { MapViewInner } from './MapViewInner'
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID ?? ''
 
 interface MapViewProps {
   results: RecommendationResult[]
+  onSelectPlace?: (place: NormalizedPlace) => void
 }
 
-export function MapView({ results }: MapViewProps) {
+export function MapView({ results, onSelectPlace }: MapViewProps) {
   const t = useTranslations('common')
   const [mounted, setMounted] = useState(false)
   const [ready, setReady] = useState(false)
@@ -32,7 +34,7 @@ export function MapView({ results }: MapViewProps) {
         />
       )}
       {mounted && ready ? (
-        <MapViewInner results={results} />
+        <MapViewInner results={results} onSelectPlace={onSelectPlace} />
       ) : (
         <div className="flex items-center justify-center h-[60vh] text-sm text-muted-foreground px-4">
           {t('mapLoading')}

@@ -110,7 +110,10 @@
     "mapNormal": "일반 뷰로 전환",
     "mapMyLocation": "현재 위치로 이동",
     "detailHomepage": "홈페이지 방문",
-    "detailTransitAccess": "대중교통 30분 이내 접근 가능"
+    "detailTransitAccess": "대중교통 30분 이내 접근 가능",
+    "sortByScore": "추천순",
+    "sortByDistance": "가까운순",
+    "showInList": "목록에서 보기"
   },
   "desktop": {
     "title": "지금 출발 추천",
@@ -118,7 +121,8 @@
   },
   "empty": {
     "title": "조건에 맞는 장소가 없어요",
-    "subtitle": "필터를 조정해 보세요"
+    "subtitle": "필터를 조정해 보세요",
+    "suggestions": "이런 장소는 어떤가요?"
   },
   "feedback": {
     "question": "이 장소가 도움이 됐나요?",
