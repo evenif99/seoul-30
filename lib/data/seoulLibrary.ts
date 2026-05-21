@@ -1,5 +1,6 @@
 import { env } from '@/lib/config/env'
 import type { NormalizedPlace } from '@/lib/types/place'
+import { toSeoulLatLng } from '@/lib/utils/coords'
 
 interface LibraryRow {
   LBRRY_NM: string       // 도서관명
@@ -31,8 +32,7 @@ export async function fetchSeoulLibraries(): Promise<NormalizedPlace[]> {
     return rows
       .filter((r) => r.GUNAME && r.LBRRY_NM)
       .map((r, i) => {
-        const lat = parseFloat(r.LATITUDE)
-        const lng = parseFloat(r.LONGITUDE)
+        const { latitude, longitude } = toSeoulLatLng(r.LATITUDE, r.LONGITUDE)
         const open = r.WEEKDAY_OPEN_TIME?.slice(0, 5) || undefined
         const close = r.WEEKDAY_CLOSE_TIME?.slice(0, 5) || undefined
 
@@ -44,8 +44,8 @@ export async function fetchSeoulLibraries(): Promise<NormalizedPlace[]> {
           category: 'library',
           district: r.GUNAME,
           address: r.ADRES || undefined,
-          latitude: isNaN(lat) ? undefined : lat,
-          longitude: isNaN(lng) ? undefined : lng,
+          latitude,
+          longitude,
           isFree: true,
           homepageUrl: r.HMPG_ADDR || undefined,
           phone: r.TEL_NO || undefined,

@@ -1,5 +1,6 @@
 import { env } from '@/lib/config/env'
 import type { NormalizedPlace } from '@/lib/types/place'
+import { toSeoulLatLng } from '@/lib/utils/coords'
 
 interface ParkRow {
   P_PARK: string       // 공원명
@@ -28,8 +29,7 @@ export async function fetchSeoulParks(): Promise<NormalizedPlace[]> {
     return rows
       .filter((r) => r.P_ZONE && r.P_PARK)
       .map((r, i) => {
-        const lat = parseFloat(r.LATITUDE)
-        const lng = parseFloat(r.LONGITUDE)
+        const { latitude, longitude } = toSeoulLatLng(r.LATITUDE, r.LONGITUDE)
 
         return {
           id: `park-${i}-${r.P_PARK.slice(0, 10).replace(/\W/g, '')}`,
@@ -39,9 +39,8 @@ export async function fetchSeoulParks(): Promise<NormalizedPlace[]> {
           category: 'park',
           district: r.P_ZONE,
           address: r.P_ADDR || undefined,
-          // 좌표 없는 공원은 undefined — 지도 마커 없이 리스트만 표시
-          latitude: isNaN(lat) || lat === 0 ? undefined : lat,
-          longitude: isNaN(lng) || lng === 0 ? undefined : lng,
+          latitude,
+          longitude,
           isFree: true,
           description: r.P_INTRODUCE || undefined,
           // 공원은 시간 정보 없음 — timefit 스코어 중립(5점) 처리

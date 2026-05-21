@@ -22,7 +22,7 @@ export function PlaceMiniMap({ lat, lng, name }: PlaceMiniMapProps) {
     const center = new naver.maps.LatLng(lat, lng)
     const map = new naver.maps.Map(containerRef.current, {
       center,
-      zoom: 16,
+      zoom: 15,
       scaleControl: false,
       mapDataControl: false,
     })

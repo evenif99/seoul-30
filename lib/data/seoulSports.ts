@@ -1,5 +1,6 @@
 import { env } from '@/lib/config/env'
 import type { NormalizedPlace } from '@/lib/types/place'
+import { toSeoulLatLng } from '@/lib/utils/coords'
 
 interface SportsRow {
   SVCNM: string    // 서비스명 (시설+종목)
@@ -30,8 +31,7 @@ export async function fetchSeoulSports(): Promise<NormalizedPlace[]> {
     return rows
       .filter((r) => r.AREANM && r.SVCNM)
       .map((r, i) => {
-        const lat = parseFloat(r.Y)
-        const lng = parseFloat(r.X)
+        const { latitude, longitude } = toSeoulLatLng(r.Y, r.X)
         const isFree = r.PAYFREE === '무료'
 
         return {
@@ -42,8 +42,8 @@ export async function fetchSeoulSports(): Promise<NormalizedPlace[]> {
           category: 'sports',
           district: r.AREANM,
           address: r.PLACENM || undefined,
-          latitude: isNaN(lat) || lat === 0 ? undefined : lat,
-          longitude: isNaN(lng) || lng === 0 ? undefined : lng,
+          latitude,
+          longitude,
           isFree,
           feeText: isFree ? undefined : '유료',
           homepageUrl: r.SVCURL || undefined,
