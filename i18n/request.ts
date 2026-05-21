@@ -16,5 +16,15 @@ export default getRequestConfig(async () => {
   return {
     locale,
     messages: (await import(`../messages/${locale}.json`)).default,
+    onError(error) {
+      if (error.code === 'MISSING_MESSAGE') {
+        console.warn('[next-intl] missing key:', error.message)
+      } else {
+        throw error
+      }
+    },
+    getMessageFallback({ key }: { namespace?: string; key: string; error: unknown }) {
+      return key.split('.').pop() ?? key
+    },
   }
 })
