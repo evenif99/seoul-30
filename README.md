@@ -40,7 +40,8 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 24** — Performance/accessibility hardening: ignoreBuildErrors removed, cache headers, PlaceCard i18n
 - **Phase 25** — Release readiness: dead import cleanup, full i18n completion (offline/about/privacy/map), MD sync
 - **Post-25** — Naver Maps 적용: Leaflet 대체, 위성 뷰 토글, 현재 위치 버튼, 그리드 클러스터링, ncpKeyId 인증
-- **Additional Phase** - Location-based transit access scoring: optional browser geolocation, server-side Ddareungi station lookup, transit minutes/mode badges, 48/48 tests passing
+- **Additional Phase** — Location-based transit access scoring: server-side Ddareungi station lookup (Seoul Open API), transit minutes/mode badges on place cards
+- **Additional Phase** — GPS onboarding modal: 첫 방문 시 위치 권한 안내 자동 표시, 거부 배너, localStorage 재표시 방지
 
 ## Local Run
 

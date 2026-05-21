@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-20 (Additional Phase: location-based transit access)
+Last updated: 2026-05-21 (Additional Phase: GPS onboarding modal)
 
 Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
@@ -140,6 +140,13 @@ Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 - [x] `npx tsc --noEmit` - passed
 - [x] `npm run test` - 48/48 passing
 - [x] `npm run build` - passed after stopping locked local Node processes on Windows
+
+### Additional Phase - GPS onboarding modal (mandatory geolocation UX)
+- [x] `components/seoul30/LocationOnboardingModal.tsx` - 첫 방문 시 위치 권한 안내 모달 (shadcn Dialog, 이동수단 아이콘 예시, ko/en)
+- [x] `app/page.tsx` - `showLocationModal` / `locationDenied` 상태 추가, 첫 방문 localStorage 체크, `handleModalAllow` / `handleModalDismiss`, GPS 거부 시 amber 배너
+- [x] `messages/ko.json` + `messages/en.json` - `locationModal` 네임스페이스 (title, description, allow, dismiss, denied, deniedBanner, mode.*)
+- [x] `npx tsc --noEmit` - passed
+- [x] `npm run test` - 48/48 passing
 
 ## Deferred Items
 

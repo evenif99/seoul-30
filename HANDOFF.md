@@ -1,10 +1,16 @@
 # HANDOFF
 
-Last updated: 2026-05-20 (Additional Phase: location-based transit access)
-
-Last updated: 2026-05-20 (Naver Maps 적용 완료 — Leaflet 대체)
+Last updated: 2026-05-21 (Additional Phase: GPS onboarding modal)
 
 ## Current State
+
+### Additional Phase - GPS onboarding modal (2026-05-21)
+- 첫 방문 사용자에게 위치 권한 온보딩 모달 자동 표시 (`LocationOnboardingModal.tsx`, shadcn Dialog 사용).
+- `localStorage` 키 `seoul30_gps_onboarding` 로 재방문 시 모달 재표시 방지.
+- [위치 허용하기] → `requestLocation()` 호출 → 성공 시 모달 닫힘 + 이동시간 뱃지 즉시 표시.
+- GPS 거부 시 모달 내 에러 문구 + 페이지 상단 amber 배너 표시.
+- [나중에] 클릭 시 localStorage 기록 후 모달 닫힘; 이후 상단 "내 위치 기반 추천" 버튼으로 재요청 가능.
+- `messages` `locationModal` 네임스페이스 ko/en 추가.
 
 ### Additional Phase - Location-based transit access scoring
 - Current work adds user-coordinate-aware access scoring without changing the existing district fallback.

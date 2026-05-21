@@ -1,8 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-20 (Additional Phase: location-based transit access)
-
-Last updated: 2026-05-20 (Phase 20 complete — all phases done)
+Last updated: 2026-05-21 (Additional Phase: GPS onboarding modal)
 
 ## Product Goal
 
@@ -39,7 +37,8 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 24 | Performance/accessibility hardening — ignoreBuildErrors 제거, static page cache headers, PlaceCard full i18n |
 | 25 | Release readiness — dead import cleanup, MapViewInner i18n, offline/about/privacy i18n 완성, MD 전체 최신화 |
 | Post-25 | Naver Maps 교체 — Leaflet 제거, 위성/하이브리드 뷰 토글, 현재 위치 버튼, 그리드 클러스터링, ncpKeyId 인증 |
-| Additional Phase | Location-based transit access scoring — optional geolocation, Ddareungi station proximity, transit minutes/mode in score breakdown |
+| Additional Phase | Location-based transit access scoring — Ddareungi station proximity (Seoul Open API), transit minutes/mode badge per place card |
+| Additional Phase | GPS onboarding modal — 첫 방문 시 위치 권한 안내 모달, 거부 시 amber 배너, localStorage 재표시 방지 |
 
 ## Deferred / Not In Scope
 
