@@ -1,139 +1,164 @@
 # Seoul 30
 
-Seoul 30 is a low-cost MVP PWA that recommends Seoul public places reachable within 30 minutes by public transit.
-Built as a deployable portfolio app with mock-first behavior and optional real public API integration.
+**서울 시민을 위한 30분 생활권 공공시설 추천 PWA**
 
-## Tech Stack
+> 현재 위치에서 대중교통 30분 이내의 도서관·공원·문화공간·스포츠시설을 무료 우선·혼잡도 반영으로 추천합니다.
 
-- Next.js 16 App Router + React 19 + TypeScript strict
-- Tailwind CSS + shadcn/ui
-- Prisma + Neon PostgreSQL (Singapore region)
-- Naver Maps JavaScript API v3
-- Vitest + React Testing Library + Playwright
-- Vercel Hobby deployment ($0/month)
+🔗 **Live**: [seoul-30-webapp.vercel.app](https://seoul-30-webapp.vercel.app)
 
-## Documentation
+---
 
-Project operation and handoff docs are managed under `docs/`.
+## 프로젝트 개요
 
-- [TASKS](docs/TASKS.md) - phase checklist and pending work
-- [PROJECT_SCOPE](docs/PROJECT_SCOPE.md) - completed scope and out-of-scope items
-- [ARCHITECTURE](docs/ARCHITECTURE.md) - file structure and runtime architecture
-- [HANDOFF](docs/HANDOFF.md) - current handoff state and work rules
-- [RUNBOOK](docs/RUNBOOK.md) - health checks, deploy, rollback, and incident notes
-- [NAVER_MAPS_IMPLEMENTATION](docs/NAVER_MAPS_IMPLEMENTATION.md) - Naver Maps implementation notes
-- [MOCK_PLACE_AUDIT](docs/MOCK_PLACE_AUDIT.md) - mock place coordinate/existence audit
+Seoul 30은 서울시 공공데이터 API와 자체 스코어링 엔진을 결합해, 사용자 위치·시간대·혼잡도를 고려한 장소 추천을 제공하는 풀스택 PWA입니다.
 
-Current status: Phase 34 is complete. Phase 35 is not complete yet and remains the next pending phase.
+**핵심 기능**
+- 6차원 스코어링 엔진 (접근성 30점 + 카테고리 25점 + 비용 15점 + 혼잡도 15점 + 운영시간 10점 + 행사임박도 5점)
+- GPS 기반 대중교통 이동시간 추정 (도보/따릉이/버스/지하철 Haversine 모델)
+- 서울시 5개 Open API 실시간 연동 + Neon PostgreSQL 스냅샷 캐시 + 만료 폴백
+- TourAPI 4.0 이미지 자동 보강 (공공데이터포털)
+- Naver Maps 핀포인트 (Seoul 경계 검증, 위성/하이브리드 뷰, 미니맵)
+- ko/en 이중 언어 (next-intl v4, 쿠키 기반)
+- PWA (오프라인 페이지, 웹 푸시 알림, 홈 설치)
+- 익명 장소 평점 (👍/👎, Prisma + Neon)
+- 근처 장소 추천 섹션
 
-## Phase Status
+---
 
-- **Phase 1** — Project setup, Next.js scaffold, Tailwind, shadcn/ui
-- **Phase 2** — Mock data, scoring model (access / relevance / cost / congestion / timefit / freshness)
-- **Phase 3** — PlaceCard UI, FilterBar (category / crowd / time / free-only)
-- **Phase 4** — PWA baseline (manifest, service worker, offline page)
-- **Phase 5** — Seoul Open API adapters (culture events, culture spaces)
-- **Phase 6** — DB caching layer (RecommendationSnapshot, ExternalCache via Prisma + Neon)
-- **Phase 7** — Search filter, open-now filter, URL query param sync
-- **Phase 8** — Bookmarks and recent views (localStorage + dedicated pages)
-- **Phase 9** — SEO (OG image, share button, sitemap, JSON-LD)
-- **Phase 10** — Production hardening (rate limiting middleware, error boundary, CI build checks)
-- **Phase 11** — Map view (Leaflet + OpenStreetMap, marker clustering, bounds controller)
-- **Phase 12** — Testing suite (Vitest unit + RTL component + Playwright E2E, CI integration)
-- **Phase 13** — Anonymous place rating (👍 / 👎, PlaceFeedback DB model, optimistic UI)
-- **Phase 14** — PWA Web Push notifications (VAPID, WebPushSubscription DB model, Vercel Cron)
-- **Phase 15** — i18n with next-intl v4 (ko/en, cookie-based locale, LanguageToggle)
-- **Phase 16** — Score explanation breakdown UI (ScoreBadge on PlaceCard, ko/en labels)
-- **Phase 17** — Stale cache fallback when Seoul Open API fails + defensive hardening (feedback/push try-catch, CRON_SECRET auth, use-push error state)
-- **Phase 18** — Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content link)
-- **Phase 19** — Static pages (About/Privacy) + PWA installability polish (manifest, shortcuts, maskable icon)
-- **Phase 20** — Launch hardening (env validation, /api/health, docs/RUNBOOK.md)
-- **Phase 21** — Observability: structured JSON logs on recommendation flow, /api/diagnostics endpoint
-- **Phase 22** — Data freshness transparency: snapshotAt in API response, relative time in stale banner
-- **Phase 23** — Engagement polish: bookmark count badge, ShareButton/BookmarkButton/Bookmarks page i18n
-- **Phase 24** — Performance/accessibility hardening: ignoreBuildErrors removed, cache headers, PlaceCard i18n
-- **Phase 25** — Release readiness: dead import cleanup, full i18n completion (offline/about/privacy/map), MD sync
-- **Post-25** — Naver Maps 적용: Leaflet 대체, 위성 뷰 토글, 현재 위치 버튼, 그리드 클러스터링, ncpKeyId 인증
-- **Additional Phase** — Location-based transit access scoring: server-side Ddareungi station lookup (Seoul Open API), transit minutes/mode badges on place cards
-- **Additional Phase** — GPS onboarding modal: 첫 방문 시 위치 권한 안내 자동 표시, 거부 배너, localStorage 재표시 방지
-- **Additional Phase** — E2E CI fix: `test.beforeEach` addInitScript로 모달 오버레이 사전 해제, GitHub Actions 통과 복구
-- **Phase 26** — Real Data Transition: fetchSeoulCultureSpaces 추가, 문화행사+문화공간 병합(fetchSeoulPlaces), /api/health Seoul API ping, 실 데이터 품질 방어
-- **Phase 27** — Data Source Expansion: 도서관(SeoulPublicLibraryInfo)/공원(ListParkService)/체육시설(ListPublicReservationSport) fetcher 추가, fetchSeoulPlaces 5개 소스 통합, PlaceSourceType 확장, mock sports 3개 추가
-- **Phase 28** — Place Detail Enrichment: PlaceCard 카테고리별 이미지 placeholder, PlaceMiniMap 컴포넌트(Naver Maps 단일 마커), 상세 페이지 미니맵/대중교통 접근성 노트/homepage i18n
-- **Phase 29** — UX & Filter Improvements: GPS 활성 시 시간 필터 실제 동작, 거리순/추천순 정렬 토글, EmptyState 대체 추천 2개, 지도 팝업 "목록에서 보기" 버튼 → 리스트 뷰 전환+스크롤
-- **Phase 30** — Operational Readiness: lib/logger.ts 공통 구조화 로그, global-error.tsx, diagnostics snapshotCount/flags 추가, RUNBOOK 최신화
-- **Phase 31** — Mock Data Expansion: 38 places, tags, nearest station metadata
-- **Phase 32** — Detail Page Enrichment: hero image, tag chips, nearest station, refreshed detail layout
-- **Phase 33** — TourAPI Image Integration: real API place image enrichment with server-side `TOUR_API_KEY`
+## 기술 스택
 
-## Recent Phase Notes
+| 영역 | 사용 기술 |
+|---|---|
+| Framework | Next.js 16 App Router + React 19 + TypeScript strict |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| Maps | Naver Maps JavaScript API v3 (ncpKeyId) |
+| Database | Prisma 5 + Neon PostgreSQL (ap-southeast-1) |
+| i18n | next-intl v4 (ko/en, cookie-based) |
+| Auth/Push | Web Push VAPID + Vercel Cron |
+| Testing | Vitest + React Testing Library + Playwright E2E |
+| CI/CD | GitHub Actions + Vercel Hobby (무료) |
+| Analytics | Vercel Analytics |
 
-- Phase 33.5 completed: mock place audit prep, coordinate guard tests, official API coordinate direction fix.
-- Phase 34 completed: real API detail lookup and coordinate-only nearby place recommendations.
-- Post-Phase 34 fix completed: PlaceMiniMap now initializes correctly after nearby detail page navigation.
-- Phase 35 pending: portfolio polish, Lighthouse/performance/accessibility audit, metadata completion.
+---
 
-## Local Run
+## 아키텍처 하이라이트
+
+```
+사용자 요청
+  └─ app/api/places/route.ts
+       ├─ Seoul 5개 API 병렬 호출 (문화행사/문화공간/도서관/공원/체육시설)
+       ├─ TourAPI 이미지 보강 (imageUrl 없는 상위 10개)
+       ├─ 스냅샷 캐시 → 만료 폴백 → mock 폴백
+       └─ 6차원 scorePlace() → 정렬 반환
+
+lib/utils/coords.ts      Seoul 경계 검증 (lat 37.413–37.715, lng 126.734–127.270)
+lib/utils/transit-time.ts Haversine 기반 대중교통 이동시간 추정
+lib/utils/place-distance.ts 좌표 기반 근처 장소 선별
+```
+
+**주요 설계 결정**
+- **좌표 없는 장소는 핀 미표시**: `toSeoulLatLng()` — 0값·경계 밖 좌표를 `undefined`로 변환해 지도 오핀 방지
+- **스냅샷 캐시**: GPS 요청은 캐시 우회(사용자별 결과 불일치 방지), 일반 요청은 DB 캐시 사용
+- **mock 우선 개발**: `USE_MOCK_DATA=true` 환경변수로 API 키 없이도 전체 기능 동작
+- **서버 전용 API 키**: `NEXT_PUBLIC_` prefix 없는 키는 Route Handler에서만 접근
+
+---
+
+## 로컬 실행
 
 ```bash
 git clone https://github.com/evenif99/seoul-30.git
 cd seoul-30
 npm install
 cp .env.example .env.local
-# fill in .env.local values (see Environment Variables below)
-npm run dev
+# .env.local 값 입력 (아래 환경변수 섹션 참고)
+npm run dev          # http://localhost:3001
 ```
 
-## Test Commands
+API 키 없이도 실행 가능: `.env.local`에서 `USE_MOCK_DATA=true` 유지.
+
+---
+
+## 테스트
 
 ```bash
-npm run test          # Vitest unit + component tests
+npm run test          # Vitest unit + component (58개)
 npm run test:e2e      # Playwright E2E
-npx tsc --noEmit      # type check
-npm run build         # production build
+npx tsc --noEmit      # TypeScript 타입 체크
+npm run build         # 프로덕션 빌드
 ```
 
-## Environment Variables
+---
+
+## 환경변수
 
 ```bash
-# Database
-DATABASE_URL=
+# 데이터베이스
+DATABASE_URL=                        # Neon PostgreSQL 연결 문자열
 
-# Seoul Open API (server-side only)
-SEOUL_OPEN_API_KEY=
+# 서울 공공데이터 (서버 전용)
+SEOUL_OPEN_API_KEY=                  # data.seoul.go.kr 인증키
+TOUR_API_KEY=                        # data.go.kr 한국관광공사 TourAPI 4.0
 
-# Korea Tourism Organization TourAPI 4.0 (server-side only)
-TOUR_API_KEY=
+# 정식 도메인 (OG 이미지·sitemap 생성용)
+NEXT_PUBLIC_BASE_URL=https://seoul-30-webapp.vercel.app
 
-# Canonical URL for OG / sitemap
-NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app
+# 기능 플래그
+USE_MOCK_DATA=true                   # false 시 실제 API 사용
+ENABLE_REALTIME_CITY_DATA=false      # true 시 따릉이 데이터 연동
+ENABLE_CULTURE_EVENTS_API=false      # true 시 서울 문화 API 사용
 
-# Feature flags
-USE_MOCK_DATA=true
-ENABLE_REALTIME_CITY_DATA=false
-ENABLE_CULTURE_EVENTS_API=false
-
-# Phase 14 — Web Push (VAPID)
-# Generate keys: npx web-push generate-vapid-keys
-VAPID_EMAIL=admin@example.com
+# Web Push VAPID (Phase 14)
+# 키 생성: npx web-push generate-vapid-keys
+VAPID_EMAIL=
 VAPID_PUBLIC_KEY=
 VAPID_PRIVATE_KEY=
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=   # same as VAPID_PUBLIC_KEY
-CRON_SECRET=                    # arbitrary secret string
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=        # VAPID_PUBLIC_KEY와 동일값
+CRON_SECRET=                         # Vercel Cron 호출 인증 임의 문자열
 
-# Naver Maps (browser-safe public key id)
-NEXT_PUBLIC_NAVER_MAP_CLIENT_ID=
+# Naver Maps (브라우저 노출 안전)
+NEXT_PUBLIC_NAVER_MAP_CLIENT_ID=     # NCP 콘솔 Application Client ID (ncpKeyId 형식)
 ```
 
-Security rules:
-- All API keys in `.env.local` or deployment env vars only — never in code
-- Server-side external API calls only (Route Handlers)
-- `NEXT_PUBLIC_` prefix only for values safe to expose to the browser
+**보안 규칙**
+- API 키는 `.env.local` 또는 배포 환경변수에만 저장 — 코드·커밋에 절대 포함 금지
+- 외부 API 호출은 Route Handler(서버)에서만
+- `NEXT_PUBLIC_` prefix는 브라우저 노출이 안전한 값에만 사용
 
-## Known Notes
+---
 
-- On Windows, Playwright process exit can hang after tests pass — tests themselves pass correctly.
+## 운영 확인
 
-## License
+```bash
+curl https://seoul-30-webapp.vercel.app/api/health
+# {"status":"ok","db":"ok","seoulApi":"ok"}
+```
+
+상세 운영 가이드: [docs/RUNBOOK.md](docs/RUNBOOK.md)
+
+---
+
+## 문서
+
+| 파일 | 내용 |
+|---|---|
+| [docs/TASKS.md](docs/TASKS.md) | Phase별 작업 체크리스트 |
+| [docs/PROJECT_SCOPE.md](docs/PROJECT_SCOPE.md) | 완료 범위 및 제외 항목 |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 파일 구조 및 런타임 아키텍처 |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | 인계 상태 및 작업 규칙 |
+| [docs/RUNBOOK.md](docs/RUNBOOK.md) | 헬스체크, 배포, 롤백, 장애 대응 |
+| [docs/MOCK_PLACE_AUDIT.md](docs/MOCK_PLACE_AUDIT.md) | Mock 장소 좌표 감사 |
+
+---
+
+## 알려진 제한사항
+
+- Playwright 로컬 실행 시 Windows에서 프로세스 종료 후 hang 발생 (테스트 자체는 정상 통과, CI 문제 없음)
+- 따릉이 실시간 데이터는 `ENABLE_REALTIME_CITY_DATA=true` 시 활성 (기본 비활성)
+- 복지시설 API는 좌표 미제공으로 지도 핀 통합 보류
+
+---
+
+## 라이선스
 
 MIT

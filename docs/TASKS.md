@@ -1,13 +1,13 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 34 + PlaceMiniMap navigation fix; docs moved to `docs/`)
+Last updated: 2026-05-21 (Phase 35: Portfolio Polish — complete)
 
 ## Current Phase Check
 
 - [x] Phase 34 completed.
 - [x] Post-Phase 34 bug fix completed: nearby detail page links now keep `PlaceMiniMap` working after `/place/...` client navigation.
 - [x] Markdown docs reorganized under `docs/` while keeping root `README.md` as the repository entry point.
-- [ ] Phase 35 not completed. Pending user approval before starting.
+- [x] Phase 35 completed.
 
 ## Docs Index
 
@@ -271,9 +271,13 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - Playwright Windows exit-hang — 로컬 한정 이슈, CI 통과 확인됨
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 
-## Pending (Phase 35+, Codex 인계)
-
-- [ ] Phase 35 — 포트폴리오 폴리시 (성능 측정, 접근성 감사, 메타 완성)
+### Phase 35 — Portfolio Polish
+- [x] `app/opengraph-image.tsx` 신규 — Next.js ImageResponse로 기본 OG 이미지 생성 (1200×630, 브랜드 컬러 #1A6B5A, edge runtime)
+- [x] `app/layout.tsx` — `metadataBase`, `openGraph`, `twitter`, `keywords`, `authors` 메타데이터 추가
+- [x] `README.md` — 포트폴리오용 전면 개선 (6차원 스코어링 설명, 아키텍처 다이어그램, 설계 결정 근거, 환경변수 표)
+- [x] `docs/TASKS.md` — Phase 35 완료 반영
+- [x] `npx tsc --noEmit` — 통과 (0 오류)
+- [x] `npm run test` — 58/58 통과
 
 ## Completed Post-Phase-20 Fixes
 
