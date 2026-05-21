@@ -26,20 +26,22 @@ Use the Decoding key in `.env.local`; the app URL-encodes it when calling TourAP
 
 Naver Geocoding can be useful, but it may be billable. Do not introduce it as an automated step without user approval.
 
-## Initial Findings
+## Initial Findings — Resolved (Phase 36, 2026-05-21)
 
-| id | Current place | Finding | Recommended action |
+| id | Before | After | Change |
 |---|---|---|---|
-| `mock-1` | 성수문화예술마당 | Search results show a different address candidate: `서울특별시 성동구 고산자로 71`, while mock uses `성수일로 77`. | Verify official current address, then update coordinates/address or remove if temporary site is no longer operating. |
-| `mock-2` | 서울숲 도서관 | Looks more like a feature inside Seoul Forest than a stable standalone public library. | Replace with an official library record or reclassify/remove. |
-| `mock-14` | 노원구 공공 테니스장 | Generic name; not a stable facility identity. | Replace with a specific official tennis court/facility. |
-| `mock-15` | 강남구 공공 수영장 | Generic name; not a stable facility identity. | Replace with a specific official public pool. |
-| `mock-29` | 서울종합운동장 실내수영장 | Mock address/district points to 광진구 능동로 1, but search results identify the facility around 잠실/송파구. | Correct to the official 잠실 facility or remove. |
-| `mock-31` | 서초구 실내체육관 | Generic name; needs official identity confirmation. | Replace with a specific official sports facility. |
-| `mock-35` | 서대문구립 복지관 | Generic name; likely not a precise official facility name. | Replace with a specific official welfare center. |
-| `mock-36` | 동작구 사회복지관 | Generic name/address mismatch risk; official welfare centers use specific names such as 사당종합사회복지관, 본동종합사회복지관, etc. | Replace with a specific official welfare center. |
-| `mock-37` | 도봉구 종합사회복지관 | Generic name; needs official identity confirmation. | Replace with a specific official welfare center. |
-| `mock-38` | 강동구 복지관 | Generic name; needs official identity confirmation. | Replace with a specific official welfare center. |
+| `mock-1` | 성수문화예술마당 (성수일로 77) | 성수문화예술마당 (고산자로 71) | 주소·좌표 수정 |
+| `mock-2` | 서울숲 도서관 (독립적 시설 아님) | 성동구립 왕십리도서관 (왕십리광장로 22) | 실 공공도서관으로 교체 |
+| `mock-14` | 노원구 공공 테니스장 (제네릭) | 태릉국제테니스장 (화랑로 727) | 정식 시설명·주소·좌표 교체 |
+| `mock-15` | 강남구 공공 수영장 (제네릭) | 강남구민체육센터 (학동로 452) | 정식 시설명·주소·좌표 교체 |
+| `mock-29` | 서울종합운동장 실내수영장 (광진구 — 오류) | 잠실종합운동장 실내수영장 (송파구 올림픽로 25) | 자치구·주소·좌표·역 정보 수정 |
+| `mock-31` | 서초구 실내체육관 (제네릭) | 서초구민체육센터 | 정식 시설명으로 변경 |
+| `mock-35` | 서대문구립 복지관 (제네릭) | 서대문종합사회복지관 | 정식 시설명으로 변경 |
+| `mock-36` | 동작구 사회복지관 (제네릭) | 사당종합사회복지관 | 정식 시설명으로 변경 |
+| `mock-37` | 도봉구 종합사회복지관 (제네릭) | 도봉종합사회복지관 | 정식 시설명으로 변경 |
+| `mock-38` | 강동구 복지관 (제네릭) | 강동종합사회복지관 | 정식 시설명으로 변경 |
+
+All 10 flagged mock places resolved. 58/58 tests passing.
 
 ## Real API Coordinate Finding
 
