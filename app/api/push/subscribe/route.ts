@@ -23,11 +23,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 })
   }
 
-  await prisma.webPushSubscription.upsert({
-    where: { endpoint },
-    create: { endpoint, p256dh: keys.p256dh, auth: keys.auth },
-    update: { p256dh: keys.p256dh, auth: keys.auth },
-  })
+  try {
+    await prisma.webPushSubscription.upsert({
+      where: { endpoint },
+      create: { endpoint, p256dh: keys.p256dh, auth: keys.auth },
+      update: { p256dh: keys.p256dh, auth: keys.auth },
+    })
+  } catch {
+    return NextResponse.json({ error: 'DB error' }, { status: 503 })
+  }
 
   return NextResponse.json({ ok: true })
 }
@@ -46,6 +50,11 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid endpoint' }, { status: 400 })
   }
 
-  await prisma.webPushSubscription.deleteMany({ where: { endpoint } })
+  try {
+    await prisma.webPushSubscription.deleteMany({ where: { endpoint } })
+  } catch {
+    return NextResponse.json({ error: 'DB error' }, { status: 503 })
+  }
+
   return NextResponse.json({ ok: true })
 }
