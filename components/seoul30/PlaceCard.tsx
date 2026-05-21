@@ -44,6 +44,7 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
   return (
     <Link
       href={`/place/${place.id}`}
+      data-testid="place-card-link"
       className="block bg-card rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow"
       aria-label={t('ariaLabel', { name: place.name })}
     >

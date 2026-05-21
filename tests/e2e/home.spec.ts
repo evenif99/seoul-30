@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 test('home to place detail golden path', async ({ page }) => {
   await page.goto('/')
 
-  const firstPlaceLink = page.locator('a[href^="/place/"]').first()
+  const firstPlaceLink = page.locator('[data-testid="place-card-link"]').first()
   await expect(firstPlaceLink).toBeVisible()
 
   await firstPlaceLink.click()
@@ -22,7 +22,7 @@ test('home to place detail golden path', async ({ page }) => {
 test('search filter changes visible results', async ({ page }) => {
   await page.goto('/')
 
-  const placeLinks = page.locator('a[href^="/place/"]')
+  const placeLinks = page.locator('[data-testid="place-card-link"]')
   await expect(placeLinks.first()).toBeVisible()
   const initialCount = await placeLinks.count()
 
