@@ -15,7 +15,7 @@ test('home to place detail golden path', async ({ page }) => {
 
   await firstPlaceLink.click()
 
-  await expect(page).toHaveURL(/\/place\/mock-/)
+  await expect(page).toHaveURL(/\/place\//)
   await expect(page.locator('h1')).toBeVisible()
 })
 

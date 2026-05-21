@@ -146,6 +146,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
           return (
             <button
               key={tag}
+              data-testid={`tag-filter-${tag}`}
               onClick={() => {
                 const next = active
                   ? filters.tags.filter((existing) => existing !== tag)
