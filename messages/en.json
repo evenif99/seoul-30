@@ -151,6 +151,20 @@
     "footerLink": "Privacy",
     "backHome": "Home"
   },
+  "locationModal": {
+    "title": "Get accurate transit times",
+    "description": "Allow location access to see estimated travel times by subway, bus, bike, and walking on each place card.",
+    "allow": "Allow Location",
+    "dismiss": "Later",
+    "denied": "Location access was denied. Please allow location in your browser settings and refresh.",
+    "deniedBanner": "Location access denied — transit times unavailable. Allow location in browser settings.",
+    "mode": {
+      "subway": "Subway",
+      "bus": "Bus",
+      "bike": "Bike",
+      "walk": "Walk"
+    }
+  },
   "score": {
     "label": "Score",
     "access": "Nearby",

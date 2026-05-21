@@ -8,6 +8,7 @@ import { Hero } from '@/components/seoul30/Hero'
 import { FilterBar, type ActiveFilters } from '@/components/seoul30/FilterBar'
 import { PlaceCard } from '@/components/seoul30/PlaceCard'
 import { MapView } from '@/components/seoul30/MapView'
+import { LocationOnboardingModal } from '@/components/seoul30/LocationOnboardingModal'
 import { BottomTabBar } from '@/components/seoul30/BottomTabBar'
 import { DesktopNav } from '@/components/seoul30/DesktopNav'
 import { EmptyState } from '@/components/seoul30/EmptyState'
@@ -67,6 +68,8 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locating, setLocating] = useState(false)
+  const [showLocationModal, setShowLocationModal] = useState(false)
+  const [locationDenied, setLocationDenied] = useState(false)
 
   // URL에서 초기 필터 복원 (클라이언트 마운트 후)
   useEffect(() => {
@@ -82,6 +85,12 @@ export default function HomePage() {
     }
     setDistrict(initialDistrict)
     setFilters(initialFilters)
+  }, [])
+
+  // 첫 방문 시 위치 온보딩 모달 표시
+  useEffect(() => {
+    const shown = localStorage.getItem('seoul30_gps_onboarding')
+    if (!shown) setShowLocationModal(true)
   }, [])
 
   // API 호출: district, category, freeOnly 변경 시
@@ -109,17 +118,34 @@ export default function HomePage() {
   }, [district, filters.category, filters.freeOnly, userCoords])
 
   function requestLocation() {
-    if (!navigator.geolocation) return
-
+    if (!navigator.geolocation) {
+      setLocationDenied(true)
+      return
+    }
     setLocating(true)
+    setLocationDenied(false)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         setLocating(false)
+        setShowLocationModal(false)
       },
-      () => setLocating(false),
+      () => {
+        setLocating(false)
+        setLocationDenied(true)
+      },
       { timeout: 8000 },
     )
+  }
+
+  function handleModalAllow() {
+    localStorage.setItem('seoul30_gps_onboarding', 'shown')
+    requestLocation()
+  }
+
+  function handleModalDismiss() {
+    localStorage.setItem('seoul30_gps_onboarding', 'shown')
+    setShowLocationModal(false)
   }
 
   function handleDistrictChange(next: string) {
@@ -156,6 +182,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <LocationOnboardingModal
+        open={showLocationModal}
+        denied={locationDenied}
+        onAllow={handleModalAllow}
+        onDismiss={handleModalDismiss}
+      />
       <aside className="hidden md:block sticky top-0 h-screen pl-6 pt-2">
         <DesktopNav />
       </aside>
@@ -182,6 +214,15 @@ export default function HomePage() {
 
         <main id="main-content" className="flex-1 overflow-y-auto pb-24 md:pb-8">
           <Hero />
+
+          {/* GPS 거부 안내 배너 */}
+          {locationDenied && (
+            <div className="max-w-2xl mx-auto px-4 mb-2">
+              <p className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-[11px] text-amber-700 text-center">
+                {t('locationModal.deniedBanner')}
+              </p>
+            </div>
+          )}
 
           <div className="max-w-2xl mx-auto px-4 mb-3 flex items-center gap-2">
             <button
