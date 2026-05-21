@@ -1,4 +1,5 @@
 export type PlaceSourceType = 'CULTURE_EVENT' | 'CULTURE_SPACE' | 'LIBRARY' | 'PARK' | 'SPORTS' | 'MOCK'
+export type PlaceTag = 'indoor' | 'outdoor' | 'wheelchair' | 'family' | 'pet' | 'parking' | 'wifi'
 
 export interface NormalizedPlace {
   id: string
@@ -18,5 +19,7 @@ export interface NormalizedPlace {
   phone?: string
   description?: string
   imageUrl?: string
+  tags?: PlaceTag[]
+  nearestStation?: string
   eventStartDate?: string  // "YYYY-MM-DD" — freshness scoring용 (CULTURE_EVENT 전용)
 }

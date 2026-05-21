@@ -171,6 +171,18 @@
       "walk": "도보"
     }
   },
+  "detail": {
+    "nearestStation": "가장 가까운 역",
+    "tags": {
+      "indoor": "실내",
+      "outdoor": "야외",
+      "wheelchair": "휠체어 접근",
+      "family": "가족 친화",
+      "pet": "반려동물",
+      "parking": "주차 가능",
+      "wifi": "무료 와이파이"
+    }
+  },
   "score": {
     "label": "추천 점수",
     "access": "지역 근접",

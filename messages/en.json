@@ -171,6 +171,18 @@
       "walk": "Walk"
     }
   },
+  "detail": {
+    "nearestStation": "Nearest station",
+    "tags": {
+      "indoor": "Indoor",
+      "outdoor": "Outdoor",
+      "wheelchair": "Wheelchair access",
+      "family": "Family-friendly",
+      "pet": "Pet-friendly",
+      "parking": "Parking",
+      "wifi": "Free Wi-Fi"
+    }
+  },
   "score": {
     "label": "Score",
     "access": "Nearby",

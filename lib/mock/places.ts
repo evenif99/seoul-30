@@ -18,6 +18,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '성수동 문화예술 복합공간. 전시·공연·체험 프로그램 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400&h=280&fit=crop',
+    tags: ['indoor', 'outdoor'],
+    nearestStation: '2호선 뚝섬역 도보 7분',
   },
   {
     id: 'mock-6',
@@ -34,6 +36,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '23:59',
     description: '도심 속 수변 산책로. 계절별 문화행사 진행.',
     imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efec6?w=400&h=280&fit=crop',
+    tags: ['outdoor'],
+    nearestStation: '1·2호선 시청역 도보 10분',
   },
   {
     id: 'mock-7',
@@ -52,6 +56,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://www.museum.go.kr',
     description: '상설전시 무료. 선사~근현대 유물 30만점 보유.',
     imageUrl: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family', 'parking'],
+    nearestStation: '4호선 이촌역 도보 10분',
   },
   {
     id: 'mock-11',
@@ -68,6 +74,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '23:59',
     description: '북한산 자락 현대식 한옥단지. 산책·포토스팟.',
     imageUrl: 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=400&h=280&fit=crop',
+    tags: ['outdoor'],
+    nearestStation: '3호선 구파발역 버스 10분',
   },
   {
     id: 'mock-16',
@@ -85,6 +93,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://museum.seoul.go.kr',
     description: '조선 개국부터 현재까지 서울 600년 역사를 담은 시립박물관.',
     imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family'],
+    nearestStation: '5호선 광화문역 도보 5분',
   },
   {
     id: 'mock-17',
@@ -102,6 +112,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://craftmuseum.seoul.go.kr',
     description: '공예 전문 공립박물관. 전통 공예품 상설전 및 기획전 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair'],
+    nearestStation: '3호선 안국역 도보 5분',
   },
   {
     id: 'mock-18',
@@ -120,6 +132,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://www.mmca.go.kr',
     description: '현대 미술 전문 국립미술관. 한국 및 해외 동시대 작품 상설·기획전.',
     imageUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair'],
+    nearestStation: '3호선 안국역 도보 10분',
   },
   {
     id: 'mock-19',
@@ -138,6 +152,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://www.ddp.or.kr',
     description: '자하 하디드 설계의 랜드마크 문화 공간. 디자인·패션·예술 전시.',
     imageUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'parking'],
+    nearestStation: '2·4·5호선 동대문역사문화공원역 도보 2분',
   },
 
   // ── 도서관 (7개) ────────────────────────────────────────────────────
@@ -156,6 +172,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '서울숲 인근 공공 도서관. 열람실·어린이실 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'wifi'],
+    nearestStation: '수인분당선 서울숲역 도보 5분',
   },
   {
     id: 'mock-20',
@@ -172,6 +190,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '마포구 대표 공공도서관. 6층 규모, 어린이실·멀티미디어실 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'wifi'],
+    nearestStation: '5호선 공덕역 도보 5분',
   },
   {
     id: 'mock-21',
@@ -188,6 +208,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '20:00',
     description: '논현동 구립 공공도서관. 독서모임·문화강좌 프로그램 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'wifi'],
+    nearestStation: '7호선 논현역 도보 5분',
   },
   {
     id: 'mock-22',
@@ -204,6 +226,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '청파동 구립 도서관. 1인 열람석·스터디룸 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1568667256549-094345857637?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair'],
+    nearestStation: '1호선 남영역 도보 10분',
   },
   {
     id: 'mock-23',
@@ -220,6 +244,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '불암산 자락 공공도서관. 야외 독서 데크 보유.',
     imageUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair'],
+    nearestStation: '7호선 하계역 도보 10분',
   },
   {
     id: 'mock-24',
@@ -236,6 +262,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '20:00',
     description: '화곡동 구립 공공도서관. 어린이 열람실·독서 문화 강좌 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'wifi'],
+    nearestStation: '5호선 화곡역 도보 5분',
   },
   {
     id: 'mock-25',
@@ -253,6 +281,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://lib.seoul.go.kr/namsan',
     description: '남산 중턱 위치, 1922년 개관 역사 깊은 공공도서관. 고문헌 자료 보유.',
     imageUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=280&fit=crop',
+    tags: ['indoor'],
+    nearestStation: '4호선 명동역 도보 15분',
   },
 
   // ── 공원 (9개) ──────────────────────────────────────────────────────
@@ -271,6 +301,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '23:59',
     description: '한강 조망 명소. 산책로와 팔각정 보유.',
     imageUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=280&fit=crop',
+    tags: ['outdoor'],
+    nearestStation: '경의중앙선 응봉역 도보 3분',
   },
   {
     id: 'mock-4',
@@ -287,6 +319,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '23:59',
     description: '한강변 수상레저·자전거·잔디광장 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1601628828688-632f38a5a7d0?w=400&h=280&fit=crop',
+    tags: ['outdoor', 'family'],
+    nearestStation: '2호선 뚝섬역 도보 8분',
   },
   {
     id: 'mock-8',
@@ -303,6 +337,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '22:00',
     description: '노을공원·하늘공원·평화의공원 포함 대규모 공원.',
     imageUrl: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=280&fit=crop',
+    tags: ['outdoor', 'parking', 'family'],
+    nearestStation: '6호선 월드컵경기장역 도보 10분',
   },
   {
     id: 'mock-9',
@@ -319,6 +355,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '도심 속 무료 캠핑·피크닉 공간.',
     imageUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=280&fit=crop',
+    tags: ['outdoor', 'family', 'pet'],
+    nearestStation: '경의중앙선 망우역 도보 15분',
   },
   {
     id: 'mock-10',
@@ -335,6 +373,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '22:00',
     description: '도산 안창호 선생 기념공원. 조용한 산책 공간.',
     imageUrl: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400&h=280&fit=crop',
+    tags: ['outdoor', 'pet'],
+    nearestStation: '분당선 압구정로데오역 도보 8분',
   },
   {
     id: 'mock-12',
@@ -351,6 +391,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '22:00',
     description: '88올림픽 경기장 부지 공원. 조각·잔디광장·산책로.',
     imageUrl: 'https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=400&h=280&fit=crop',
+    tags: ['outdoor', 'wheelchair', 'parking', 'family'],
+    nearestStation: '5·9호선 올림픽공원역 도보 3분',
   },
   {
     id: 'mock-26',
@@ -368,6 +410,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://dreamforest.seoul.go.kr',
     description: '서울 북부 대표 공원. 창녕위궁재사·전망대·분수광장·산책로.',
     imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=280&fit=crop',
+    tags: ['outdoor', 'family', 'pet'],
+    nearestStation: '우이신설선 솔샘역 도보 10분',
   },
   {
     id: 'mock-27',
@@ -386,6 +430,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     homepageUrl: 'https://botanicpark.seoul.go.kr',
     description: '12개국 식물 3,100여 종 보유 도심 식물원. 온실·호수원·야외정원.',
     imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=280&fit=crop',
+    tags: ['indoor', 'outdoor', 'wheelchair', 'family'],
+    nearestStation: '9호선 마곡나루역 도보 5분',
   },
   {
     id: 'mock-28',
@@ -402,6 +448,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '22:00',
     description: '공군사관학교 옛터의 대규모 시민공원. 자전거 도로·배드민턴장·인라인스케이트장.',
     imageUrl: 'https://images.unsplash.com/photo-1562095080-29d9274be5a8?w=400&h=280&fit=crop',
+    tags: ['outdoor', 'family', 'pet'],
+    nearestStation: '7호선 보라매역 도보 5분',
   },
 
   // ── 스포츠 (8개) ────────────────────────────────────────────────────
@@ -421,6 +469,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '22:00',
     description: '수영·배드민턴·헬스장·에어로빅 운영 종합체육관.',
     imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair'],
+    nearestStation: '5호선 공덕역 도보 10분',
   },
   {
     id: 'mock-14',
@@ -438,6 +488,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '야외 테니스 코트 6면. 인터넷 예약 필수.',
     imageUrl: 'https://images.unsplash.com/photo-1542144582-1ba00456b5e3?w=400&h=280&fit=crop',
+    tags: ['outdoor'],
+    nearestStation: '7호선 중계역 도보 8분',
   },
   {
     id: 'mock-15',
@@ -455,6 +507,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '50m 레인 수영장. 자유수영·수영강습 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=280&fit=crop',
+    tags: ['indoor'],
+    nearestStation: '2호선 삼성역 도보 8분',
   },
   {
     id: 'mock-29',
@@ -472,6 +526,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:30',
     description: '25m 레인 8코스. 자유수영·수영교실·아쿠아로빅 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400&h=280&fit=crop',
+    tags: ['indoor'],
+    nearestStation: '2·5호선 잠실역 도보 15분',
   },
   {
     id: 'mock-30',
@@ -489,6 +545,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '22:00',
     description: '헬스·수영·요가·실내 클라이밍 운영 복합 스포츠센터.',
     imageUrl: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=280&fit=crop',
+    tags: ['indoor'],
+    nearestStation: '7호선 숭실대입구역 도보 10분',
   },
   {
     id: 'mock-31',
@@ -506,6 +564,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '22:00',
     description: '배드민턴·탁구·농구코트 운영. 월별 생활체육 강좌 개설.',
     imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=280&fit=crop',
+    tags: ['indoor'],
+    nearestStation: '3호선 양재역 도보 10분',
   },
   {
     id: 'mock-32',
@@ -523,6 +583,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '25m 6레인 실내수영장. 생활체육 수영강습 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=280&fit=crop',
+    tags: ['indoor'],
+    nearestStation: '7호선 중화역 도보 10분',
   },
   {
     id: 'mock-33',
@@ -540,6 +602,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '21:00',
     description: '목동종합운동장 내 실내수영장. 자유수영·강습 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=400&h=280&fit=crop',
+    tags: ['indoor'],
+    nearestStation: '5호선 오목교역 도보 5분',
   },
 
   // ── 복지시설 (6개) ──────────────────────────────────────────────────
@@ -559,6 +623,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '구민 대상 문화·체육·복지 강좌 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family'],
+    nearestStation: '2호선 왕십리역 도보 5분',
   },
   {
     id: 'mock-34',
@@ -576,6 +642,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '어르신·장애인·가족 복지 통합 서비스. 반찬나눔·돌봄 프로그램.',
     imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family'],
+    nearestStation: '3호선 응암역 도보 5분',
   },
   {
     id: 'mock-35',
@@ -593,6 +661,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '지역 주민 복지 허브. 상담·교육·돌봄·자원봉사 연계 운영.',
     imageUrl: 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family'],
+    nearestStation: '3호선 독립문역 도보 10분',
   },
   {
     id: 'mock-36',
@@ -610,6 +680,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '복지상담·재가서비스·문화프로그램 운영 종합복지관.',
     imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family'],
+    nearestStation: '2호선 사당역 도보 5분',
   },
   {
     id: 'mock-37',
@@ -627,6 +699,8 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '저소득 가정·어르신·장애인 대상 종합 복지 서비스 제공.',
     imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family'],
+    nearestStation: '1호선 도봉역 도보 10분',
   },
   {
     id: 'mock-38',
@@ -644,5 +718,7 @@ export const MOCK_PLACES: NormalizedPlace[] = [
     closeTimeText: '18:00',
     description: '어르신 주간보호·장애인 자립지원·지역사회 통합 복지 서비스.',
     imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=280&fit=crop',
+    tags: ['indoor', 'wheelchair', 'family'],
+    nearestStation: '5호선 천호역 도보 5분',
   },
 ]
