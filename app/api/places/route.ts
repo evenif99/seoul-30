@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { featureFlags } from '@/lib/config/feature-flags'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { getMockRealtime } from '@/lib/mock/realtime'
-import { fetchSeoulCultureEvents } from '@/lib/adapters/seoul-culture.adapter'
+import { fetchSeoulPlaces } from '@/lib/adapters/seoul-culture.adapter'
 import { fetchSeoulCongestion } from '@/lib/adapters/seoul-citydata.adapter'
 import { getSnapshot, getStaleSnapshot, setSnapshot } from '@/lib/cache/recommendation.cache'
 import { getDdareungiStations } from '@/lib/data/ddareungi'
@@ -51,7 +51,9 @@ export async function GET(request: Request) {
   let isStale = false
 
   if (featureFlags.cultureEventsApi) {
-    const apiPlaces = await fetchSeoulCultureEvents()
+    const raw = await fetchSeoulPlaces()
+    // 이름 없는 항목 제거 (실 API 응답 방어)
+    const apiPlaces = raw.filter((p) => p.name && p.name.trim().length > 0)
     if (apiPlaces.length > 0) {
       places = apiPlaces
       isMock = false

@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Additional Phase: E2E fix for GPS onboarding modal)
+Last updated: 2026-05-21 (Phase 26: Real Data Transition)
 
 ## Product Goal
 
@@ -40,6 +40,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | Additional Phase | Location-based transit access scoring — Ddareungi station proximity (Seoul Open API), transit minutes/mode badge per place card |
 | Additional Phase | GPS onboarding modal — 첫 방문 시 위치 권한 안내 모달, 거부 시 amber 배너, localStorage 재표시 방지 |
 | Additional Phase | E2E CI fix — `test.beforeEach` addInitScript로 모달 사전 dismiss, GitHub Actions 통과 복구 |
+| 26 | Real Data Transition — fetchSeoulCultureSpaces 추가, fetchSeoulPlaces 통합, /api/health Seoul API ping, 실 데이터 품질 방어 |
 
 ## Deferred / Not In Scope
 

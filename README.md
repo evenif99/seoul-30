@@ -43,6 +43,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Additional Phase** — Location-based transit access scoring: server-side Ddareungi station lookup (Seoul Open API), transit minutes/mode badges on place cards
 - **Additional Phase** — GPS onboarding modal: 첫 방문 시 위치 권한 안내 자동 표시, 거부 배너, localStorage 재표시 방지
 - **Additional Phase** — E2E CI fix: `test.beforeEach` addInitScript로 모달 오버레이 사전 해제, GitHub Actions 통과 복구
+- **Phase 26** — Real Data Transition: fetchSeoulCultureSpaces 추가, 문화행사+문화공간 병합(fetchSeoulPlaces), /api/health Seoul API ping, 실 데이터 품질 방어
 
 ## Local Run
 

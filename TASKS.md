@@ -1,8 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Additional Phase: E2E fix for GPS onboarding modal)
-
-Last updated: 2026-05-20 (Phase 20 complete — all phases done)
+Last updated: 2026-05-21 (Phase 26: Real Data Transition)
 
 ## Completed Phases (1–15)
 
@@ -150,6 +148,13 @@ Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
 ### Additional Phase - E2E CI fix (GPS onboarding modal blocking)
 - [x] `tests/e2e/home.spec.ts` - `test.beforeEach`에서 `page.addInitScript`로 `seoul30_gps_onboarding` 키 사전 주입, 모달 오버레이가 place 클릭·검색 차단하던 CI 실패 수정
+
+### Phase 26 — Real Data Transition
+- [x] `lib/adapters/seoul-culture.adapter.ts` — `CultureSpaceRow` 타입 + `fetchSeoulCultureSpaces()` 추가 (culturalSpaceInfo API)
+- [x] `lib/adapters/seoul-culture.adapter.ts` — `fetchSeoulPlaces()` 통합 함수 (events + spaces 병렬 호출)
+- [x] `app/api/places/route.ts` — `fetchSeoulCultureEvents` → `fetchSeoulPlaces` 교체, name 빈 값 방어 필터 추가
+- [x] `app/api/health/route.ts` — `pingSeoulApi()` 추가, Seoul API 상태 응답에 `seoulApi` 필드 반환
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
 ## Deferred Items
 
