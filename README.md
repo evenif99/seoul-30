@@ -12,6 +12,20 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - Vitest + React Testing Library + Playwright
 - Vercel Hobby deployment ($0/month)
 
+## Documentation
+
+Project operation and handoff docs are managed under `docs/`.
+
+- [TASKS](docs/TASKS.md) - phase checklist and pending work
+- [PROJECT_SCOPE](docs/PROJECT_SCOPE.md) - completed scope and out-of-scope items
+- [ARCHITECTURE](docs/ARCHITECTURE.md) - file structure and runtime architecture
+- [HANDOFF](docs/HANDOFF.md) - current handoff state and work rules
+- [RUNBOOK](docs/RUNBOOK.md) - health checks, deploy, rollback, and incident notes
+- [NAVER_MAPS_IMPLEMENTATION](docs/NAVER_MAPS_IMPLEMENTATION.md) - Naver Maps implementation notes
+- [MOCK_PLACE_AUDIT](docs/MOCK_PLACE_AUDIT.md) - mock place coordinate/existence audit
+
+Current status: Phase 34 is complete. Phase 35 is not complete yet and remains the next pending phase.
+
 ## Phase Status
 
 - **Phase 1** — Project setup, Next.js scaffold, Tailwind, shadcn/ui
@@ -33,7 +47,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 17** — Stale cache fallback when Seoul Open API fails + defensive hardening (feedback/push try-catch, CRON_SECRET auth, use-push error state)
 - **Phase 18** — Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content link)
 - **Phase 19** — Static pages (About/Privacy) + PWA installability polish (manifest, shortcuts, maskable icon)
-- **Phase 20** — Launch hardening (env validation, /api/health, RUNBOOK.md)
+- **Phase 20** — Launch hardening (env validation, /api/health, docs/RUNBOOK.md)
 - **Phase 21** — Observability: structured JSON logs on recommendation flow, /api/diagnostics endpoint
 - **Phase 22** — Data freshness transparency: snapshotAt in API response, relative time in stale banner
 - **Phase 23** — Engagement polish: bookmark count badge, ShareButton/BookmarkButton/Bookmarks page i18n
@@ -51,6 +65,13 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 31** — Mock Data Expansion: 38 places, tags, nearest station metadata
 - **Phase 32** — Detail Page Enrichment: hero image, tag chips, nearest station, refreshed detail layout
 - **Phase 33** — TourAPI Image Integration: real API place image enrichment with server-side `TOUR_API_KEY`
+
+## Recent Phase Notes
+
+- Phase 33.5 completed: mock place audit prep, coordinate guard tests, official API coordinate direction fix.
+- Phase 34 completed: real API detail lookup and coordinate-only nearby place recommendations.
+- Post-Phase 34 fix completed: PlaceMiniMap now initializes correctly after nearby detail page navigation.
+- Phase 35 pending: portfolio polish, Lighthouse/performance/accessibility audit, metadata completion.
 
 ## Local Run
 

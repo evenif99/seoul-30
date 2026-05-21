@@ -1,5 +1,16 @@
 # ARCHITECTURE
 
+Last updated: 2026-05-21 (Phase 34 + PlaceMiniMap navigation fix)
+
+## Documentation Layout
+
+- Root `README.md` is the project entry point.
+- Operational docs live in `docs/`: `TASKS.md`, `PROJECT_SCOPE.md`, `HANDOFF.md`, `RUNBOOK.md`, `NAVER_MAPS_IMPLEMENTATION.md`, `MOCK_PLACE_AUDIT.md`.
+
+## Latest Architecture Note
+
+`components/seoul30/PlaceMiniMap.tsx` handles Naver Maps SDK reuse during client navigation. This prevents detail pages opened from the nearby-place list from rendering an empty mini map when the SDK script is already loaded.
+
 Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 
 ## Stack

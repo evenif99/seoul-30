@@ -1,5 +1,14 @@
 # PROJECT_SCOPE
 
+Last updated: 2026-05-21 (Phase 34 complete; Phase 35 pending; docs moved to `docs/`)
+
+## Current Scope Status
+
+- Completed through Phase 34.
+- Phase 35 is not complete and remains pending.
+- Post-Phase 34 fix included in current scope: `PlaceMiniMap` supports nearby detail page navigation without losing Naver Maps initialization.
+- Markdown operations docs are centralized in `docs/`; root `README.md` remains the entry document.
+
 Last updated: 2026-05-21 (Phase 33 — TourAPI Image Integration)
 
 ## Product Goal
@@ -30,7 +39,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 17 | Stale cache fallback (Seoul API 장애 시 만료 스냅샷 반환) + defensive hardening |
 | 18 | Skeleton loading states + accessibility (aria-live, aria-busy, skip-to-content) |
 | 19 | Static pages (About/Privacy) + PWA polish (manifest shortcuts, maskable icon, categories) |
-| 20 | Launch hardening — validateEnv(), /api/health, RUNBOOK.md |
+| 20 | Launch hardening — validateEnv(), /api/health, docs/RUNBOOK.md |
 | 21 | Observability — structured JSON logs on recommendation flow, /api/diagnostics endpoint |
 | 22 | Data freshness transparency — snapshotAt in API response, relative time in stale banner + cache indicator |
 | 23 | Engagement polish — bookmark count badge in BottomTabBar, ShareButton/BookmarkButton/Bookmarks page i18n |

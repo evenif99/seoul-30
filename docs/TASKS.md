@@ -1,5 +1,24 @@
 # TASKS
 
+Last updated: 2026-05-21 (Phase 34 + PlaceMiniMap navigation fix; docs moved to `docs/`)
+
+## Current Phase Check
+
+- [x] Phase 34 completed.
+- [x] Post-Phase 34 bug fix completed: nearby detail page links now keep `PlaceMiniMap` working after `/place/...` client navigation.
+- [x] Markdown docs reorganized under `docs/` while keeping root `README.md` as the repository entry point.
+- [ ] Phase 35 not completed. Pending user approval before starting.
+
+## Docs Index
+
+- `docs/TASKS.md`
+- `docs/PROJECT_SCOPE.md`
+- `docs/ARCHITECTURE.md`
+- `docs/HANDOFF.md`
+- `docs/RUNBOOK.md`
+- `docs/NAVER_MAPS_IMPLEMENTATION.md`
+- `docs/MOCK_PLACE_AUDIT.md`
+
 Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 
 ## Completed Phases (1–15)
@@ -83,7 +102,7 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 ### Phase 20 — Launch Hardening
 - [x] `lib/config/env.ts` — `validateEnv()` 추가 (DATABASE_URL, SEOUL_OPEN_API_KEY, VAPID 쌍 검증)
 - [x] `app/api/health/route.ts` — GET /api/health (env 검증 + DB ping)
-- [x] `RUNBOOK.md` — 헬스 체크, 시나리오별 대응, 시크릿 교체, 배포/롤백 절차
+- [x] `docs/RUNBOOK.md` — 헬스 체크, 시나리오별 대응, 시크릿 교체, 배포/롤백 절차
 - [x] `tests/unit/env.test.ts` — validateEnv 5 tests
 - [x] TypeScript check + 29/29 tests passing
 
@@ -119,7 +138,7 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `app/offline/page.tsx` — 전체 i18n (`getTranslations('offline')`)
 - [x] `app/about/page.tsx` + `app/privacy/page.tsx` — isKo 분기 제거, `t('backHome')` / `t('intro')` / `t('scoringNote')` 통일
 - [x] `messages` — offline, about.backHome/intro/scoringNote, privacy.backHome 추가
-- [x] TASKS.md, PROJECT_SCOPE.md, README.md, HANDOFF.md Phase 21-25 반영
+- [x] `docs/TASKS.md`, `docs/PROJECT_SCOPE.md`, `README.md`, `docs/HANDOFF.md` Phase 21-25 반영
 - [x] TypeScript 오류 없음, 43/43 통과
 
 ## Additional Phases After Phase 25
@@ -189,7 +208,7 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `app/global-error.tsx` — App Router 루트 레벨 에러 UI (reset 버튼, 한국어)
 - [x] `app/api/diagnostics/route.ts` — snapshotCount, seoulApiEnabled, realtimeCityDataEnabled 필드 추가
 - [x] `tests/unit/diagnostics.test.ts` — snapshotCount mock + env mock 추가 (48/48 통과)
-- [x] `RUNBOOK.md` — health 응답 표 업데이트, Phase 26-30 신규 API 소스 설명, 로그 포맷 안내
+- [x] `docs/RUNBOOK.md` — health 응답 표 업데이트, Phase 26-30 신규 API 소스 설명, 로그 포맷 안내
 - [x] Vercel Analytics — layout.tsx에 이미 적용됨 확인 (@vercel/analytics v1.6.1)
 - [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
@@ -231,7 +250,7 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `cmd /c npm run build` passed
 
 ### Phase 33.5 — Mock Place Audit & Pin Accuracy Prep
-- [x] `MOCK_PLACE_AUDIT.md` — key rotation guidance, coordinate source priority, initial suspect mock-place list
+- [x] `docs/MOCK_PLACE_AUDIT.md` — key rotation guidance, coordinate source priority, initial suspect mock-place list
 - [x] `lib/adapters/seoul-culture.adapter.ts` — route culture event/space coordinates through `toSeoulLatLng()`, fix `culturalSpaceInfo` X/Y direction
 - [x] `tests/unit/mock-places.test.ts` — unique id/slug, required fields, Seoul bounds checks
 
