@@ -63,10 +63,13 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
                 loading={priority ? 'eager' : 'lazy'}
               />
             ) : (
-              <div className={cn(
-                'w-full h-full flex items-center justify-center',
-                CATEGORY_PLACEHOLDER[place.category]?.bg ?? 'bg-muted',
-              )}>
+              <div
+                aria-hidden="true"
+                className={cn(
+                  'w-full h-full flex items-center justify-center',
+                  CATEGORY_PLACEHOLDER[place.category]?.bg ?? 'bg-muted',
+                )}
+              >
                 {CATEGORY_PLACEHOLDER[place.category]?.icon}
               </div>
             )}

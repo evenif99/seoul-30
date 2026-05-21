@@ -389,7 +389,7 @@ export default function HomePage() {
               ) : (
                 displayResults.map(({ place, score }, i) => (
                   <div key={place.id} id={`place-card-${place.id}`}>
-                    <PlaceCard place={place} score={score} priority={i === 0} />
+                    <PlaceCard place={place} score={score} priority={i < 3} />
                   </div>
                 ))
               )}

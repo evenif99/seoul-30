@@ -163,10 +163,13 @@ export default async function PlaceDetailPage({ params }: PageProps) {
               priority
             />
           ) : (
-            <div className={cn(
-              'w-full h-full flex items-center justify-center',
-              heroPlaceholder?.bg ?? 'bg-muted',
-            )}>
+            <div
+              aria-hidden="true"
+              className={cn(
+                'w-full h-full flex items-center justify-center',
+                heroPlaceholder?.bg ?? 'bg-muted',
+              )}
+            >
               {heroPlaceholder?.icon}
             </div>
           )}

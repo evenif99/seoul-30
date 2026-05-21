@@ -55,7 +55,6 @@ export const viewport: Viewport = {
   themeColor: '#1A6B5A',
   width: 'device-width',
   initialScale: 1,
-  userScalable: false,
 }
 
 export default async function RootLayout({
@@ -68,6 +67,11 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={`${notoSansKR.variable} ${inter.variable} bg-background`}>
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://openapi.map.naver.com" />
+      </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           <a
