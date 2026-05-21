@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Additional Phase: GPS onboarding modal)
+Last updated: 2026-05-21 (Additional Phase: E2E fix for GPS onboarding modal)
 
 Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 
@@ -147,6 +147,9 @@ Last updated: 2026-05-20 (Phase 20 complete — all phases done)
 - [x] `messages/ko.json` + `messages/en.json` - `locationModal` 네임스페이스 (title, description, allow, dismiss, denied, deniedBanner, mode.*)
 - [x] `npx tsc --noEmit` - passed
 - [x] `npm run test` - 48/48 passing
+
+### Additional Phase - E2E CI fix (GPS onboarding modal blocking)
+- [x] `tests/e2e/home.spec.ts` - `test.beforeEach`에서 `page.addInitScript`로 `seoul30_gps_onboarding` 키 사전 주입, 모달 오버레이가 place 클릭·검색 차단하던 CI 실패 수정
 
 ## Deferred Items
 

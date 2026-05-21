@@ -42,6 +42,7 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Post-25** — Naver Maps 적용: Leaflet 대체, 위성 뷰 토글, 현재 위치 버튼, 그리드 클러스터링, ncpKeyId 인증
 - **Additional Phase** — Location-based transit access scoring: server-side Ddareungi station lookup (Seoul Open API), transit minutes/mode badges on place cards
 - **Additional Phase** — GPS onboarding modal: 첫 방문 시 위치 권한 안내 자동 표시, 거부 배너, localStorage 재표시 방지
+- **Additional Phase** — E2E CI fix: `test.beforeEach` addInitScript로 모달 오버레이 사전 해제, GitHub Actions 통과 복구
 
 ## Local Run
 

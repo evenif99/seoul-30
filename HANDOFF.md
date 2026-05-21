@@ -1,8 +1,14 @@
 # HANDOFF
 
-Last updated: 2026-05-21 (Additional Phase: GPS onboarding modal)
+Last updated: 2026-05-21 (Additional Phase: E2E fix for GPS onboarding modal)
 
 ## Current State
+
+### Additional Phase - E2E CI fix (2026-05-21)
+- GPS 온보딩 모달 도입 후 E2E 테스트 2건 CI 실패 (`home to place detail`, `search filter`).
+- 원인: Playwright는 매 테스트마다 새 브라우저 컨텍스트로 시작 → localStorage 비어있음 → 모달 자동 오픈 → `z-50` 오버레이가 장소 카드 클릭·검색 입력 차단.
+- 수정: `tests/e2e/home.spec.ts`에 `test.beforeEach` 추가, `page.addInitScript`로 `seoul30_gps_onboarding = 'shown'` 사전 주입 → 모달 미표시.
+- `addInitScript`는 페이지 JS 실행 전에 브라우저 컨텍스트에서 실행되므로 React 마운트 시 이미 키가 존재.
 
 ### Additional Phase - GPS onboarding modal (2026-05-21)
 - 첫 방문 사용자에게 위치 권한 온보딩 모달 자동 표시 (`LocationOnboardingModal.tsx`, shadcn Dialog 사용).

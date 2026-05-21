@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Additional Phase: GPS onboarding modal)
+Last updated: 2026-05-21 (Additional Phase: E2E fix for GPS onboarding modal)
 
 ## Product Goal
 
@@ -39,6 +39,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | Post-25 | Naver Maps 교체 — Leaflet 제거, 위성/하이브리드 뷰 토글, 현재 위치 버튼, 그리드 클러스터링, ncpKeyId 인증 |
 | Additional Phase | Location-based transit access scoring — Ddareungi station proximity (Seoul Open API), transit minutes/mode badge per place card |
 | Additional Phase | GPS onboarding modal — 첫 방문 시 위치 권한 안내 모달, 거부 시 amber 배너, localStorage 재표시 방지 |
+| Additional Phase | E2E CI fix — `test.beforeEach` addInitScript로 모달 사전 dismiss, GitHub Actions 통과 복구 |
 
 ## Deferred / Not In Scope
 
