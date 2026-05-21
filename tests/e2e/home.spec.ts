@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test'
 
+// GPS 온보딩 모달이 열리지 않도록 localStorage 키를 사전 설정
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('seoul30_gps_onboarding', 'shown')
+  })
+})
+
 test('home to place detail golden path', async ({ page }) => {
   await page.goto('/')
 
