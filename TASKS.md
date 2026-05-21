@@ -220,14 +220,23 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `components/seoul30/PlaceMiniMap.tsx` — zoom 16 → 15 (주변 맥락 더 잘 보임)
 - [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
+### Phase 33 — TourAPI Image Integration
+- [x] `lib/data/tourImages.ts` — TourAPI 4.0 `searchKeyword2` + `detailImage2` server-side fetcher
+- [x] `app/api/places/route.ts` — real API top-10 results without `imageUrl` get TourAPI image enrichment
+- [x] `lib/config/env.ts` — server-only `TOUR_API_KEY` added and validated with `ENABLE_CULTURE_EVENTS_API=true`
+- [x] `.env.example` + `README.md` — `TOUR_API_KEY` setup documented
+- [x] `tests/unit/tourImages.test.ts` + `tests/unit/env.test.ts` — TourAPI fallback and env validation coverage
+- [x] `cmd /c npx tsc --noEmit` passed
+- [x] `cmd /c npm run test` passed (53/53)
+- [x] `cmd /c npm run build` passed
+
 ## Deferred Items
 
 - Playwright Windows exit-hang — 로컬 한정 이슈, CI 통과 확인됨
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
 
-## Pending (Phase 33+, Codex 인계)
+## Pending (Phase 34+, Codex 인계)
 
-- [ ] Phase 33 — 실제 장소 이미지 연동 (TourAPI 4.0 공공데이터포털, 새 env var 필요: `TOUR_API_KEY`)
 - [ ] Phase 34 — 근처 장소 추천 + 복지시설 API 연동
 - [ ] Phase 35 — 포트폴리오 폴리시 (성능 측정, 접근성 감사, 메타 완성)
 

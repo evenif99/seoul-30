@@ -6,6 +6,7 @@ import { fetchSeoulPlaces } from '@/lib/adapters/seoul-culture.adapter'
 import { fetchSeoulCongestion } from '@/lib/adapters/seoul-citydata.adapter'
 import { getSnapshot, getStaleSnapshot, setSnapshot } from '@/lib/cache/recommendation.cache'
 import { getDdareungiStations } from '@/lib/data/ddareungi'
+import { mergeTourImages } from '@/lib/data/tourImages'
 import { scorePlace } from '@/lib/scoring'
 import { nearestDdareungiStation } from '@/lib/utils/transit-time'
 import type { RecommendationInput } from '@/lib/types/recommendation'
@@ -99,7 +100,7 @@ export async function GET(request: Request) {
     return true
   })
 
-  const results = filtered
+  let results = filtered
     .map((place) => {
       const ddareungiNearDest =
         stations.length === 0 || place.latitude == null || place.longitude == null
@@ -114,6 +115,10 @@ export async function GET(request: Request) {
     })
     .sort((a, b) => b.score.total - a.score.total)
     .slice(0, 10)
+
+  if (!isMock) {
+    results = await mergeTourImages(results)
+  }
 
   // 실 API 결과만 DB에 캐시
   if (!isMock && !hasUserCoords) {

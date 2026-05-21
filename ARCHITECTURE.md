@@ -69,6 +69,7 @@ messages/
 lib/
   scoring.ts                         # scorePlace — 6 dimensions, KST-aware timefit + transit access
   data/ddareungi.ts                  # Seoul bikeList fetcher with 10-minute cache
+  data/tourImages.ts                 # TourAPI 4.0 image enrichment (searchKeyword2 + detailImage2)
   data/seoulLibrary.ts               # SeoulPublicLibraryInfo fetcher (Phase 27)
   data/seoulParks.ts                 # ListParkService fetcher (Phase 27)
   data/seoulSports.ts                # ListPublicReservationSport fetcher (Phase 27)
@@ -217,6 +218,7 @@ Transit access estimate:
 |---|---|---|
 | `DATABASE_URL` | server | Prisma / Neon |
 | `SEOUL_OPEN_API_KEY` | server | public data API |
+| `TOUR_API_KEY` | server | Korea Tourism Organization TourAPI 4.0 image lookup |
 | `NEXT_PUBLIC_BASE_URL` | both | canonical URL for OG / sitemap |
 | `USE_MOCK_DATA` | server | bypass real API |
 | `ENABLE_CULTURE_EVENTS_API` | server | feature flag |

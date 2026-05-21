@@ -1,15 +1,15 @@
 # HANDOFF
 
-Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
+Last updated: 2026-05-21 (Phase 33 — TourAPI Image Integration)
 
 ## 인계 요약
 
-Phase 32까지 완료. Phase 33부터 Codex가 이어받는다.
+Phase 33까지 완료. Phase 34부터 Codex가 이어받는다.
 
 **배포 URL**: https://seoul-30-webapp.vercel.app  
 **레포**: https://github.com/evenif99/seoul-30  
 **현재 브랜치**: master  
-**테스트**: 48/48 통과 (Vitest unit + component + Playwright E2E)
+**테스트**: 53/53 통과 (Vitest unit + component)
 
 ---
 
@@ -67,16 +67,17 @@ Phase 32까지 완료. Phase 33부터 Codex가 이어받는다.
 
 ---
 
-## Phase 33+ Codex 작업 계획
+## Phase 33 작업 요약
 
 ### Phase 33 — 실제 장소 이미지 연동 (TourAPI 4.0)
-**주의**: 새 env var `TOUR_API_KEY` 필요 — 사용 전 사용자 승인 받을 것
+- `lib/data/tourImages.ts` 신규: TourAPI 4.0 `searchKeyword2`로 `contentid` 매칭 후 `detailImage2` 이미지 조회
+- `app/api/places/route.ts`: 실제 API 결과 중 `imageUrl` 없는 최종 top-10 장소에만 이미지 보강
+- `lib/config/env.ts`: 서버 전용 `TOUR_API_KEY` 추가, `ENABLE_CULTURE_EVENTS_API=true`일 때 필수 검증
+- `.env.example` + `README.md`: `TOUR_API_KEY` 수동 설정 안내 추가
+- `tests/unit/tourImages.test.ts`: 키 미설정, 기존 이미지 유지, detailImage2 조회, 결과 병합 테스트 추가
+- 검증: `cmd /c npx tsc --noEmit`, `cmd /c npm run test` (53/53), `cmd /c npm run build` 통과
 
-- 공공데이터포털(data.go.kr) TourAPI 4.0 `detailImage2` 엔드포인트
-- `lib/data/tourImages.ts` — server-side fetcher (Route Handler에서만 호출)
-- `app/api/places/route.ts` — 각 장소의 `imageUrl` 없을 때 TourAPI 이미지 병렬 조회
-- `lib/config/env.ts` — `TOUR_API_KEY` 추가
-- `next: { revalidate: 86400 }` — 이미지 URL은 하루 캐시
+## Phase 34+ Codex 작업 계획
 
 ### Phase 34 — 근처 장소 추천 + 복지시설 API
 - 상세 페이지 하단 "근처 다른 장소" 섹션
@@ -117,14 +118,15 @@ Phase 32까지 완료. Phase 33부터 Codex가 이어받는다.
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | browser | Vercel env 설정됨 |
 | `CRON_SECRET` | server | Vercel env 설정됨 |
 | `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` | browser | Vercel env 설정됨 (ncpKeyId 형식) |
-| `TOUR_API_KEY` | server | **미설정 — Phase 33 전 승인 필요** |
+| `TOUR_API_KEY` | server | **수동 설정 필요 — `.env.local` + Vercel env에 추가 후 재배포** |
 
 ---
 
-## 검증 상태 (Phase 32 + Pin Accuracy 완료 기준)
+## 검증 상태 (Phase 33 완료 기준)
 
-- `npx tsc --noEmit` — 통과 (0 오류)
-- `npm run test` — 48/48 통과
+- `cmd /c npx tsc --noEmit` — 통과 (0 오류)
+- `cmd /c npm run test` — 53/53 통과
+- `cmd /c npm run build` — 통과
 - Vercel 배포 — 정상 (https://seoul-30-webapp.vercel.app)
 - Naver Maps 핀포인트 — 38개 mock 좌표 보정 완료
 - 상세 페이지 — hero image, tag chips, nearest station 표시 확인

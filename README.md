@@ -48,6 +48,9 @@ Built as a deployable portfolio app with mock-first behavior and optional real p
 - **Phase 28** — Place Detail Enrichment: PlaceCard 카테고리별 이미지 placeholder, PlaceMiniMap 컴포넌트(Naver Maps 단일 마커), 상세 페이지 미니맵/대중교통 접근성 노트/homepage i18n
 - **Phase 29** — UX & Filter Improvements: GPS 활성 시 시간 필터 실제 동작, 거리순/추천순 정렬 토글, EmptyState 대체 추천 2개, 지도 팝업 "목록에서 보기" 버튼 → 리스트 뷰 전환+스크롤
 - **Phase 30** — Operational Readiness: lib/logger.ts 공통 구조화 로그, global-error.tsx, diagnostics snapshotCount/flags 추가, RUNBOOK 최신화
+- **Phase 31** — Mock Data Expansion: 38 places, tags, nearest station metadata
+- **Phase 32** — Detail Page Enrichment: hero image, tag chips, nearest station, refreshed detail layout
+- **Phase 33** — TourAPI Image Integration: real API place image enrichment with server-side `TOUR_API_KEY`
 
 ## Local Run
 
@@ -77,6 +80,9 @@ DATABASE_URL=
 
 # Seoul Open API (server-side only)
 SEOUL_OPEN_API_KEY=
+
+# Korea Tourism Organization TourAPI 4.0 (server-side only)
+TOUR_API_KEY=
 
 # Canonical URL for OG / sitemap
 NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app

@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
+Last updated: 2026-05-21 (Phase 33 — TourAPI Image Integration)
 
 ## Product Goal
 
@@ -48,12 +48,12 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 31 | Mock Data Expansion — 15→38 장소, 17개 자치구, Unsplash imageUrl 전체, PlaceTag 타입 + tags/nearestStation 필드 |
 | 32 | Detail Page Enrichment — 상세 페이지 hero image, tag chips, nearest station, CATEGORY_HERO / TAG_CONFIG 맵, 레이아웃 전면 재설계 |
 | Pin Accuracy | 핀포인트 오차 최소화 — toSeoulLatLng() 유틸리티(Seoul bounds guard), 3개 API fetcher 통일, 38개 mock 좌표 전면 보정, PlaceMiniMap zoom 16→15 |
+| 33 | TourAPI Image Integration — TourAPI 4.0 `searchKeyword2` + `detailImage2`, real API image enrichment, server-only `TOUR_API_KEY` |
 
-## Pending (Phase 33+, Codex 인계)
+## Pending (Phase 34+, Codex 인계)
 
 | Phase | 계획 |
 |---|---|
-| 33 | 실제 장소 이미지 연동 (TourAPI 4.0, 공공데이터포털, 새 env var: `TOUR_API_KEY` — 사용 전 승인 필요) |
 | 34 | 근처 장소 추천 + 복지시설 API 연동 |
 | 35 | 포트폴리오 폴리시 (성능 측정, Lighthouse, 접근성 감사, 메타 완성) |
 
