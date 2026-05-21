@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 import { featureFlags } from '@/lib/config/feature-flags'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { getMockRealtime } from '@/lib/mock/realtime'
@@ -7,7 +8,7 @@ import { fetchSeoulCongestion } from '@/lib/adapters/seoul-citydata.adapter'
 import { getSnapshot, getStaleSnapshot, setSnapshot } from '@/lib/cache/recommendation.cache'
 import { getDdareungiStations } from '@/lib/data/ddareungi'
 import { mergeTourImages } from '@/lib/data/tourImages'
-import { scorePlace } from '@/lib/scoring'
+import { scorePlace, type FeedbackStats } from '@/lib/scoring'
 import { nearestDdareungiStation } from '@/lib/utils/transit-time'
 import type { RecommendationInput } from '@/lib/types/recommendation'
 import type { ApiResponse } from '@/lib/types/api'
@@ -85,6 +86,21 @@ export async function GET(request: Request) {
     if (liveSignal) realtime = liveSignal
   }
 
+  // 피드백 집계 — UP/DOWN 투표 수를 place 단위로 집계 (실패 시 빈 맵으로 폴백)
+  const feedbackMap: Record<string, FeedbackStats> = {}
+  try {
+    const feedbacks = await prisma.placeFeedback.findMany({
+      select: { placeId: true, vote: true },
+    })
+    for (const fb of feedbacks) {
+      if (!feedbackMap[fb.placeId]) feedbackMap[fb.placeId] = { upCount: 0, totalCount: 0 }
+      feedbackMap[fb.placeId].totalCount++
+      if (fb.vote === 'UP') feedbackMap[fb.placeId].upCount++
+    }
+  } catch {
+    // DB 장애 시 피드백 없이 진행
+  }
+
   const stations =
     featureFlags.realtimeCityData && userLat != null && userLng != null
       ? await getDdareungiStations()
@@ -109,7 +125,7 @@ export async function GET(request: Request) {
 
       return {
         place,
-        score: scorePlace(place, input, realtime, ddareungiNearUser, ddareungiNearDest),
+        score: scorePlace(place, input, realtime, ddareungiNearUser, ddareungiNearDest, feedbackMap[place.id]),
         isMock,
       }
     })

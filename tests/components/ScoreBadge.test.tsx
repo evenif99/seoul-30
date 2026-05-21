@@ -10,6 +10,7 @@ const highScore: ScoreBreakdown = {
   congestion: 15,
   timefit: 10,
   freshness: 5,
+  feedbackBonus: 0,
   total: 100,
 }
 
@@ -20,6 +21,7 @@ const lowScore: ScoreBreakdown = {
   congestion: 8,
   timefit: 0,
   freshness: 0,
+  feedbackBonus: 0,
   total: 23,
 }
 

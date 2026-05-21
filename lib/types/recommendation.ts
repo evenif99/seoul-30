@@ -16,6 +16,7 @@ export interface ScoreBreakdown {
   congestion: number // 0–15: 혼잡도
   timefit: number    // 0–10: 현재 운영 중 여부
   freshness: number  // 0–5:  행사 임박/오늘 진행 여부
+  feedbackBonus: number // -3–+2: 사용자 평가 반영 (3표 이상 집계 시)
   total: number
   transitMinutes?: number
   transitMode?: import('@/lib/utils/transit-time').TransitMode

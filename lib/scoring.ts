@@ -3,12 +3,18 @@ import type { RealtimeSignal } from './types/realtime'
 import type { RecommendationInput, ScoreBreakdown } from './types/recommendation'
 import { estimateTransit, haversineKm, transitAccessScore } from './utils/transit-time'
 
+export interface FeedbackStats {
+  upCount: number
+  totalCount: number
+}
+
 export function scorePlace(
   place: NormalizedPlace,
   input: RecommendationInput,
   realtime: RealtimeSignal | null,
   ddareungiNearUser = true,
   ddareungiNearDest = true,
+  feedbackStats?: FeedbackStats,
 ): ScoreBreakdown {
   const access = calcAccess(place, input, ddareungiNearUser, ddareungiNearDest)
   const relevance = calcRelevance(place, input)
@@ -16,6 +22,7 @@ export function scorePlace(
   const congestion = calcCongestion(realtime)
   const timefit = calcTimefit(place)
   const freshness = calcFreshness(place)
+  const feedbackBonus = calcFeedbackBonus(feedbackStats)
 
   return {
     access: access.score,
@@ -24,7 +31,8 @@ export function scorePlace(
     congestion,
     timefit,
     freshness,
-    total: access.score + relevance + cost + congestion + timefit + freshness,
+    feedbackBonus,
+    total: access.score + relevance + cost + congestion + timefit + freshness + feedbackBonus,
     transitMinutes: access.transitMinutes,
     transitMode: access.transitMode,
   }
@@ -91,6 +99,15 @@ function calcFreshness(place: NormalizedPlace): number {
   if (daysUntil < 0) return 0    // 이미 시작됨
   if (daysUntil <= 7) return 5   // 7일 이내 개막
   if (daysUntil <= 30) return 3  // 30일 이내 개막
+  return 0
+}
+
+// 사용자 평가 반영 (-3–+2) — 3표 미만이면 중립 0점
+export function calcFeedbackBonus(stats?: FeedbackStats): number {
+  if (!stats || stats.totalCount < 3) return 0
+  const ratio = stats.upCount / stats.totalCount
+  if (ratio >= 0.75) return 2
+  if (ratio <= 0.25) return -3
   return 0
 }
 

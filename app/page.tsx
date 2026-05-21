@@ -73,6 +73,7 @@ export default function HomePage() {
   const [locating, setLocating] = useState(false)
   const [showLocationModal, setShowLocationModal] = useState(false)
   const [locationDenied, setLocationDenied] = useState(false)
+  const [recentIds, setRecentIds] = useState<string[]>([])
 
   // URL에서 초기 필터 복원 (클라이언트 마운트 후)
   useEffect(() => {
@@ -96,6 +97,14 @@ export default function HomePage() {
   useEffect(() => {
     const shown = localStorage.getItem('seoul30_gps_onboarding')
     if (!shown) setShowLocationModal(true)
+  }, [])
+
+  // 최근 본 장소 목록 로드 (soft-dedup용)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('seoul30:recent')
+      if (raw) setRecentIds(JSON.parse(raw))
+    } catch {}
   }, [])
 
   // API 호출: district, category, freeOnly 변경 시
@@ -191,6 +200,17 @@ export default function HomePage() {
       }
       return b.score.total - a.score.total
     })
+
+  // 최근 본 장소(최대 3개) soft-dedup: 결과가 4개 이상일 때만 뒤로 밀기
+  const RECENT_WINDOW = recentIds.slice(0, 3)
+  const sorted = displayResults
+  const displayResultsDeduped =
+    sorted.length >= 4 && RECENT_WINDOW.length > 0
+      ? [
+          ...sorted.filter(({ place }) => !RECENT_WINDOW.includes(place.id)),
+          ...sorted.filter(({ place }) => RECENT_WINDOW.includes(place.id)),
+        ]
+      : sorted
 
   const isFiltered =
     filters.freeOnly ||
@@ -384,10 +404,10 @@ export default function HomePage() {
             >
               {loading ? (
                 Array.from({ length: 3 }).map((_, i) => <PlaceCardSkeleton key={i} />)
-              ) : displayResults.length === 0 ? (
+              ) : displayResultsDeduped.length === 0 ? (
                 <EmptyState suggestions={results.slice(0, 2).map((r) => r.place)} />
               ) : (
-                displayResults.map(({ place, score }, i) => (
+                displayResultsDeduped.map(({ place, score }, i) => (
                   <div key={place.id} id={`place-card-${place.id}`}>
                     <PlaceCard place={place} score={score} priority={i < 3} />
                   </div>
@@ -399,11 +419,11 @@ export default function HomePage() {
           {/* 지도 뷰 */}
           {viewMode === 'map' && !loading && (
             <div className="max-w-2xl mx-auto w-full">
-              {displayResults.length === 0 ? (
+              {displayResultsDeduped.length === 0 ? (
                 <EmptyState suggestions={results.slice(0, 2).map((r) => r.place)} />
               ) : (
                 <MapView
-                  results={displayResults}
+                  results={displayResultsDeduped}
                   onSelectPlace={(place) => {
                     setViewMode('list')
                     // 리스트 뷰 전환 후 해당 카드로 스크롤
