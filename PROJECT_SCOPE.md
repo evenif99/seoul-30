@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Phase 30: Operational Readiness)
+Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 
 ## Product Goal
 
@@ -45,6 +45,17 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 28 | Place Detail Enrichment — PlaceCard 카테고리 placeholder, PlaceMiniMap(단일 마커 Naver Maps), 상세 페이지 미니맵/대중교통 노트/homepage i18n |
 | 29 | UX & Filter Improvements — GPS 시간 필터 실동작, 거리순/추천순 정렬 토글, EmptyState 대체 추천, 지도 팝업 "목록에서 보기" 연동 |
 | 30 | Operational Readiness — lib/logger.ts 구조화 로그 공통화, global-error.tsx, diagnostics 강화(snapshotCount/flags), Analytics 확인, RUNBOOK 최신화 |
+| 31 | Mock Data Expansion — 15→38 장소, 17개 자치구, Unsplash imageUrl 전체, PlaceTag 타입 + tags/nearestStation 필드 |
+| 32 | Detail Page Enrichment — 상세 페이지 hero image, tag chips, nearest station, CATEGORY_HERO / TAG_CONFIG 맵, 레이아웃 전면 재설계 |
+| Pin Accuracy | 핀포인트 오차 최소화 — toSeoulLatLng() 유틸리티(Seoul bounds guard), 3개 API fetcher 통일, 38개 mock 좌표 전면 보정, PlaceMiniMap zoom 16→15 |
+
+## Pending (Phase 33+, Codex 인계)
+
+| Phase | 계획 |
+|---|---|
+| 33 | 실제 장소 이미지 연동 (TourAPI 4.0, 공공데이터포털, 새 env var: `TOUR_API_KEY` — 사용 전 승인 필요) |
+| 34 | 근처 장소 추천 + 복지시설 API 연동 |
+| 35 | 포트폴리오 폴리시 (성능 측정, Lighthouse, 접근성 감사, 메타 완성) |
 
 ## Deferred / Not In Scope
 

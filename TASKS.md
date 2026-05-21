@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 30: Operational Readiness)
+Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 
 ## Completed Phases (1–15)
 
@@ -193,10 +193,43 @@ Last updated: 2026-05-21 (Phase 30: Operational Readiness)
 - [x] Vercel Analytics — layout.tsx에 이미 적용됨 확인 (@vercel/analytics v1.6.1)
 - [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
+### Phase 31 — Mock Data Expansion (15 → 38 places)
+- [x] `lib/mock/places.ts` — 38개 장소로 확장 (15→38), 17개 자치구 커버
+- [x] 모든 장소에 Unsplash `imageUrl` 추가 (카테고리별 고품질 이미지)
+- [x] `PlaceTag` 타입 (`indoor | outdoor | wheelchair | family | pet | parking | wifi`) 정의 및 전 장소 적용
+- [x] `NormalizedPlace.nearestStation` 필드 추가, 전 장소 가장 가까운 역 정보 입력
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
+
+### Phase 32 — Detail Page Enrichment
+- [x] `lib/types/place.ts` — `PlaceTag` union 타입, `tags?`, `nearestStation?` 필드 추가
+- [x] `messages/ko.json` + `messages/en.json` — `detail` 네임스페이스 추가 (`nearestStation`, `tags.*` 7개 키)
+- [x] `app/place/[id]/page.tsx` — 전체 구조 재설계:
+  - Hero 이미지 섹션 (full-width 208px, 카테고리 placeholder fallback with Lucide icon + color)
+  - Tag chips 행 (아이콘 + 색상 per tag, `TAG_CONFIG` map)
+  - Nearest station 행 (역 정보)
+  - `CATEGORY_HERO` 맵, `TAG_CONFIG` 맵 추가
+  - 레이아웃 순서: back button → hero image → name/share/bookmark → fee badge → tags → description → info card → minimap → feedback → directions
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
+
+### Pin Accuracy Fix (Phase 32+ 핀포인트 오차 최소화)
+- [x] `lib/utils/coords.ts` 신규 — `toSeoulLatLng()` 유틸리티 (Seoul 경계 검증: lat 37.413–37.715, lng 126.734–127.270, 0값 거부)
+- [x] `lib/data/seoulLibrary.ts` — `toSeoulLatLng()` 적용 (기존 `lng===0` 누락 방어 수정)
+- [x] `lib/data/seoulParks.ts` — `toSeoulLatLng()` 통일
+- [x] `lib/data/seoulSports.ts` — `toSeoulLatLng(r.Y, r.X)` (X=경도, Y=위도 확인)
+- [x] `lib/mock/places.ts` — 38개 장소 좌표 전면 보정 (critical: mock-13 3km lng 오차, mock-36 2.7km, mock-9 1.5km 수정)
+- [x] `components/seoul30/PlaceMiniMap.tsx` — zoom 16 → 15 (주변 맥락 더 잘 보임)
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
+
 ## Deferred Items
 
 - Playwright Windows exit-hang — 로컬 한정 이슈, CI 통과 확인됨
 - [ ] Playwright Windows exit-hang (local-only issue — tests pass)
+
+## Pending (Phase 33+, Codex 인계)
+
+- [ ] Phase 33 — 실제 장소 이미지 연동 (TourAPI 4.0 공공데이터포털, 새 env var 필요: `TOUR_API_KEY`)
+- [ ] Phase 34 — 근처 장소 추천 + 복지시설 API 연동
+- [ ] Phase 35 — 포트폴리오 폴리시 (성능 측정, 접근성 감사, 메타 완성)
 
 ## Completed Post-Phase-20 Fixes
 

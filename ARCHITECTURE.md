@@ -1,8 +1,6 @@
 # ARCHITECTURE
 
-Last updated: 2026-05-20 (Additional Phase: location-based transit access)
-
-Last updated: 2026-05-20 (Phase 15 complete)
+Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 
 ## Stack
 
@@ -44,13 +42,17 @@ components/seoul30/
   FeedbackPanel.tsx                  # 👍/👎 rating UI (Phase 13)
   FilterBar.tsx
   Header.tsx
-  Hero.tsx
+  Hero.tsx                           # suppressHydrationWarning on greeting (hydration fix)
   LanguageToggle.tsx                 # ko/en toggle (Phase 15)
+  LocationOnboardingModal.tsx        # GPS permission onboarding (first visit)
   MapView.tsx                        # dynamic import wrapper (ssr: false)
-  MapViewInner.tsx                   # Naver Maps view + grid clustering
-  PlaceCard.tsx
+  MapViewInner.tsx                   # Naver Maps view + grid clustering + onSelectPlace
+  PlaceCard.tsx                      # data-testid="place-card-link" on Link
+  PlaceMiniMap.tsx                   # 단일 마커 Naver Maps 미니맵 (zoom 15)
+  PlaceCardSkeleton.tsx              # shimmer skeleton (Phase 18)
   PushSubscribeButton.tsx            # Web Push subscribe/unsubscribe (Phase 14)
   RecentTracker.tsx
+  ScoreBadge.tsx                     # score breakdown badge (Phase 16)
   ShareButton.tsx
 
 hooks/
@@ -67,11 +69,15 @@ messages/
 lib/
   scoring.ts                         # scorePlace — 6 dimensions, KST-aware timefit + transit access
   data/ddareungi.ts                  # Seoul bikeList fetcher with 10-minute cache
+  data/seoulLibrary.ts               # SeoulPublicLibraryInfo fetcher (Phase 27)
+  data/seoulParks.ts                 # ListParkService fetcher (Phase 27)
+  data/seoulSports.ts                # ListPublicReservationSport fetcher (Phase 27)
   utils/transit-time.ts              # Haversine + transit estimate helpers
+  utils/coords.ts                    # toSeoulLatLng() — Seoul bounds validation utility
   prisma.ts                          # singleton Prisma client
-  types/place.ts
+  types/place.ts                     # NormalizedPlace, PlaceSourceType, PlaceTag
   types/recommendation.ts
-  mock/places.ts
+  mock/places.ts                     # 38 mock places (Phase 31+), tags + nearestStation
   mock/realtime.ts
   adapters/
   cache/recommendation.cache.ts
@@ -101,6 +107,35 @@ vitest.config.ts
 playwright.config.ts
 .github/workflows/ci.yml
 ```
+
+## Key Types (lib/types/place.ts)
+
+```typescript
+export type PlaceSourceType = 'CULTURE_EVENT' | 'CULTURE_SPACE' | 'LIBRARY' | 'PARK' | 'SPORTS' | 'MOCK'
+export type PlaceTag = 'indoor' | 'outdoor' | 'wheelchair' | 'family' | 'pet' | 'parking' | 'wifi'
+
+export interface NormalizedPlace {
+  id: string; slug: string; sourceType: PlaceSourceType
+  name: string; category: string; district: string
+  address?: string; latitude?: number; longitude?: number
+  isFree: boolean; feeText?: string
+  openTimeText?: string; closeTimeText?: string   // "HH:MM"
+  homepageUrl?: string; phone?: string; description?: string; imageUrl?: string
+  tags?: PlaceTag[]          // Phase 32 — 태그 칩
+  nearestStation?: string    // Phase 32 — 가장 가까운 역
+  eventStartDate?: string    // "YYYY-MM-DD" — freshness scoring (CULTURE_EVENT only)
+}
+```
+
+## Coordinate Handling (lib/utils/coords.ts)
+
+Seoul 경계 검증 + 0값 거부 유틸리티:
+- `toSeoulLatLng(rawLat, rawLng)` → `{ latitude?, longitude? }`
+- Seoul 경계: lat 37.413–37.715, lng 126.734–127.270
+- NaN, 0, 경계 밖 좌표는 `{}` 반환 → map 핀 미표시 처리
+- seoulLibrary/Parks/Sports 3개 fetcher 모두 이 유틸리티 사용
+- Naver Maps API 좌표 순서: `new naver.maps.LatLng(lat, lng)` (위도 먼저)
+- Seoul Sports API: X=경도(longitude), Y=위도(latitude)
 
 ## Database Models (Prisma + Neon)
 
