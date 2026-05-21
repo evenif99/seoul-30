@@ -1,13 +1,13 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Phase 34 complete; Phase 35 pending; docs moved to `docs/`)
+Last updated: 2026-05-21 (Phase 42 complete)
 
 ## Current Scope Status
 
-- Completed through Phase 34.
-- Phase 35 is not complete and remains pending.
-- Post-Phase 34 fix included in current scope: `PlaceMiniMap` supports nearby detail page navigation without losing Naver Maps initialization.
+- Completed through Phase 42.
+- Post-Phase 34 fix included: `PlaceMiniMap` supports nearby detail page navigation without losing Naver Maps initialization.
 - Markdown operations docs are centralized in `docs/`; root `README.md` remains the entry document.
+- Phase 43–45 pending (SW cache, Vercel Cron push, JSON-LD structured data).
 
 Last updated: 2026-05-21 (Phase 33 — TourAPI Image Integration)
 
@@ -60,18 +60,27 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 33 | TourAPI Image Integration — TourAPI 4.0 `searchKeyword2` + `detailImage2`, real API image enrichment, server-only `TOUR_API_KEY` |
 | 33.5 | Mock Place Audit Prep — mock 좌표/존재 감사 문서, 문화공간 좌표 방향 수정, mock data 품질 테스트 |
 | 34 | Nearby Places + Pin Accuracy First — 실제 API 상세 페이지 연결, 좌표 검증된 근처 장소 추천, 좌표 없는 복지시설 API 지도 통합 보류 |
+| 35 | Portfolio Polish — OG 이미지(ImageResponse), layout 메타데이터 강화, README 포트폴리오 전면 개선 |
+| 36 | Mock Place Audit & Fix — 10개 문제 장소 실재 시설로 교체, 주소/좌표 보정, MOCK_PLACE_AUDIT.md 업데이트 |
+| 37 | Tag-based Facility Filter — FilterBar 태그 pills (indoor/outdoor/wheelchair/family/pet/parking/wifi), AND 교집합 필터, URL sync |
+| 38 | Accessibility & Core Web Vitals — userScalable:false 제거(WCAG 1.4.4), preconnect/dns-prefetch, aria-hidden 보강 |
+| 39 | Seoul Realtime Congestion Test Coverage — seoulCongestion.test.ts 8개 케이스, vi.hoisted env mock 패턴 |
+| 40 | Feedback-loop Scoring + Recent-view Dedup — feedbackBonus ScoreBreakdown 필드, calcFeedbackBonus(), soft-dedup (최근 3개 후위 이동) |
+| 41 | Admin Diagnostics Dashboard — /admin 서버 렌더링 페이지 (DB 상태, 피처 플래그, 장소 데이터) |
+| 42 | E2E Test Expansion — 1 → 13개 스펙 (filter/place-detail/i18n/admin), tag-filter data-testid 추가 |
 
-## Pending (Phase 35+, Codex 인계)
+## Pending (Phase 43+)
 
 | Phase | 계획 |
 |---|---|
-| 35 | 포트폴리오 폴리시 (성능 측정, Lighthouse, 접근성 감사, 메타 완성) |
+| 43 | SW 캐시 전략 고도화 — /api/places + place detail 오프라인 캐시 |
+| 44 | Vercel Cron + Push 발송 자동화 |
+| 45 | Place 페이지 JSON-LD 구조화 데이터 (schema.org TouristAttraction) |
 
 ## Deferred / Not In Scope
 
 - Playwright Windows exit-hang (로컬 한정, CI 통과 확인됨)
 - Authentication / user accounts
-- Admin dashboard
 - Vector DB / AI-powered recommendations
 - Chatbot integration
 - Data export

@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 35: Portfolio Polish — complete)
+Last updated: 2026-05-21 (Phase 42: E2E test expansion — complete)
 
 ## Current Phase Check
 
@@ -8,6 +8,14 @@ Last updated: 2026-05-21 (Phase 35: Portfolio Polish — complete)
 - [x] Post-Phase 34 bug fix completed: nearby detail page links now keep `PlaceMiniMap` working after `/place/...` client navigation.
 - [x] Markdown docs reorganized under `docs/` while keeping root `README.md` as the repository entry point.
 - [x] Phase 35 completed.
+- [x] Phase 36 completed: 10 mock places replaced with verified official facilities.
+- [x] Phase 37 completed: Tag-based facility filter added to FilterBar.
+- [x] Phase 38 completed: Lighthouse accessibility + Core Web Vitals improvements.
+- [x] Phase 39 completed: Seoul realtime congestion test coverage (8 cases).
+- [x] Phase 40 completed: Personalization via feedback-loop scoring + recent-view soft-dedup.
+- [x] Fix: MISSING_MESSAGE crash suppressed in next-intl (i18n/request.ts onError handler).
+- [x] Phase 41 completed: Admin diagnostics dashboard at /admin.
+- [x] Phase 42 completed: E2E test coverage expanded 1 → 13 specs across 4 files.
 
 ## Docs Index
 
@@ -278,6 +286,72 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `docs/TASKS.md` — Phase 35 완료 반영
 - [x] `npx tsc --noEmit` — 통과 (0 오류)
 - [x] `npm run test` — 58/58 통과
+
+### Phase 36 — Mock Place Audit & Fix
+- [x] `lib/mock/places.ts` — 10개 문제 장소 교체: 존재 확인된 공식 시설명 + 정확한 주소 + 보정된 좌표
+  - mock-1: 성동구립 뚝섬도서관 (고산자로 71)
+  - mock-2: 성동구립 왕십리도서관 (왕십리광장로 22)
+  - mock-14: 태릉국제테니스장 (화랑로 727)
+  - mock-15: 강남구민체육센터 (학동로 452)
+  - mock-29: 잠실종합운동장 실내수영장 (올림픽로 25, 구 광진구→송파구)
+  - mock-31: 서초구민체육센터 / mock-35: 서대문종합사회복지관
+  - mock-36: 사당종합사회복지관 / mock-37: 도봉종합사회복지관 / mock-38: 강동종합사회복지관
+- [x] `docs/MOCK_PLACE_AUDIT.md` — "Initial Findings" → "Resolved (Phase 36)" 업데이트
+- [x] `npx tsc --noEmit` — 통과 (0 오류), `npm run test` — 통과
+
+### Phase 37 — Tag-based Facility Filter
+- [x] `lib/types/place.ts` — `PlaceTag` union 확인 (`indoor | outdoor | wheelchair | family | pet | parking | wifi`)
+- [x] `components/seoul30/FilterBar.tsx` — `tags: PlaceTag[]` ActiveFilters 필드, TAG_OPTIONS 상수, 태그 pills 행 추가
+- [x] `app/page.tsx` — `tags: []` DEFAULT_FILTERS, URL sync, 태그 AND 교집합 필터 로직, isFiltered 업데이트
+- [x] `messages/ko.json` + `messages/en.json` — `filter.tags.*` 8개 키 추가 (label + 7개 태그)
+- [x] `tests/components/FilterBar.test.tsx` — `tags: []` baseFilters 픽스처 추가
+- [x] `npx tsc --noEmit` — 통과, 테스트 통과
+
+### Phase 38 — Accessibility & Core Web Vitals
+- [x] `app/layout.tsx` — `userScalable: false` 제거 (WCAG 1.4.4 위반 해소), preconnect/dns-prefetch 추가
+- [x] `components/seoul30/PlaceCard.tsx` — 카테고리 placeholder div에 `aria-hidden="true"`
+- [x] `app/place/[id]/page.tsx` — hero placeholder div에 `aria-hidden="true"`
+- [x] `npx tsc --noEmit` — 통과 (0 오류)
+
+### Phase 39 — Seoul Realtime Congestion Test Coverage
+- [x] `tests/unit/seoulCongestion.test.ts` — 8개 테스트 케이스 (vi.hoisted 패턴으로 env mock)
+  - no-key → null, unknown district → null, valid response → RealtimeSignal
+  - empty rows → null, non-ok → null, network error → null
+  - 4개 혼잡도 레벨 전체 검증, areaCode 매핑
+- [x] `npx tsc --noEmit` — 통과, 테스트 전체 통과
+
+### Phase 40 — Feedback-loop Scoring + Recent-view Dedup
+- [x] `lib/types/recommendation.ts` — `ScoreBreakdown`에 `feedbackBonus: number` 필드 추가
+- [x] `lib/scoring.ts` — `FeedbackStats` 인터페이스, `calcFeedbackBonus()` 함수 추가, `scorePlace()` 6번째 파라미터
+- [x] `app/api/places/route.ts` — `prisma` import 추가, feedbackMap 집계 블록 (DB 장애 시 graceful fallback)
+- [x] `app/api/diagnostics/route.ts` — `ratedPlacesCount` 필드 추가 (distinct placeId 조회)
+- [x] `app/page.tsx` — `recentIds` state, localStorage 로드, `displayResultsDeduped` soft-dedup (최근 3개 → 리스트 후위)
+- [x] `tests/unit/feedback-scoring.test.ts` — 8개 테스트 (calcFeedbackBonus + scorePlace with feedback)
+- [x] `tests/unit/diagnostics.test.ts` — findMany mock + ratedPlacesCount 어서션 추가
+- [x] `tests/components/ScoreBadge.test.tsx` — `feedbackBonus: 0` 픽스처 추가
+- [x] `npx tsc --noEmit` — 통과, 80/80 테스트 통과
+
+### Fix — next-intl MISSING_MESSAGE 오류 방어
+- [x] `i18n/request.ts` — `onError` 핸들러 추가 (MISSING_MESSAGE → console.warn, UI 크래시 방지)
+- [x] `i18n/request.ts` — `getMessageFallback` 추가 (키 마지막 세그먼트 표시)
+- [x] `npx tsc --noEmit` — 통과
+
+### Phase 41 — Admin Diagnostics Dashboard
+- [x] `app/admin/page.tsx` — 서버 렌더링 진단 대시보드 (`/admin` 경로)
+  - DB 상태 섹션 (스냅샷 수, 피드백 수, 평가된 장소, Push 구독자)
+  - 피처 플래그 섹션 (서울 API, 실시간 혼잡도, Mock 모드) — StatusDot 컴포넌트
+  - 장소 데이터 섹션 (등록 수, 태그 보유, 무료 비율)
+  - `noindex, nofollow` 처리
+- [x] `npx tsc --noEmit` — 통과, 80/80 테스트 통과
+
+### Phase 42 — E2E Test Expansion
+- [x] `components/seoul30/FilterBar.tsx` — 태그 버튼에 `data-testid="tag-filter-{tag}"` 추가
+- [x] `tests/e2e/home.spec.ts` — URL 패턴 `/place/mock-` → `/place/` (실 API ID 대응)
+- [x] `tests/e2e/filter.spec.ts` — 4개 스펙: free-only 토글, indoor 태그, 태그 복원, wheelchair 태그
+- [x] `tests/e2e/place-detail.spec.ts` — 4개 스펙: 타이틀/뒤로, 북마크 토글, 피드백 패널, 뒤로가기 네비게이션
+- [x] `tests/e2e/i18n.spec.ts` — 2개 스펙: 영어 전환, 한국어 복귀
+- [x] `tests/e2e/admin.spec.ts` — 1개 스펙: admin 페이지 렌더링
+- [x] E2E 1 → 13개 스펙, 13/13 통과 | 유닛 80/80 통과
 
 ## Completed Post-Phase-20 Fixes
 
