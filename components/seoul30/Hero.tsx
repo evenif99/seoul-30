@@ -36,7 +36,8 @@ export function Hero() {
           <br />
           {t('headingLine2')}
         </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
+        {/* suppressHydrationWarning: server(UTC) vs client(KST) time difference is intentional */}
+        <p className="mt-1.5 text-sm text-muted-foreground" suppressHydrationWarning>
           {t(`greetings.${greetingKey}`)}{t('greetingSuffix')}
         </p>
         <p className="mt-1 text-xs text-muted-foreground/70">
