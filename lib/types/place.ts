@@ -1,4 +1,4 @@
-export type PlaceSourceType = 'CULTURE_EVENT' | 'CULTURE_SPACE' | 'MOCK'
+export type PlaceSourceType = 'CULTURE_EVENT' | 'CULTURE_SPACE' | 'LIBRARY' | 'PARK' | 'SPORTS' | 'MOCK'
 
 export interface NormalizedPlace {
   id: string

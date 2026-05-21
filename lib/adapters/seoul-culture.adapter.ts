@@ -1,5 +1,8 @@
 import { env } from '@/lib/config/env'
 import type { NormalizedPlace } from '@/lib/types/place'
+import { fetchSeoulLibraries } from '@/lib/data/seoulLibrary'
+import { fetchSeoulParks } from '@/lib/data/seoulParks'
+import { fetchSeoulSports } from '@/lib/data/seoulSports'
 
 interface CultureEventRow {
   CODENAME: string   // 카테고리 (뮤지컬·오페라, 전시, 연극 등)
@@ -107,13 +110,16 @@ export async function fetchSeoulCultureSpaces(): Promise<NormalizedPlace[]> {
   }
 }
 
-// 문화행사 + 문화공간 통합 — 중복 제거 없이 단순 병합 (id prefix로 구분)
+// 문화행사 + 문화공간 + 도서관 + 공원 + 체육시설 통합 (id prefix로 소스 구분)
 export async function fetchSeoulPlaces(): Promise<NormalizedPlace[]> {
-  const [events, spaces] = await Promise.all([
+  const [events, spaces, libraries, parks, sports] = await Promise.all([
     fetchSeoulCultureEvents(),
     fetchSeoulCultureSpaces(),
+    fetchSeoulLibraries(),
+    fetchSeoulParks(),
+    fetchSeoulSports(),
   ])
-  return [...events, ...spaces]
+  return [...events, ...spaces, ...libraries, ...parks, ...sports]
 }
 
 function normalizeEventRow(row: CultureEventRow, index: number): NormalizedPlace {

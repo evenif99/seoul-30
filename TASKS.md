@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 26: Real Data Transition)
+Last updated: 2026-05-21 (Phase 27: Data Source Expansion)
 
 ## Completed Phases (1–15)
 
@@ -154,6 +154,15 @@ Last updated: 2026-05-21 (Phase 26: Real Data Transition)
 - [x] `lib/adapters/seoul-culture.adapter.ts` — `fetchSeoulPlaces()` 통합 함수 (events + spaces 병렬 호출)
 - [x] `app/api/places/route.ts` — `fetchSeoulCultureEvents` → `fetchSeoulPlaces` 교체, name 빈 값 방어 필터 추가
 - [x] `app/api/health/route.ts` — `pingSeoulApi()` 추가, Seoul API 상태 응답에 `seoulApi` 필드 반환
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
+
+### Phase 27 — Data Source Expansion
+- [x] `lib/types/place.ts` — PlaceSourceType에 `LIBRARY | PARK | SPORTS` 추가
+- [x] `lib/data/seoulLibrary.ts` — `SeoulPublicLibraryInfo` fetcher (운영시간 포함)
+- [x] `lib/data/seoulParks.ts` — `ListParkService` fetcher (좌표 없는 공원 방어 처리)
+- [x] `lib/data/seoulSports.ts` — `ListPublicReservationSport` fetcher (유/무료 구분)
+- [x] `lib/adapters/seoul-culture.adapter.ts` — `fetchSeoulPlaces()` 5소스 병렬 통합
+- [x] `lib/mock/places.ts` — sports mock 3개 추가 (마포체육관, 노원테니스, 강남수영장)
 - [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
 ## Deferred Items

@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Phase 26: Real Data Transition)
+Last updated: 2026-05-21 (Phase 27: Data Source Expansion)
 
 ## Product Goal
 
@@ -41,6 +41,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | Additional Phase | GPS onboarding modal — 첫 방문 시 위치 권한 안내 모달, 거부 시 amber 배너, localStorage 재표시 방지 |
 | Additional Phase | E2E CI fix — `test.beforeEach` addInitScript로 모달 사전 dismiss, GitHub Actions 통과 복구 |
 | 26 | Real Data Transition — fetchSeoulCultureSpaces 추가, fetchSeoulPlaces 통합, /api/health Seoul API ping, 실 데이터 품질 방어 |
+| 27 | Data Source Expansion — 도서관/공원/체육시설 Seoul Open API fetcher, PlaceSourceType 확장(LIBRARY/PARK/SPORTS), fetchSeoulPlaces 5소스 통합 |
 
 ## Deferred / Not In Scope
 
