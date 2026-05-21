@@ -108,7 +108,9 @@
     "mapLoading": "Loading map...",
     "mapSatellite": "Switch to satellite view",
     "mapNormal": "Switch to normal view",
-    "mapMyLocation": "Go to my location"
+    "mapMyLocation": "Go to my location",
+    "detailHomepage": "Visit Homepage",
+    "detailTransitAccess": "Accessible within 30 min by transit"
   },
   "desktop": {
     "title": "Recommended now",

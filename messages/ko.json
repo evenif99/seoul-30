@@ -108,7 +108,9 @@
     "mapLoading": "지도 불러오는 중...",
     "mapSatellite": "위성 뷰로 전환",
     "mapNormal": "일반 뷰로 전환",
-    "mapMyLocation": "현재 위치로 이동"
+    "mapMyLocation": "현재 위치로 이동",
+    "detailHomepage": "홈페이지 방문",
+    "detailTransitAccess": "대중교통 30분 이내 접근 가능"
   },
   "desktop": {
     "title": "지금 출발 추천",

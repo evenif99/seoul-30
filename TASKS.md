@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 27: Data Source Expansion)
+Last updated: 2026-05-21 (Phase 28: Place Detail Enrichment)
 
 ## Completed Phases (1–15)
 
@@ -163,6 +163,13 @@ Last updated: 2026-05-21 (Phase 27: Data Source Expansion)
 - [x] `lib/data/seoulSports.ts` — `ListPublicReservationSport` fetcher (유/무료 구분)
 - [x] `lib/adapters/seoul-culture.adapter.ts` — `fetchSeoulPlaces()` 5소스 병렬 통합
 - [x] `lib/mock/places.ts` — sports mock 3개 추가 (마포체육관, 노원테니스, 강남수영장)
+- [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
+
+### Phase 28 — Place Detail Enrichment
+- [x] `components/seoul30/PlaceCard.tsx` — imageUrl 없을 때 카테고리별 placeholder (Landmark/BookOpen/Trees/Dumbbell/Heart 아이콘 + 색상)
+- [x] `components/seoul30/PlaceMiniMap.tsx` — 신규 클라이언트 컴포넌트 (Naver Maps 단일 마커, h-48 미니맵)
+- [x] `app/place/[id]/page.tsx` — PlaceMiniMap 통합 (lat/lng 있을 때만), 대중교통 접근성 노트, homepage i18n
+- [x] `messages/ko.json` + `messages/en.json` — `detailHomepage`, `detailTransitAccess` 추가
 - [x] TypeScript check 통과 (0 오류), 48/48 테스트 통과
 
 ## Deferred Items

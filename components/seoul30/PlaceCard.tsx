@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Clock, ChevronRight } from 'lucide-react'
+import { MapPin, Clock, ChevronRight, BookOpen, Trees, Dumbbell, Heart, Landmark } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { ScoreBadge } from '@/components/seoul30/ScoreBadge'
@@ -16,9 +16,15 @@ interface PlaceCardProps {
   priority?: boolean
 }
 
-const PLACEHOLDER = 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=280&fit=crop&auto=format'
-
 const KNOWN_CATEGORIES = new Set(['culture', 'library', 'park', 'sports', 'welfare'])
+
+const CATEGORY_PLACEHOLDER: Record<string, { bg: string; icon: React.ReactNode }> = {
+  culture:  { bg: 'bg-purple-100',  icon: <Landmark className="w-10 h-10 text-purple-400" /> },
+  library:  { bg: 'bg-amber-100',   icon: <BookOpen  className="w-10 h-10 text-amber-400" /> },
+  park:     { bg: 'bg-green-100',   icon: <Trees     className="w-10 h-10 text-green-400" /> },
+  sports:   { bg: 'bg-blue-100',    icon: <Dumbbell  className="w-10 h-10 text-blue-400" /> },
+  welfare:  { bg: 'bg-rose-100',    icon: <Heart     className="w-10 h-10 text-rose-400" /> },
+}
 const TRANSIT_MODE_KEYS: Record<NonNullable<ScoreBreakdown['transitMode']>, string> = {
   도보: 'walk',
   따릉이: 'bike',
@@ -45,15 +51,24 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
         <div className="flex gap-0">
           {/* 이미지 */}
           <div className="relative w-[130px] shrink-0 self-stretch min-h-[130px]">
-            <Image
-              src={place.imageUrl ?? PLACEHOLDER}
-              alt={place.name}
-              fill
-              className="object-cover"
-              sizes="130px"
-              priority={priority}
-              loading={priority ? 'eager' : 'lazy'}
-            />
+            {place.imageUrl ? (
+              <Image
+                src={place.imageUrl}
+                alt={place.name}
+                fill
+                className="object-cover"
+                sizes="130px"
+                priority={priority}
+                loading={priority ? 'eager' : 'lazy'}
+              />
+            ) : (
+              <div className={cn(
+                'w-full h-full flex items-center justify-center',
+                CATEGORY_PLACEHOLDER[place.category]?.bg ?? 'bg-muted',
+              )}>
+                {CATEGORY_PLACEHOLDER[place.category]?.icon}
+              </div>
+            )}
           </div>
 
           {/* 콘텐츠 */}

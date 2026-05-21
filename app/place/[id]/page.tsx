@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Clock, Phone, Globe, ExternalLink } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Phone, Globe, ExternalLink, Train } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { FeedbackPanel } from '@/components/seoul30/FeedbackPanel'
 import { RecentTracker } from '@/components/seoul30/RecentTracker'
 import { ShareButton } from '@/components/seoul30/ShareButton'
+import { PlaceMiniMap } from '@/components/seoul30/PlaceMiniMap'
 import { notFound } from 'next/navigation'
 
 interface PageProps {
@@ -184,11 +185,22 @@ export default async function PlaceDetailPage({ params }: PageProps) {
                 rel="noopener noreferrer"
                 className="text-sm text-primary hover:underline truncate"
               >
-                홈페이지 방문
+                {t('detailHomepage')}
               </a>
             </div>
           )}
+          {place.latitude && place.longitude && (
+            <div className="flex items-center gap-3 px-4 py-3">
+              <Train className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
+              <span className="text-sm text-muted-foreground">{t('detailTransitAccess')}</span>
+            </div>
+          )}
         </div>
+
+        {/* 미니 지도 */}
+        {place.latitude && place.longitude && (
+          <PlaceMiniMap lat={place.latitude} lng={place.longitude} name={place.name} />
+        )}
 
         {/* 평가 */}
         <FeedbackPanel placeId={place.id} />

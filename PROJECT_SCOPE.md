@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Phase 27: Data Source Expansion)
+Last updated: 2026-05-21 (Phase 28: Place Detail Enrichment)
 
 ## Product Goal
 
@@ -42,6 +42,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | Additional Phase | E2E CI fix — `test.beforeEach` addInitScript로 모달 사전 dismiss, GitHub Actions 통과 복구 |
 | 26 | Real Data Transition — fetchSeoulCultureSpaces 추가, fetchSeoulPlaces 통합, /api/health Seoul API ping, 실 데이터 품질 방어 |
 | 27 | Data Source Expansion — 도서관/공원/체육시설 Seoul Open API fetcher, PlaceSourceType 확장(LIBRARY/PARK/SPORTS), fetchSeoulPlaces 5소스 통합 |
+| 28 | Place Detail Enrichment — PlaceCard 카테고리 placeholder, PlaceMiniMap(단일 마커 Naver Maps), 상세 페이지 미니맵/대중교통 노트/homepage i18n |
 
 ## Deferred / Not In Scope
 
