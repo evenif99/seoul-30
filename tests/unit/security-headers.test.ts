@@ -18,5 +18,12 @@ describe('security headers', () => {
     expect(nextConfig).toContain('https://openapi.map.naver.com')
     expect(nextConfig).toContain('https://*.map.naver.com')
     expect(nextConfig).toContain('https://*.ssl.naver.com')
+    expect(nextConfig).toContain('https://*.pstatic.net')
+  })
+
+  it('allows real place image providers in CSP', () => {
+    expect(nextConfig).toContain('https://culture.seoul.go.kr')
+    expect(nextConfig).toContain('https://*.seoul.go.kr')
+    expect(nextConfig).toContain('https://*.visitkorea.or.kr')
   })
 })

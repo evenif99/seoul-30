@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import {
   ArrowLeft, MapPin, Clock, Phone, Globe, ExternalLink, Train,
@@ -13,6 +12,7 @@ import { RecentTracker } from '@/components/seoul30/RecentTracker'
 import { ShareButton } from '@/components/seoul30/ShareButton'
 import { PlaceMiniMap } from '@/components/seoul30/PlaceMiniMap'
 import { PlaceCard } from '@/components/seoul30/PlaceCard'
+import { PlaceImage } from '@/components/seoul30/PlaceImage'
 import { notFound } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { getPlaceDetailData } from '@/lib/data/place-detail'
@@ -155,26 +155,14 @@ export default async function PlaceDetailPage({ params }: PageProps) {
 
         {/* 히어로 이미지 */}
         <div className="relative h-52 overflow-hidden">
-          {place.imageUrl ? (
-            <Image
-              src={place.imageUrl}
-              alt={place.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 672px) 100vw, 672px"
-              priority
-            />
-          ) : (
-            <div
-              aria-hidden="true"
-              className={cn(
-                'w-full h-full flex items-center justify-center',
-                heroPlaceholder?.bg ?? 'bg-muted',
-              )}
-            >
-              {heroPlaceholder?.icon}
-            </div>
-          )}
+          <PlaceImage
+            src={place.imageUrl}
+            alt={place.name}
+            category={place.category}
+            sizes="(max-width: 672px) 100vw, 672px"
+            priority
+            iconSize="hero"
+          />
         </div>
 
         {/* 본문 */}
