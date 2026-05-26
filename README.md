@@ -1,5 +1,11 @@
 # Seoul 30
 
+## Phase 50 Update
+
+- Security headers are configured in `next.config.mjs`.
+- Lighthouse CI audits the app on `http://localhost:3001/`.
+- MapView now shows a fallback instead of leaving a blank map when Naver Maps cannot load.
+
 ## Phase 49 Update
 
 - PWA install banner added with browser `beforeinstallprompt` support.

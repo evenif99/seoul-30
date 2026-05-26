@@ -1,5 +1,12 @@
 # TASKS
 
+## Phase 50 - Production Quality
+
+- [x] MapView fallback for missing Naver Maps key, script load failure, and render-time map errors.
+- [x] Security headers in `next.config.mjs`: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
+- [x] Lighthouse CI config added with `temporary-public-storage`.
+- [x] Lighthouse CI uses port `3001` only: `npx next start -p 3001`, `http://localhost:3001/`.
+
 ## Phase 49 - PWA Completeness (2026-05-26)
 
 - [x] `hooks/use-pwa-install.ts` added: captures `beforeinstallprompt`, wraps `prompt()`, detects installed/standalone state.

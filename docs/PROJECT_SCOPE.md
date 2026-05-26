@@ -1,5 +1,11 @@
 # PROJECT_SCOPE
 
+## Phase 50 Scope Update (2026-05-26)
+
+- Added production security headers without adding paid services.
+- Added Lighthouse CI with temporary public upload storage and port `3001`.
+- Added MapView fallback/error handling for Naver Maps configuration and load failures.
+
 ## Phase 49 Scope Update (2026-05-26)
 
 - Completed PWA install prompt flow with `beforeinstallprompt`.

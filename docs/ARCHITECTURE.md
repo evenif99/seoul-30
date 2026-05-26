@@ -1,5 +1,13 @@
 # ARCHITECTURE
 
+## Phase 50 Architecture Note (2026-05-26)
+
+Security headers are defined centrally in `next.config.mjs` and apply to `/:path*`. The CSP intentionally allows the Naver Maps SDK/assets and Vercel Analytics while blocking frame embedding and object execution.
+
+Map rendering now fails closed into a usable fallback: missing `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID`, Naver script load failure, or `MapViewInner` render errors all leave the list experience intact.
+
+Lighthouse CI audits `http://localhost:3001/` only, using `npx next start -p 3001`.
+
 ## Phase 49 Architecture Note (2026-05-26)
 
 PWA install UX is browser-event driven. `hooks/use-pwa-install.ts` listens for `beforeinstallprompt`, stores the deferred prompt, wraps `prompt()`, and hides the CTA after install, standalone launch, or a `localStorage` “later” decision. `components/seoul30/PwaInstallBanner.tsx` is mounted near the top of `app/page.tsx`.

@@ -1,5 +1,10 @@
 # HANDOFF
 
+## Phase 50 Port Rule
+
+- Local/CI server checks for Phase 50 must use port `3001`.
+- Lighthouse CI is configured to run `npx next start -p 3001` and audit `http://localhost:3001/`.
+
 ## Phase 49 Codex Handoff (2026-05-26)
 
 - **완료**: PWA 설치 배너 + 오프라인 캐시 UX.

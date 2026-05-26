@@ -53,3 +53,12 @@ jobs:
           USE_MOCK_DATA: true
           ENABLE_REALTIME_CITY_DATA: false
           ENABLE_CULTURE_EVENTS_API: false
+
+      - name: Lighthouse CI
+        run: npx @lhci/cli@0.15.1 autorun
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://ci:ci@localhost/ci' }}
+          NEXT_PUBLIC_BASE_URL: http://localhost:3001
+          USE_MOCK_DATA: true
+          ENABLE_REALTIME_CITY_DATA: false
+          ENABLE_CULTURE_EVENTS_API: false
