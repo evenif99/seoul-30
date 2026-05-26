@@ -1,5 +1,12 @@
 # PROJECT_SCOPE
 
+## Phase 51 Scope Update (2026-05-26)
+
+- Stabilized Lighthouse CI without adding paid services.
+- Kept all local/CI app server checks on port `3001`.
+- Treated Lighthouse as a quality signal, with accessibility as the blocking gate and other categories as warnings.
+- Kept PWA verification in deterministic unit tests for manifest/icon/SW assets.
+
 ## Additional Phase Scope Update (2026-05-26)
 
 - Fixed PWA icon asset gaps after Phase 50 review.

@@ -38,7 +38,7 @@ jobs:
         run: npm run test:e2e
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://ci:ci@localhost/ci' }}
-          NEXT_PUBLIC_BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_BASE_URL: http://localhost:3001
           USE_MOCK_DATA: true
           ENABLE_REALTIME_CITY_DATA: false
           ENABLE_CULTURE_EVENTS_API: false
@@ -49,7 +49,7 @@ jobs:
           # Provide minimal stubs so the build can resolve env references.
           # Real values are only needed at runtime.
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://ci:ci@localhost/ci' }}
-          NEXT_PUBLIC_BASE_URL: https://seoul-30.vercel.app
+          NEXT_PUBLIC_BASE_URL: http://localhost:3001
           USE_MOCK_DATA: true
           ENABLE_REALTIME_CITY_DATA: false
           ENABLE_CULTURE_EVENTS_API: false

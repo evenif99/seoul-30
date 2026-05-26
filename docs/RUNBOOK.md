@@ -1,5 +1,21 @@
 # RUNBOOK
 
+## Phase 51 CI / Lighthouse Notes
+
+- CI server checks use port `3001` only.
+- Lighthouse CI starts the production server with `npx next start -p 3001`.
+- LHCI audits `http://localhost:3001/`.
+- Blocking gate: accessibility score must be at least `0.9`.
+- Warning gates: performance `0.8`, best-practices `0.9`, seo `0.9`.
+- PWA installability is checked with unit tests around `public/manifest.json`, icon files, and service worker references rather than a Lighthouse `pwa` category assertion.
+- Last local smoke result for Phase 51: performance `0.98`, accessibility `0.96`, best-practices `0.93`, seo `1.00`.
+
+If CI fails in the Lighthouse step:
+1. Open the temporary public storage URL printed by LHCI.
+2. Check whether the failure is an assertion error or a server startup timeout.
+3. If startup timed out, confirm no workflow step changed the required port `3001`.
+4. If an assertion failed, treat accessibility as blocking; review warning categories before deciding whether to tighten or relax thresholds.
+
 Seoul 30 운영 런북. 배포 후 문제 발생 시 첫 번째로 참조한다.
 
 ---

@@ -1,5 +1,11 @@
 # Seoul 30
 
+## Phase 51 Update
+
+- Lighthouse CI is stabilized around port `3001`.
+- CI base URLs now consistently use `http://localhost:3001`.
+- Lighthouse assertions use stable categories: performance, accessibility, best-practices, seo.
+
 ## Additional Phase Update
 
 - Added concrete 192/512 PNG PWA icons under `public/icons/`.

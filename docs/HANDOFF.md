@@ -1,5 +1,15 @@
 # HANDOFF
 
+## Phase 51 - Lighthouse CI Stabilization (2026-05-26)
+
+- **완료**: CI/LHCI 3001 포트 정렬 및 Lighthouse 기준 안정화.
+- `.github/workflows/ci.yml`의 E2E/Build/LHCI `NEXT_PUBLIC_BASE_URL`을 모두 `http://localhost:3001`로 통일.
+- `lighthouserc.cjs`에 `startServerReadyTimeout: 120000` 추가.
+- Lighthouse 수집 카테고리를 `performance`, `accessibility`, `best-practices`, `seo`로 명시.
+- `categories:pwa` assertion은 최신 Lighthouse 계열에서 카테고리 부재로 CI 불안정 가능성이 있어 제거하고, PWA installability는 manifest/icon/SW 테스트로 커버.
+- `tests/unit/lighthouse-ci.test.ts`로 3001 포트와 품질 게이트 회귀 검증.
+- 로컬 LHCI smoke 결과: performance 0.98, accessibility 0.96, best-practices 0.93, seo 1.00.
+
 ## Additional Phase - PWA Icon and CSP Hardening (2026-05-26)
 
 - **완료**: Phase 50 후속 점검에서 발견된 PWA 아이콘 참조 불일치와 CSP 도메인 여유 보강.

@@ -1,5 +1,9 @@
 # ARCHITECTURE
 
+## Phase 51 Architecture Note (2026-05-26)
+
+CI and Lighthouse now use port `3001` consistently across Playwright, build-time base URL, and LHCI. Lighthouse collection is intentionally limited to categories that are stable in current Lighthouse releases: `performance`, `accessibility`, `best-practices`, and `seo`. PWA installability is covered by manifest/icon/service-worker tests instead of a Lighthouse `pwa` category assertion, which can be absent in newer Lighthouse versions.
+
 ## Additional Phase Note - PWA Icon and CSP Hardening (2026-05-26)
 
 PWA installability now has concrete PNG icon assets in addition to the SVG maskable icon. The manifest includes `192x192` and `512x512` PNG entries under `/icons/`, and shortcut icons point to an existing PNG file. Push notification `icon`/`badge` paths in `public/sw.js` resolve to the same 192 PNG.

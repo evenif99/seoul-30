@@ -9,14 +9,17 @@ describe('Lighthouse CI configuration', () => {
   it('runs Lighthouse CI in GitHub Actions', () => {
     expect(workflow).toContain('Lighthouse CI')
     expect(workflow).toContain('npx @lhci/cli@0.15.1 autorun')
+    expect(workflow).toContain('NEXT_PUBLIC_BASE_URL: http://localhost:3001')
   })
 
   it('sets quality gates and temporary upload storage', () => {
     expect(lhciConfig).toContain('http://localhost:3001/')
     expect(lhciConfig).toContain('npx next start -p 3001')
+    expect(lhciConfig).toContain('startServerReadyTimeout: 120000')
     expect(lhciConfig).toContain("target: 'temporary-public-storage'")
     expect(lhciConfig).toContain("'categories:performance'")
     expect(lhciConfig).toContain("'categories:accessibility'")
-    expect(lhciConfig).toContain("'categories:pwa'")
+    expect(lhciConfig).toContain("'categories:best-practices'")
+    expect(lhciConfig).toContain("'categories:seo'")
   })
 })

@@ -1,5 +1,14 @@
 # TASKS
 
+## Phase 51 - Lighthouse CI Stabilization (2026-05-26)
+
+- [x] CI `NEXT_PUBLIC_BASE_URL` values aligned to `http://localhost:3001`.
+- [x] LHCI start server command remains `npx next start -p 3001`.
+- [x] Added `startServerReadyTimeout: 120000` to reduce CI boot race failures.
+- [x] Restricted Lighthouse collection to stable categories: performance, accessibility, best-practices, seo.
+- [x] Replaced fragile `categories:pwa` assertion with manifest/icon/SW unit coverage from the previous Additional Phase.
+- [x] Updated `tests/unit/lighthouse-ci.test.ts` to lock the 3001 and category assumptions.
+
 ## Additional Phase - PWA Icon and CSP Hardening (2026-05-26)
 
 - [x] Added `public/icons/icon-192.png` and `public/icons/icon-512.png`.
