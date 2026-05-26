@@ -17,3 +17,5 @@ node_modules
 tsconfig.tsbuildinfo
 playwright-report/
 test-results/
+.lighthouseci/
+.lhci-local/

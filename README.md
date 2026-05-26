@@ -1,5 +1,11 @@
 # Seoul 30
 
+## Phase 52 Update
+
+- Manifest installability metadata now includes `id`, `display_override`, and screenshots.
+- Real app screenshots are available under `public/screenshots/`.
+- Service worker cache version bumped to `v3` for refreshed PWA assets.
+
 ## Phase 51 Update
 
 - Lighthouse CI is stabilized around port `3001`.

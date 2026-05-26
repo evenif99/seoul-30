@@ -1,5 +1,16 @@
 # RUNBOOK
 
+## Phase 52 PWA Installability Notes
+
+- Manifest is served at `/manifest.json`.
+- Required install assets:
+  - `/icons/icon-192.png`
+  - `/icons/icon-512.png`
+  - `/screenshots/mobile-home.png`
+  - `/screenshots/desktop-home.png`
+- Service worker cache version after Phase 52: `v3`.
+- If installability regresses, run `npm run test` first; manifest tests verify icon, shortcut, and screenshot file paths.
+
 ## Phase 51 CI / Lighthouse Notes
 
 - CI server checks use port `3001` only.

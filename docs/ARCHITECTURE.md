@@ -1,5 +1,9 @@
 # ARCHITECTURE
 
+## Phase 52 Architecture Note (2026-05-26)
+
+The web app manifest now includes concrete installability metadata beyond the baseline fields: `id`, `display_override`, 192/512 PNG icons, and screenshots for both narrow and wide form factors. Screenshots are real captures of the home experience served from port `3001`. The service worker cache version is `v3` so clients refresh PWA shell/API/image caches after the manifest and screenshot asset changes.
+
 ## Phase 51 Architecture Note (2026-05-26)
 
 CI and Lighthouse now use port `3001` consistently across Playwright, build-time base URL, and LHCI. Lighthouse collection is intentionally limited to categories that are stable in current Lighthouse releases: `performance`, `accessibility`, `best-practices`, and `seo`. PWA installability is covered by manifest/icon/service-worker tests instead of a Lighthouse `pwa` category assertion, which can be absent in newer Lighthouse versions.

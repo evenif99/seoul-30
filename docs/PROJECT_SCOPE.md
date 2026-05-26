@@ -1,5 +1,11 @@
 # PROJECT_SCOPE
 
+## Phase 52 Scope Update (2026-05-26)
+
+- Completed PWA installability polish with manifest `id`, display override, screenshots, and cache version bump.
+- Kept the work asset-only/local; no new paid services, no database changes, no environment variable changes.
+- Added deterministic tests so manifest screenshot/icon paths cannot drift again.
+
 ## Phase 51 Scope Update (2026-05-26)
 
 - Stabilized Lighthouse CI without adding paid services.

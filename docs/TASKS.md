@@ -1,5 +1,15 @@
 # TASKS
 
+## Phase 52 - PWA Installability Final Check (2026-05-26)
+
+- [x] Added manifest `id`.
+- [x] Added `display_override` with `standalone` and `minimal-ui`.
+- [x] Captured real app screenshots on port `3001`.
+- [x] Added manifest screenshots for narrow/mobile and wide/desktop form factors.
+- [x] Bumped service worker cache version from `v2` to `v3`.
+- [x] Strengthened manifest tests for screenshots, file existence, display override, and app id.
+- [x] Added `.lighthouseci/` and `.lhci-local/` to `.gitignore`.
+
 ## Phase 51 - Lighthouse CI Stabilization (2026-05-26)
 
 - [x] CI `NEXT_PUBLIC_BASE_URL` values aligned to `http://localhost:3001`.

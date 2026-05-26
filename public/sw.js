@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2'
+const CACHE_VERSION = 'v3'
 const STATIC_CACHE  = `seoul30-static-${CACHE_VERSION}`
 const API_CACHE     = `seoul30-api-${CACHE_VERSION}`
 const PAGE_CACHE    = `seoul30-pages-${CACHE_VERSION}`

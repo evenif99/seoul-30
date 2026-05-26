@@ -1,5 +1,14 @@
 # HANDOFF
 
+## Phase 52 - PWA Installability Final Check (2026-05-26)
+
+- **완료**: manifest installability 보강, 실제 앱 스크린샷 추가, SW cache v3 bump.
+- `public/manifest.json`에 `id`, `display_override`, narrow/wide `screenshots` 추가.
+- 실제 홈 화면 캡처 파일 추가: `public/screenshots/mobile-home.png`, `public/screenshots/desktop-home.png`.
+- PWA 아이콘/스크린샷/shortcut 파일 존재 검증을 `tests/unit/manifest.test.ts`에 추가.
+- `public/sw.js` cache version을 `v2` → `v3`로 올려 새 PWA 자산 갱신 유도.
+- `.gitignore`에 local LHCI report 폴더(`.lighthouseci/`, `.lhci-local/`) 추가.
+
 ## Phase 51 - Lighthouse CI Stabilization (2026-05-26)
 
 - **완료**: CI/LHCI 3001 포트 정렬 및 Lighthouse 기준 안정화.
