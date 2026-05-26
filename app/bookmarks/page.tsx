@@ -12,9 +12,22 @@ import type { NormalizedPlace } from '@/lib/types/place'
 
 type Tab = 'saved' | 'recent'
 
+/** localStorage에 저장된 장소 데이터를 읽어 ID로 resolve.
+ *  북마크/최근본 저장 시 place 데이터도 함께 저장하므로 실 API 장소도 표시 가능. */
 function resolvePlaces(ids: string[]): NormalizedPlace[] {
+  let storedData: Record<string, NormalizedPlace> = {}
+  try {
+    const bookmarkData: Record<string, NormalizedPlace> = JSON.parse(
+      localStorage.getItem('seoul30:bookmark_data') ?? '{}'
+    )
+    const recentData: Record<string, NormalizedPlace> = JSON.parse(
+      localStorage.getItem('seoul30:recent_data') ?? '{}'
+    )
+    storedData = { ...recentData, ...bookmarkData }
+  } catch {}
+
   return ids
-    .map((id) => MOCK_PLACES.find((p) => p.id === id))
+    .map((id) => storedData[id] ?? MOCK_PLACES.find((p) => p.id === id))
     .filter((p): p is NormalizedPlace => p !== undefined)
 }
 

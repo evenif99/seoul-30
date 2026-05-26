@@ -88,7 +88,7 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
                   {place.district ? ` · ${place.district}` : ''}
                 </p>
               </div>
-              <BookmarkButton placeId={place.id} />
+              <BookmarkButton placeId={place.id} place={place} />
             </div>
 
             {/* 뱃지: 무료 여부 + 추천 점수 */}

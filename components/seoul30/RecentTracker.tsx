@@ -2,9 +2,15 @@
 
 import { useEffect } from 'react'
 import { useRecent } from '@/hooks/use-recent'
+import type { NormalizedPlace } from '@/lib/types/place'
 
-export function RecentTracker({ placeId }: { placeId: string }) {
+interface Props {
+  placeId: string
+  place?: NormalizedPlace
+}
+
+export function RecentTracker({ placeId, place }: Props) {
   const { push } = useRecent()
-  useEffect(() => { push(placeId) }, [placeId, push])
+  useEffect(() => { push(placeId, place) }, [placeId, place, push])
   return null
 }

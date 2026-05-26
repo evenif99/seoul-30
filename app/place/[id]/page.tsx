@@ -138,7 +138,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <RecentTracker placeId={place.id} />
+      <RecentTracker placeId={place.id} place={place} />
 
       <div className="max-w-2xl mx-auto">
 

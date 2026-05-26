@@ -130,7 +130,7 @@ export async function GET(request: Request) {
       }
     })
     .sort((a, b) => b.score.total - a.score.total)
-    .slice(0, 10)
+    .slice(0, 30)
 
   if (!isMock) {
     results = await mergeTourImages(results)

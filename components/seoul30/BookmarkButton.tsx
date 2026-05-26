@@ -4,13 +4,15 @@ import { Bookmark } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useBookmark } from '@/hooks/use-bookmark'
 import { cn } from '@/lib/utils'
+import type { NormalizedPlace } from '@/lib/types/place'
 
 interface BookmarkButtonProps {
   placeId: string
+  place?: NormalizedPlace
   className?: string
 }
 
-export function BookmarkButton({ placeId, className }: BookmarkButtonProps) {
+export function BookmarkButton({ placeId, place, className }: BookmarkButtonProps) {
   const t = useTranslations('bookmark')
   const { isBookmarked, toggle } = useBookmark()
   const active = isBookmarked(placeId)
@@ -20,7 +22,7 @@ export function BookmarkButton({ placeId, className }: BookmarkButtonProps) {
       data-testid={`bookmark-button-${placeId}`}
       onClick={(e) => {
         e.preventDefault()
-        toggle(placeId)
+        toggle(placeId, place)
       }}
       aria-label={active ? t('remove') : t('save')}
       aria-pressed={active}
