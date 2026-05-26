@@ -114,6 +114,8 @@
     "backToList": "Back",
     "directions": "Get directions",
     "staleData": "Seoul public API is unavailable — showing cached results ({age})",
+    "offlineCachedData": "You're offline. Showing cached places ({age}).",
+    "unknownAge": "previously saved",
     "cachedData": "Updated {age}",
     "mapLoading": "Loading map...",
     "mapSatellite": "Switch to satellite view",
@@ -144,6 +146,12 @@
     "subscribed": "Subscribed",
     "denied": "Notifications blocked",
     "deniedTitle": "Notifications are blocked in your browser"
+  },
+  "pwaInstall": {
+    "title": "Install Seoul 30",
+    "body": "Open recommendations faster from your home screen.",
+    "install": "Install",
+    "later": "Later"
   },
   "lang": {
     "toggle": "한국어"

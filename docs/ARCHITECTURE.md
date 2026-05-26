@@ -1,5 +1,11 @@
 # ARCHITECTURE
 
+## Phase 49 Architecture Note (2026-05-26)
+
+PWA install UX is browser-event driven. `hooks/use-pwa-install.ts` listens for `beforeinstallprompt`, stores the deferred prompt, wraps `prompt()`, and hides the CTA after install, standalone launch, or a `localStorage` “later” decision. `components/seoul30/PwaInstallBanner.tsx` is mounted near the top of `app/page.tsx`.
+
+Offline recommendation UX is service-worker driven. `public/sw.js` uses a network-first strategy for `/api/places`; when the network fails and a cached API response exists, it returns JSON with `isStale: true`, `isOfflineCache: true`, and a `snapshotAt` value. `app/page.tsx` renders this as an explicit cached-place notice.
+
 Last updated: 2026-05-21 (Phase 34 + PlaceMiniMap navigation fix)
 
 ## Documentation Layout

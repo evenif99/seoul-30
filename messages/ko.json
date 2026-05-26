@@ -114,6 +114,8 @@
     "backToList": "목록으로",
     "directions": "카카오맵으로 길찾기",
     "staleData": "서울 공공 API에 연결할 수 없어 이전 캐시 데이터를 표시하고 있습니다 ({age} 기준)",
+    "offlineCachedData": "오프라인 상태입니다. 캐시된 장소를 표시하고 있습니다 ({age}).",
+    "unknownAge": "이전에 저장됨",
     "cachedData": "{age} 업데이트된 데이터",
     "mapLoading": "지도 불러오는 중...",
     "mapSatellite": "위성 뷰로 전환",
@@ -144,6 +146,12 @@
     "subscribed": "알림 구독 중",
     "denied": "알림 차단됨",
     "deniedTitle": "브라우저에서 알림이 차단되어 있습니다"
+  },
+  "pwaInstall": {
+    "title": "Seoul 30 앱 설치",
+    "body": "홈 화면에서 추천 장소를 더 빠르게 열어보세요.",
+    "install": "설치",
+    "later": "나중에"
   },
   "lang": {
     "toggle": "English"

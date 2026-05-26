@@ -1,5 +1,16 @@
 # TASKS
 
+## Phase 49 - PWA Completeness (2026-05-26)
+
+- [x] `hooks/use-pwa-install.ts` added: captures `beforeinstallprompt`, wraps `prompt()`, detects installed/standalone state.
+- [x] `components/seoul30/PwaInstallBanner.tsx` added and mounted near the top of `app/page.tsx`.
+- [x] “Later” choice stored in `localStorage` as `seoul30:pwa_install_dismissed`.
+- [x] `public/sw.js` now returns cached `/api/places` JSON on network failure with `isStale` and `isOfflineCache`.
+- [x] `app/page.tsx` shows a clear cached-place offline banner.
+- [x] `messages/ko.json` and `messages/en.json` updated for install/offline copy.
+- [x] Tests added: `tests/components/PwaInstallBanner.test.tsx`, `tests/unit/service-worker-cache.test.ts`.
+- [ ] Push tag personalization deferred: requires Prisma schema change and Neon `db push` approval/capacity check.
+
 Last updated: 2026-05-26 (Bug fixes: detail page 404, map pins limit, bookmarks/recent resolve)
 
 ## Current Phase Check

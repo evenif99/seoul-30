@@ -1,5 +1,12 @@
 # PROJECT_SCOPE
 
+## Phase 49 Scope Update (2026-05-26)
+
+- Completed PWA install prompt flow with `beforeinstallprompt`.
+- Added home-screen install CTA and “later” persistence via localStorage.
+- Improved offline `/api/places` fallback so cached API data is marked stale/offline instead of looking fresh.
+- Deferred Push tag personalization because it requires a Prisma schema change and Neon `db push` approval/capacity check.
+
 Last updated: 2026-05-26 (Phase 48 + Additional Phase: Filter Hard Apply)
 
 ## Current Scope Status

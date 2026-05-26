@@ -43,7 +43,7 @@ self.addEventListener('fetch', (event) => {
 
   // 2) /api/places — network-first, 5분 TTL 캐시 fallback
   if (url.pathname === '/api/places') {
-    event.respondWith(networkFirstWithTTL(request, API_CACHE, API_TTL_MS))
+    event.respondWith(networkFirstApiWithCache(request, API_CACHE, API_TTL_MS))
     return
   }
 
@@ -122,6 +122,52 @@ async function networkFirstWithTTL(request, cacheName, ttlMs) {
       if (cachedAt && Date.now() - Number(cachedAt) < ttlMs) return cached
     }
     return Response.error()
+  }
+}
+
+async function networkFirstApiWithCache(request, cacheName, ttlMs) {
+  const cache = await caches.open(cacheName)
+  try {
+    const response = await fetch(request)
+    if (response.ok) {
+      const headers = new Headers(response.headers)
+      headers.set('x-sw-cached-at', String(Date.now()))
+      const stamped = new Response(await response.clone().blob(), {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      })
+      cache.put(request, stamped)
+    }
+    return response
+  } catch {
+    const cached = await cache.match(request)
+    if (!cached) return Response.error()
+
+    const cachedAt = cached.headers.get('x-sw-cached-at')
+    const cachedMs = cachedAt ? Number(cachedAt) : Date.now()
+
+    try {
+      const body = await cached.clone().json()
+      return Response.json(
+        {
+          ...body,
+          isStale: true,
+          isOfflineCache: true,
+          snapshotAt: body.snapshotAt ?? new Date(cachedMs).toISOString(),
+        },
+        {
+          status: 200,
+          headers: {
+            'content-type': 'application/json',
+            'x-sw-cache': 'offline',
+            'x-sw-cached-at': String(cachedMs),
+          },
+        },
+      )
+    } catch {
+      return cached
+    }
   }
 }
 

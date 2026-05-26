@@ -1,5 +1,18 @@
 # Seoul 30
 
+## Phase 49 Update
+
+- PWA install banner added with browser `beforeinstallprompt` support.
+- “Later” install dismissal is remembered in `localStorage`.
+- Offline `/api/places` fallback now shows cached-place guidance on the home screen.
+
+Local run:
+
+```bash
+npm run dev
+# http://localhost:3001
+```
+
 **서울 시민을 위한 30분 생활권 공공시설 추천 PWA**
 
 > 현재 위치에서 대중교통 30분 이내의 도서관·공원·문화공간·스포츠시설을 무료 우선·혼잡도 반영으로 추천합니다.

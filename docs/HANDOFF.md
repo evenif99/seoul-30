@@ -1,5 +1,14 @@
 # HANDOFF
 
+## Phase 49 Codex Handoff (2026-05-26)
+
+- **완료**: PWA 설치 배너 + 오프라인 캐시 UX.
+- **다음**: Phase 50 (보안 헤더 + Lighthouse CI + MapView 에러 바운더리).
+- PWA 설치 배너: `hooks/use-pwa-install.ts` + `components/seoul30/PwaInstallBanner.tsx`.
+- 오프라인 캐시: `public/sw.js`가 `/api/places` 캐시 fallback에 `isStale`, `isOfflineCache`, `snapshotAt`을 주입.
+- 홈 안내: `app/page.tsx`에서 캐시된 장소 안내 문구 표시.
+- Push 태그 개인화는 Prisma schema 변경과 Neon `db push` 승인/용량 확인이 필요해 이번 Phase 49에서는 제외.
+
 Last updated: 2026-05-26 (Additional Phase — 필터 하드 적용)
 
 ## Current Status (Clean Summary)
