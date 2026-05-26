@@ -1,11 +1,11 @@
 # HANDOFF
 
-Last updated: 2026-05-26 (Phase 47 — Admin 보안 + 테스트 커버리지)
+Last updated: 2026-05-26 (Phase 48 — 상세 페이지 성능 + MapView 북마크)
 
 ## Current Status (Clean Summary)
 
-- **완료**: Phase 47 완료
-- **다음**: Phase 48 (상세 페이지 성능 + MapView 북마크)
+- **완료**: Phase 48 완료
+- **다음**: Phase 49 (PWA 완성도)
 - **배포 URL**: https://seoul-30.vercel.app
 - **레포**: https://github.com/evenif99/seoul-30
 - **현재 브랜치**: master
@@ -22,6 +22,20 @@ Last updated: 2026-05-26 (Phase 47 — Admin 보안 + 테스트 커버리지)
 | 최근본 미출력 | 북마크와 동일 구조 원인 | 상세 방문 시 place 데이터 localStorage 저장 |
 
 **참고**: 수정 이전에 저장된 북마크/최근본 데이터는 place 정보 없이 ID만 저장되어 있어 이전 항목은 표시 안됨. 수정 후 새로 북마크하거나 상세 페이지 재방문 시 정상 표시됨.
+
+## Phase 48 작업 요약
+
+| 항목 | 내용 | 커밋 |
+|---|---|---|
+| fetchByIdPrefix() 신규 | ID prefix(ce-/cs-/lib-/park-/sport-)로 단일 소스만 fetch | `e8b6aa3` |
+| getSnapshotPlaces() 신규 | 최신 스냅샷에서 장소 목록 추출 (근처 추천용, API 재호출 없음) | `e8b6aa3` |
+| getPlaceDetailData 개선 | 스냅샷 우선 → selective fetch 순서로 API 호출 최소화 | `e8b6aa3` |
+| MapView 팝업 북마크 | `MapViewInner.tsx` — 선택된 장소 팝업에 BookmarkButton 추가 | `e8b6aa3` |
+
+**성능 효과**:
+- 이전: 상세 페이지 매 요청마다 Seoul API 5개 병렬 호출 (~1–2초)
+- 이후: DB 스냅샷 우선(~50ms) → 미스 시 ID prefix로 1개만 fetch (~300ms)
+- 재방문 시 거의 항상 스냅샷 히트로 API 호출 0회
 
 ## Phase 47 작업 요약
 
@@ -193,7 +207,7 @@ Last updated: 2026-05-26 (Phase 47 — Admin 보안 + 테스트 커버리지)
 
 ---
 
-## 검증 상태 (Phase 47 완료 기준 — 2026-05-26)
+## 검증 상태 (Phase 48 완료 기준 — 2026-05-26)
 
 - `npx tsc --noEmit` — 통과 (0 오류) ✅
 - `npx vitest run` — 134/134 통과 ✅
