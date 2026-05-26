@@ -172,7 +172,7 @@ export default function HomePage() {
     syncUrl(district, next)
   }
 
-  // 클라이언트 사이드 필터링 (search, openNow, 시간 필터)
+  // 클라이언트 사이드 필터링 (search, openNow, 시간 필터, 카테고리, 자치구, 태그)
   const maxMinutes = parseInt(filters.time) || 30
   const displayResults = results
     .filter(({ place, score }) => {
@@ -185,8 +185,13 @@ export default function HomePage() {
       if (filters.openNow && !isOpenNow(place)) return false
       // GPS 활성 시에만 시간 필터 적용
       if (userCoords && score?.transitMinutes != null && score.transitMinutes > maxMinutes) return false
-      // 태그 필터: tags 있는 장소에만 적용, 없는 장소(실 API)는 통과
-      if (filters.tags.length > 0 && place.tags && place.tags.length > 0) {
+      // 카테고리 하드 필터: 선택된 카테고리 장소만 표시
+      if (filters.category !== 'all' && place.category !== filters.category) return false
+      // 자치구 하드 필터: GPS 미사용 + 자치구 선택 시 해당 구 장소만 표시
+      if (district && !userCoords && place.district !== district) return false
+      // 태그 필터: AND 교집합, tags 없는 장소는 제외 (Phase 46 enrichment 이후 일관성 유지)
+      if (filters.tags.length > 0) {
+        if (!place.tags || place.tags.length === 0) return false
         if (!filters.tags.every((tag) => place.tags!.includes(tag))) return false
       }
       return true
