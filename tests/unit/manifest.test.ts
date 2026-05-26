@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import manifest from '../../public/manifest.json'
 
 describe('manifest.json', () => {
@@ -28,5 +30,28 @@ describe('manifest.json', () => {
   it('has shortcuts defined', () => {
     expect(manifest.shortcuts).toBeDefined()
     expect(manifest.shortcuts!.length).toBeGreaterThan(0)
+  })
+
+  it('includes installable png icons that exist on disk', () => {
+    const requiredIcons = [
+      { src: '/icons/icon-192.png', sizes: '192x192' },
+      { src: '/icons/icon-512.png', sizes: '512x512' },
+    ]
+
+    for (const required of requiredIcons) {
+      const icon = manifest.icons.find((item) => item.src === required.src)
+      expect(icon?.sizes).toBe(required.sizes)
+      expect(icon?.type).toBe('image/png')
+      expect(icon?.purpose).toContain('maskable')
+      expect(existsSync(join(process.cwd(), 'public', required.src))).toBe(true)
+    }
+  })
+
+  it('shortcut icons point to existing files', () => {
+    for (const shortcut of manifest.shortcuts ?? []) {
+      for (const icon of shortcut.icons ?? []) {
+        expect(existsSync(join(process.cwd(), 'public', icon.src))).toBe(true)
+      }
+    }
   })
 })

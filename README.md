@@ -1,5 +1,11 @@
 # Seoul 30
 
+## Additional Phase Update
+
+- Added concrete 192/512 PNG PWA icons under `public/icons/`.
+- Manifest shortcut and push notification icons now point to existing assets.
+- CSP now allows both current Naver Maps SDK hostnames used by the app.
+
 ## Phase 50 Update
 
 - Security headers are configured in `next.config.mjs`.

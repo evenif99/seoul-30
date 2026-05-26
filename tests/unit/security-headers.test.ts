@@ -15,6 +15,7 @@ describe('security headers', () => {
 
   it('allows Naver Maps assets in CSP', () => {
     expect(nextConfig).toContain('https://oapi.map.naver.com')
+    expect(nextConfig).toContain('https://openapi.map.naver.com')
     expect(nextConfig).toContain('https://*.map.naver.com')
     expect(nextConfig).toContain('https://*.ssl.naver.com')
   })

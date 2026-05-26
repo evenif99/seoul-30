@@ -1,5 +1,11 @@
 # ARCHITECTURE
 
+## Additional Phase Note - PWA Icon and CSP Hardening (2026-05-26)
+
+PWA installability now has concrete PNG icon assets in addition to the SVG maskable icon. The manifest includes `192x192` and `512x512` PNG entries under `/icons/`, and shortcut icons point to an existing PNG file. Push notification `icon`/`badge` paths in `public/sw.js` resolve to the same 192 PNG.
+
+The CSP now allows both `oapi.map.naver.com` and `openapi.map.naver.com`, matching the current script URL and existing DNS prefetch hint.
+
 ## Phase 50 Architecture Note (2026-05-26)
 
 Security headers are defined centrally in `next.config.mjs` and apply to `/:path*`. The CSP intentionally allows the Naver Maps SDK/assets and Vercel Analytics while blocking frame embedding and object execution.

@@ -1,5 +1,12 @@
 # PROJECT_SCOPE
 
+## Additional Phase Scope Update (2026-05-26)
+
+- Fixed PWA icon asset gaps after Phase 50 review.
+- Strengthened installability by adding 192/512 PNG maskable icons to the manifest.
+- Kept the work within free/local assets only; no new paid services or env changes.
+- Hardened CSP Naver Maps compatibility without relaxing frame/object protections.
+
 ## Phase 50 Scope Update (2026-05-26)
 
 - Added production security headers without adding paid services.

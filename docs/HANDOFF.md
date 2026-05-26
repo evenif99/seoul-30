@@ -1,5 +1,16 @@
 # HANDOFF
 
+## Additional Phase - PWA Icon and CSP Hardening (2026-05-26)
+
+- **완료**: Phase 50 후속 점검에서 발견된 PWA 아이콘 참조 불일치와 CSP 도메인 여유 보강.
+- **현재 상태**: Phase 50 + Additional Phase 완료.
+- **다음 후보**: GitHub Actions Lighthouse 결과 확인 후 기준값 조정 또는 Phase 51 착수.
+- `public/icons/icon-192.png`, `public/icons/icon-512.png` 추가.
+- `public/manifest.json`에 192/512 PNG maskable 아이콘과 shortcut PNG 아이콘 경로 추가.
+- `public/sw.js`의 Push notification icon/badge 경로와 실제 파일이 일치함.
+- `next.config.mjs` CSP에 `https://openapi.map.naver.com`도 허용해 layout dns-prefetch와 정책을 맞춤.
+- `tests/unit/manifest.test.ts`, `tests/unit/security-headers.test.ts`에 회귀 검증 추가.
+
 ## Phase 50 Port Rule
 
 - Local/CI server checks for Phase 50 must use port `3001`.

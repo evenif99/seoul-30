@@ -1,5 +1,14 @@
 # TASKS
 
+## Additional Phase - PWA Icon and CSP Hardening (2026-05-26)
+
+- [x] Added `public/icons/icon-192.png` and `public/icons/icon-512.png`.
+- [x] Updated `public/manifest.json` with 192/512 PNG maskable icons.
+- [x] Updated manifest shortcut icon to an existing PNG asset.
+- [x] Verified service worker push icon/badge paths now point to existing files.
+- [x] Added `https://openapi.map.naver.com` to CSP for Naver Maps DNS/script/connect compatibility.
+- [x] Strengthened manifest and security header tests.
+
 ## Phase 50 - Production Quality
 
 - [x] MapView fallback for missing Naver Maps key, script load failure, and render-time map errors.

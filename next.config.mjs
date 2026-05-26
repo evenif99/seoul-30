@@ -10,11 +10,11 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://oapi.map.naver.com https://*.map.naver.com https://*.ssl.naver.com https://va.vercel-scripts.com https://vercel.live",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://oapi.map.naver.com https://openapi.map.naver.com https://*.map.naver.com https://*.ssl.naver.com https://va.vercel-scripts.com https://vercel.live",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://images.unsplash.com https://*.pstatic.net https://*.map.naver.com https://*.ssl.naver.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.map.naver.com https://*.ssl.naver.com https://oapi.map.naver.com https://*.vercel-insights.com https://vitals.vercel-insights.com",
+      "connect-src 'self' https://*.map.naver.com https://*.ssl.naver.com https://oapi.map.naver.com https://openapi.map.naver.com https://*.vercel-insights.com https://vitals.vercel-insights.com",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
       "media-src 'self' data: blob:",
