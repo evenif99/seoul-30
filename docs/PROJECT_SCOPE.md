@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-26 (Phase 46 complete)
+Last updated: 2026-05-26 (Phase 47 complete)
 
 ## Current Scope Status
 
@@ -73,6 +73,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 45 | JSON-LD Structured Data — schema.org TouristAttraction, 11개 유닛 테스트, i18n E2E 안정화 (serviceWorkers:block) |
 | Bug Fix | 상세 페이지 404 + 지도 핀 30개 + 북마크/최근본 실 API 장소 지원 (place 데이터 localStorage 저장) |
 | 46 | Real API Data Quality — enrichPlace() sourceType별 태그 자동 추론, PARK timefit 24/7 보정(5→10점), ScoreBadge feedbackBonus 표시, 테스트 9개 추가 |
+| 47 | Admin 보안 + 테스트 커버리지 — ADMIN_SECRET ?secret= 접근 제어, isAdminAuthorized() 유틸, coords.ts 경계 테스트 16개, 유닛 134개 |
 
 ## Deferred / Not In Scope
 

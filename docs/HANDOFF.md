@@ -1,15 +1,15 @@
 # HANDOFF
 
-Last updated: 2026-05-26 (Phase 46 — Real API Data Quality)
+Last updated: 2026-05-26 (Phase 47 — Admin 보안 + 테스트 커버리지)
 
 ## Current Status (Clean Summary)
 
-- **완료**: Phase 46 완료
-- **다음**: Phase 47 (테스트 커버리지 + /admin 보안)
+- **완료**: Phase 47 완료
+- **다음**: Phase 48 (상세 페이지 성능 + MapView 북마크)
 - **배포 URL**: https://seoul-30.vercel.app
 - **레포**: https://github.com/evenif99/seoul-30
 - **현재 브랜치**: master
-- **테스트**: 유닛 110/110 통과 (Vitest) + E2E 13/13 통과 (Playwright)
+- **테스트**: 유닛 134/134 통과 (Vitest) + E2E 15/15 통과 (Playwright)
 - **TypeScript**: 0 오류
 
 ## 버그 수정 요약 (2026-05-26, 커밋 `4fb4ea4`)
@@ -22,6 +22,22 @@ Last updated: 2026-05-26 (Phase 46 — Real API Data Quality)
 | 최근본 미출력 | 북마크와 동일 구조 원인 | 상세 방문 시 place 데이터 localStorage 저장 |
 
 **참고**: 수정 이전에 저장된 북마크/최근본 데이터는 place 정보 없이 ID만 저장되어 있어 이전 항목은 표시 안됨. 수정 후 새로 북마크하거나 상세 페이지 재방문 시 정상 표시됨.
+
+## Phase 47 작업 요약
+
+| 항목 | 내용 | 커밋 |
+|---|---|---|
+| isAdminAuthorized() 신규 | `lib/utils/admin-auth.ts` — ADMIN_SECRET 미설정→공개, 설정→?secret= 검증 | `79dd4ed` |
+| env.ts ADMIN_SECRET 추가 | 옵셔널 환경변수 (미설정 시 '' — 하위 호환) | `79dd4ed` |
+| admin 페이지 접근 제어 | `app/admin/page.tsx` — searchParams.secret 불일치 시 notFound() | `79dd4ed` |
+| coords.test.ts 신규 | `toSeoulLatLng` 경계 케이스 16개 (유효/무효/경계값/API 특수케이스) | `79dd4ed` |
+| admin-auth.test.ts 신규 | `isAdminAuthorized` 공개/보호 모드 8개 케이스 | `79dd4ed` |
+| admin E2E 확장 | 1→2개 (공개모드 접근 + ?secret= 파라미터) | `79dd4ed` |
+
+**운영 적용**:
+- `ADMIN_SECRET` 미설정 시 기존과 동일하게 `/admin`은 공개 (배포 무중단)
+- 보호 필요 시: Vercel 대시보드에서 `ADMIN_SECRET=<임의값>` 설정 후 재배포
+- 접근: `https://seoul-30-webapp.vercel.app/admin?secret=<값>`
 
 ## Phase 46 작업 요약
 
@@ -177,11 +193,11 @@ Last updated: 2026-05-26 (Phase 46 — Real API Data Quality)
 
 ---
 
-## 검증 상태 (Phase 46 완료 기준 — 2026-05-26)
+## 검증 상태 (Phase 47 완료 기준 — 2026-05-26)
 
 - `npx tsc --noEmit` — 통과 (0 오류) ✅
-- `npx vitest run` — 110/110 통과 ✅
-- `npx playwright test` — 13/13 통과 ✅
+- `npx vitest run` — 134/134 통과 ✅
+- `npx playwright test` — 15/15 통과 ✅
 - Vercel 배포 — 정상 (https://seoul-30.vercel.app)
 - Naver Maps 핀포인트 — 최대 30개 표시, 38개 mock 좌표 보정 완료
 - 상세 페이지 — hero image, tag chips, nearest station + JSON-LD 표시 확인
