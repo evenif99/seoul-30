@@ -113,7 +113,11 @@ export function calcFeedbackBonus(stats?: FeedbackStats): number {
 
 // 현재 운영 중 여부 (0–10) — 서울 서비스이므로 KST(UTC+9) 기준으로 계산
 function calcTimefit(place: NormalizedPlace): number {
-  if (!place.openTimeText || !place.closeTimeText) return 5
+  if (!place.openTimeText || !place.closeTimeText) {
+    // 서울 공원은 시간 정보 없음 — 대부분 24시간 개방이므로 최고점 10점
+    if (place.sourceType === 'PARK') return 10
+    return 5
+  }
 
   const now = new Date()
   const kstMinutes = (now.getUTCHours() * 60 + now.getUTCMinutes() + 9 * 60) % (24 * 60)

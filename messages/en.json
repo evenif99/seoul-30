@@ -203,6 +203,7 @@
     "cost": "Free",
     "congestion": "Not crowded",
     "timefit": "Open now",
-    "freshness": "New event"
+    "freshness": "New event",
+    "feedbackBonus": "Highly rated"
   }
 }

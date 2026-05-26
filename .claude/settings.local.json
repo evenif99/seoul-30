@@ -33,7 +33,25 @@
       "Bash(rm /c/project/seoul-30-webapp/app/api/realtime/\\\\[areaCode\\\\]/route.ts)",
       "Bash(rmdir /c/project/seoul-30-webapp/app/api/realtime/\\\\[areaCode\\\\])",
       "Bash(npm --prefix /c/project/seoul-30-webapp run test)",
-      "Bash(git -C /c/project/seoul-30-webapp add -A)"
+      "Bash(git -C /c/project/seoul-30-webapp add -A)",
+      "Bash(git -C /c/project/seoul-30-webapp add app/api/places/route.ts app/api/diagnostics/route.ts tests/unit/diagnostics.test.ts HANDOFF.md RUNBOOK.md)",
+      "Bash(git -C /c/project/seoul-30-webapp add lib/types/api.ts lib/cache/recommendation.cache.ts app/api/places/route.ts lib/utils/relative-time.ts app/page.tsx messages/ko.json messages/en.json tests/unit/relative-time.test.ts HANDOFF.md)",
+      "Bash(git -C /c/project/seoul-30-webapp add components/seoul30/ShareButton.tsx components/seoul30/BookmarkButton.tsx components/seoul30/BottomTabBar.tsx app/bookmarks/page.tsx messages/ko.json messages/en.json tests/components/BottomTabBar.test.tsx HANDOFF.md)",
+      "Bash(git -C /c/project/seoul-30-webapp add next.config.mjs components/seoul30/PlaceCard.tsx messages/ko.json messages/en.json HANDOFF.md)",
+      "Bash(git -C /c/project/seoul-30-webapp add components/seoul30/PlaceCard.tsx components/seoul30/MapViewInner.tsx app/bookmarks/page.tsx app/offline/page.tsx app/about/page.tsx app/privacy/page.tsx messages/ko.json messages/en.json HANDOFF.md TASKS.md PROJECT_SCOPE.md README.md)",
+      "Bash(npm --prefix /c/project/seoul-30-webapp uninstall leaflet react-leaflet react-leaflet-cluster @types/leaflet)",
+      "PowerShell(taskkill /PID 3832 /F)",
+      "PowerShell(taskkill /PID 2036 /F)",
+      "PowerShell(taskkill /IM node.exe /F 2>$null)",
+      "PowerShell(taskkill /PID 4004 /F)",
+      "WebFetch(domain:lab.odsay.com)",
+      "WebFetch(domain:data.seoul.go.kr)",
+      "Bash(git commit --allow-empty -m 'ci: retrigger GitHub Actions and Vercel deployment *)",
+      "Bash(npx playwright *)",
+      "Bash(git commit -m 'fix\\(e2e\\): stabilize i18n and place-detail E2E tests *)",
+      "Bash(npx vitest *)",
+      "Bash(git commit -m 'Phase 44: Add push send unit tests and verify Vercel cron config *)",
+      "PowerShell(cd c:\\\\project\\\\seoul-30-webapp; npx tsc --noEmit 2>&1; echo \"Exit: $LASTEXITCODE\")"
     ],
     "additionalDirectories": [
       "C:\\project\\seoul-30-webapp"

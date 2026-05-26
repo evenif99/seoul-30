@@ -4,6 +4,7 @@ import { fetchSeoulLibraries } from '@/lib/data/seoulLibrary'
 import { fetchSeoulParks } from '@/lib/data/seoulParks'
 import { fetchSeoulSports } from '@/lib/data/seoulSports'
 import { toSeoulLatLng } from '@/lib/utils/coords'
+import { enrichPlace } from '@/lib/adapters/enrichment'
 
 interface CultureEventRow {
   CODENAME: string   // 카테고리 (뮤지컬·오페라, 전시, 연극 등)
@@ -120,7 +121,7 @@ export async function fetchSeoulPlaces(): Promise<NormalizedPlace[]> {
     fetchSeoulParks(),
     fetchSeoulSports(),
   ])
-  return [...events, ...spaces, ...libraries, ...parks, ...sports]
+  return [...events, ...spaces, ...libraries, ...parks, ...sports].map(enrichPlace)
 }
 
 const FREE_FEE_EXACT = new Set(['무료', '0원', '없음', '0', 'free'])

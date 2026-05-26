@@ -64,6 +64,30 @@ describe('scorePlace', () => {
     expect(score.freshness).toBe(5)
   })
 
+  it('awards full timefit points for parks with no hours (24/7 assumption)', () => {
+    const parkPlace: NormalizedPlace = {
+      ...basePlace,
+      sourceType: 'PARK',
+      openTimeText: undefined,
+      closeTimeText: undefined,
+    }
+    const score = scorePlace(parkPlace, {}, null)
+
+    expect(score.timefit).toBe(10)
+  })
+
+  it('returns neutral timefit points for non-park places with no hours', () => {
+    const libraryPlace: NormalizedPlace = {
+      ...basePlace,
+      sourceType: 'LIBRARY',
+      openTimeText: undefined,
+      closeTimeText: undefined,
+    }
+    const score = scorePlace(libraryPlace, {}, null)
+
+    expect(score.timefit).toBe(5)
+  })
+
   it('sets total to the sum of all dimensions', () => {
     const score = scorePlace(basePlace, { district: 'Seongdong-gu', category: 'park' }, null)
 

@@ -18,7 +18,8 @@ const SCORE_REASONS: Array<{
   { key: 'cost',       threshold: 15 },
   { key: 'congestion', threshold: 10 },
   { key: 'timefit',    threshold: 10 },
-  { key: 'freshness',  threshold: 3  },
+  { key: 'freshness',     threshold: 3  },
+  { key: 'feedbackBonus', threshold: 1  },
 ]
 
 function scoreColor(total: number) {
