@@ -6,6 +6,7 @@ import { X, Layers, LocateFixed } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { NormalizedPlace } from '@/lib/types/place'
 import type { RecommendationResult } from '@/lib/types/recommendation'
+import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 
 type PlaceWithCoords = NormalizedPlace & { latitude: number; longitude: number }
 
@@ -252,6 +253,11 @@ export function MapViewInner({ results, onSelectPlace }: Props) {
             >
               {t('viewDetail')}
             </Link>
+            <BookmarkButton
+              placeId={selected.id}
+              place={selected}
+              className="self-center"
+            />
           </div>
           <button
             onClick={() => setSelected(null)}
