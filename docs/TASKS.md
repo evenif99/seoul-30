@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-26 (Phase 45: JSON-LD + i18n E2E fix — complete)
+Last updated: 2026-05-26 (Bug fixes: detail page 404, map pins limit, bookmarks/recent resolve)
 
 ## Current Phase Check
 
@@ -19,6 +19,7 @@ Last updated: 2026-05-26 (Phase 45: JSON-LD + i18n E2E fix — complete)
 - [x] Phase 43 completed: Service worker cache strategy upgraded (4-tier, v2, SKIP_WAITING).
 - [x] Phase 44 completed: push-send route unit tests (8 cases, auth + CRON + 410 cleanup).
 - [x] Phase 45 completed: JSON-LD structured data (TouristAttraction) + 11 unit tests + i18n E2E stability fix (serviceWorkers:block, waitForNavigation).
+- [x] Bug fix (2026-05-26): 상세 페이지 404, 지도 핀 10개 제한, 북마크/최근본 실 API 장소 미출력 4건 수정.
 
 ## Docs Index
 
@@ -276,6 +277,17 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `cmd /c npx tsc --noEmit` passed
 - [x] `cmd /c npm run test` passed (58/58)
 - [x] `cmd /c npm run build` passed
+
+### Bug Fix — 상세 페이지 404 / 지도 핀 / 북마크 / 최근본 (2026-05-26)
+- [x] `app/api/places/route.ts` — `.slice(0, 10)` → `.slice(0, 30)` (지도 핀 최대 30개)
+- [x] `lib/data/place-detail.ts` — Seoul API 미발견 시 DB 스냅샷 캐시 fallback 추가 (상세 페이지 404 방지)
+- [x] `hooks/use-bookmark.ts` — `toggle(id, place?)`: 북마크 시 `seoul30:bookmark_data`에 `NormalizedPlace` 전체 저장
+- [x] `hooks/use-recent.ts` — `push(id, place?)`: 방문 시 `seoul30:recent_data`에 `NormalizedPlace` 전체 저장
+- [x] `components/seoul30/BookmarkButton.tsx` — `place?: NormalizedPlace` prop 추가, toggle에 전달
+- [x] `components/seoul30/PlaceCard.tsx` — `<BookmarkButton place={place} />` 전달
+- [x] `components/seoul30/RecentTracker.tsx` — `place?: NormalizedPlace` prop 추가, push에 전달
+- [x] `app/place/[id]/page.tsx` — `<RecentTracker place={place} />` 전달
+- [x] `app/bookmarks/page.tsx` — `resolvePlaces()` → localStorage bookmark_data + recent_data 우선 조회 후 MOCK_PLACES fallback
 
 ## Deferred Items
 

@@ -1,13 +1,13 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-21 (Phase 42 complete)
+Last updated: 2026-05-26 (Phase 45 + Bug fixes complete)
 
 ## Current Scope Status
 
-- Completed through Phase 42.
+- Completed through Phase 45 + bug fixes (2026-05-26).
 - Post-Phase 34 fix included: `PlaceMiniMap` supports nearby detail page navigation without losing Naver Maps initialization.
 - Markdown operations docs are centralized in `docs/`; root `README.md` remains the entry document.
-- Phase 43–45 pending (SW cache, Vercel Cron push, JSON-LD structured data).
+- 버그 수정 4건 완료: 상세 페이지 404, 지도 핀 10개 제한, 북마크/최근본 실 API 장소 미출력.
 
 Last updated: 2026-05-21 (Phase 33 — TourAPI Image Integration)
 
@@ -68,14 +68,10 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 40 | Feedback-loop Scoring + Recent-view Dedup — feedbackBonus ScoreBreakdown 필드, calcFeedbackBonus(), soft-dedup (최근 3개 후위 이동) |
 | 41 | Admin Diagnostics Dashboard — /admin 서버 렌더링 페이지 (DB 상태, 피처 플래그, 장소 데이터) |
 | 42 | E2E Test Expansion — 1 → 13개 스펙 (filter/place-detail/i18n/admin), tag-filter data-testid 추가 |
-
-## Pending (Phase 43+)
-
-| Phase | 계획 |
-|---|---|
-| 43 | SW 캐시 전략 고도화 — /api/places + place detail 오프라인 캐시 |
-| 44 | Vercel Cron + Push 발송 자동화 |
-| 45 | Place 페이지 JSON-LD 구조화 데이터 (schema.org TouristAttraction) |
+| 43 | SW Cache Strategy — 4-tier 캐시 (static/api/pages/images), v2, SKIP_WAITING 메시지 핸들러 |
+| 44 | Push-send Unit Tests — 8개 테스트 (Bearer auth, 구독자 발송, 410 expired 자동 삭제, Vercel cron 스케줄 검증) |
+| 45 | JSON-LD Structured Data — schema.org TouristAttraction, 11개 유닛 테스트, i18n E2E 안정화 (serviceWorkers:block) |
+| Bug Fix | 상세 페이지 404 + 지도 핀 30개 + 북마크/최근본 실 API 장소 지원 (place 데이터 localStorage 저장) |
 
 ## Deferred / Not In Scope
 

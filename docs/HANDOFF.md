@@ -1,16 +1,27 @@
 # HANDOFF
 
-Last updated: 2026-05-26 (Phase 45 — JSON-LD + i18n E2E fix complete)
+Last updated: 2026-05-26 (버그 수정 — 상세 페이지/지도 핀/북마크/최근본 4건)
 
 ## Current Status (Clean Summary)
 
-- **완료**: Phase 45까지 전체 완료
+- **완료**: Phase 45 + 버그 수정 4건 완료
 - **다음**: Phase 46 이후 (미정)
 - **배포 URL**: https://seoul-30.vercel.app
 - **레포**: https://github.com/evenif99/seoul-30
 - **현재 브랜치**: master
 - **테스트**: 유닛 99/99 통과 (Vitest) + E2E 13/13 통과 (Playwright)
 - **TypeScript**: 0 오류
+
+## 버그 수정 요약 (2026-05-26, 커밋 `4fb4ea4`)
+
+| 버그 | 원인 | 수정 |
+|---|---|---|
+| 상세 페이지 404 | `getPlaceDetailData` Seoul API 재호출 → 비결정 결과 | DB 스냅샷 캐시 fallback 추가 (`lib/data/place-detail.ts`) |
+| 지도 핀 10개 제한 | `route.ts` `.slice(0,10)` 하드코딩 | `.slice(0,30)` 증가 |
+| 북마크 미출력 | `resolvePlaces()` MOCK_PLACES만 참조 | bookmark 시 place 데이터 localStorage 저장 + 조회 우선 |
+| 최근본 미출력 | 북마크와 동일 구조 원인 | 상세 방문 시 place 데이터 localStorage 저장 |
+
+**참고**: 수정 이전에 저장된 북마크/최근본 데이터는 place 정보 없이 ID만 저장되어 있어 이전 항목은 표시 안됨. 수정 후 새로 북마크하거나 상세 페이지 재방문 시 정상 표시됨.
 
 ## Phase 43–45 작업 요약
 
@@ -117,14 +128,6 @@ Last updated: 2026-05-26 (Phase 45 — JSON-LD + i18n E2E fix complete)
 - 복지시설 API 확인: 동작구 `fcltOpenInfo_DJ`는 주소는 제공하지만 lat/lng가 없어, 네이버맵 핀 정확도 원칙에 따라 지도/추천 통합은 보류
 - 로컬 3001 확인: production과 같은 실제 API 모드에서 첫 결과 `ce-*` 상세 페이지 200 확인
 
-## Phase 43+ 작업 계획
-
-| Phase | 내용 |
-|---|---|
-| 43 | SW 캐시 전략 고도화 — /api/places + place detail 오프라인 캐시 전략 |
-| 44 | Vercel Cron + Push 발송 자동화 (vercel.json cron 확인 + 실 발송 테스트) |
-| 45 | Place 페이지 JSON-LD 구조화 데이터 (schema.org TouristAttraction) |
-
 ---
 
 ## 작업 규칙 (Codex 준수 필수)
@@ -158,16 +161,18 @@ Last updated: 2026-05-26 (Phase 45 — JSON-LD + i18n E2E fix complete)
 
 ---
 
-## 검증 상태 (Phase 34 완료 기준)
+## 검증 상태 (버그 수정 완료 기준 — 2026-05-26)
 
 - `npx tsc --noEmit` — 통과 (0 오류) ✅
-- `npx vitest run` — 80/80 통과 ✅
+- `npx vitest run` — 99/99 통과 ✅
 - `npx playwright test` — 13/13 통과 ✅
 - Vercel 배포 — 정상 (https://seoul-30.vercel.app)
-- Naver Maps 핀포인트 — 38개 mock 좌표 보정 완료
-- 상세 페이지 — hero image, tag chips, nearest station 표시 확인
+- Naver Maps 핀포인트 — 최대 30개 표시, 38개 mock 좌표 보정 완료
+- 상세 페이지 — hero image, tag chips, nearest station + JSON-LD 표시 확인
+- 북마크/최근본 — place 데이터 localStorage 저장으로 실 API 장소 표시 지원
 - /admin 진단 대시보드 — 접근 가능 확인
 - next-intl MISSING_MESSAGE — onError 핸들러로 크래시 방지
+- i18n E2E — serviceWorkers:block + waitForNavigation 안정화
 
 ## Do-Not-Touch Rules
 
