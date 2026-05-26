@@ -24,7 +24,6 @@ import type { NormalizedPlace } from '@/lib/types/place'
 
 const DEFAULT_FILTERS: ActiveFilters = {
   category: 'all',
-  crowd: 'all',
   time: '30',
   freeOnly: false,
   search: '',
@@ -82,7 +81,6 @@ export default function HomePage() {
     const rawTags = params.get('tags') ?? ''
     const initialFilters: ActiveFilters = {
       category: params.get('category') ?? 'all',
-      crowd: 'all',
       time: '30',
       freeOnly: params.get('freeOnly') === 'true',
       openNow: params.get('openNow') === 'true',
@@ -221,7 +219,6 @@ export default function HomePage() {
     filters.freeOnly ||
     filters.openNow ||
     filters.search.trim() !== '' ||
-    filters.crowd !== 'all' ||
     filters.time !== '30' ||
     filters.category !== 'all' ||
     filters.tags.length > 0 ||

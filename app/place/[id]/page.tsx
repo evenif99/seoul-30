@@ -194,7 +194,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
                 text={`${place.name} — Seoul 30에서 확인한 30분 생활권 장소`}
                 url={placeUrl}
               />
-              <BookmarkButton placeId={place.id} />
+              <BookmarkButton placeId={place.id} place={place} />
             </div>
           </div>
 

@@ -2,12 +2,11 @@
 
 import { Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { CATEGORY_FILTERS, CROWD_FILTERS, TIME_FILTERS } from '@/lib/data'
+import { CATEGORY_FILTERS, TIME_FILTERS } from '@/lib/data'
 import type { PlaceTag } from '@/lib/types/place'
 
 export interface ActiveFilters {
   category: string
-  crowd: string
   time: string
   freeOnly: boolean
   search: string
@@ -20,12 +19,6 @@ const TAG_OPTIONS: PlaceTag[] = ['indoor', 'outdoor', 'wheelchair', 'family', 'p
 interface FilterBarProps {
   filters: ActiveFilters
   onFiltersChange: (filters: ActiveFilters) => void
-}
-
-const CROWD_KEY_MAP: Record<string, 'relaxed' | 'moderate' | 'busy'> = {
-  '여유로움': 'relaxed',
-  '보통': 'moderate',
-  '혼잡': 'busy',
 }
 
 export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
@@ -119,20 +112,6 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
           </button>
         ))}
 
-        {CROWD_FILTERS.filter((f) => f.id !== 'all').map((f) => (
-          <button
-            key={f.id}
-            onClick={() => set({ crowd: f.id === filters.crowd ? 'all' : f.id })}
-            aria-pressed={filters.crowd === f.id}
-            className={`shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors whitespace-nowrap ${
-              filters.crowd === f.id
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-card text-muted-foreground border-border hover:border-primary/40'
-            }`}
-          >
-            {t(`crowd.${CROWD_KEY_MAP[f.id] ?? 'moderate'}`)}
-          </button>
-        ))}
       </div>
 
       {/* 태그 필터 */}

@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { fetchSeoulCultureEvents, fetchSeoulCultureSpaces } from '@/lib/adapters/seoul-culture.adapter'
 import { enrichPlace } from '@/lib/adapters/enrichment'
 import { featureFlags } from '@/lib/config/feature-flags'
@@ -84,7 +85,11 @@ async function fetchByIdPrefix(id: string): Promise<NormalizedPlace[]> {
  * 2. 스냅샷에 없으면 ID prefix 기반 단일 소스 fetch (1개 API, ~300ms)
  * 3. 실 API 모드 비활성 또는 mock-* ID → MOCK_PLACES 반환
  */
-export async function getPlaceDetailData(id: string): Promise<PlaceDetailData> {
+/**
+ * React.cache()로 감싸 동일 요청 내 중복 호출(generateMetadata + Page)을
+ * 자동으로 dedup — DB/API 호출이 1회로 제한된다.
+ */
+export const getPlaceDetailData = cache(async function getPlaceDetailData(id: string): Promise<PlaceDetailData> {
   if (featureFlags.cultureEventsApi) {
     // 1단계: DB 스냅샷 캐시 검색
     const fromSnapshot = await findInSnapshots(id)
@@ -115,4 +120,4 @@ export async function getPlaceDetailData(id: string): Promise<PlaceDetailData> {
     places: MOCK_PLACES,
     isMock: true,
   }
-}
+})

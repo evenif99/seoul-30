@@ -5,7 +5,6 @@ import { FilterBar, type ActiveFilters } from '@/components/seoul30/FilterBar'
 
 const baseFilters: ActiveFilters = {
   category: 'all',
-  crowd: 'all',
   time: '30',
   freeOnly: false,
   search: '',
