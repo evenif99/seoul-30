@@ -1,6 +1,6 @@
 # TASKS
 
-Last updated: 2026-05-21 (Phase 42: E2E test expansion — complete)
+Last updated: 2026-05-26 (Phase 45: JSON-LD + i18n E2E fix — complete)
 
 ## Current Phase Check
 
@@ -16,6 +16,9 @@ Last updated: 2026-05-21 (Phase 42: E2E test expansion — complete)
 - [x] Fix: MISSING_MESSAGE crash suppressed in next-intl (i18n/request.ts onError handler).
 - [x] Phase 41 completed: Admin diagnostics dashboard at /admin.
 - [x] Phase 42 completed: E2E test coverage expanded 1 → 13 specs across 4 files.
+- [x] Phase 43 completed: Service worker cache strategy upgraded (4-tier, v2, SKIP_WAITING).
+- [x] Phase 44 completed: push-send route unit tests (8 cases, auth + CRON + 410 cleanup).
+- [x] Phase 45 completed: JSON-LD structured data (TouristAttraction) + 11 unit tests + i18n E2E stability fix (serviceWorkers:block, waitForNavigation).
 
 ## Docs Index
 

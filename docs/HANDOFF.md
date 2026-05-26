@@ -1,16 +1,24 @@
 # HANDOFF
 
-Last updated: 2026-05-21 (Phase 42 — E2E test expansion complete)
+Last updated: 2026-05-26 (Phase 45 — JSON-LD + i18n E2E fix complete)
 
 ## Current Status (Clean Summary)
 
-- **완료**: Phase 42까지 전체 완료
-- **다음**: Phase 43 (SW 캐시 전략 고도화)
+- **완료**: Phase 45까지 전체 완료
+- **다음**: Phase 46 이후 (미정)
 - **배포 URL**: https://seoul-30.vercel.app
 - **레포**: https://github.com/evenif99/seoul-30
 - **현재 브랜치**: master
-- **테스트**: 유닛 80/80 통과 (Vitest) + E2E 13/13 통과 (Playwright)
+- **테스트**: 유닛 99/99 통과 (Vitest) + E2E 13/13 통과 (Playwright)
 - **TypeScript**: 0 오류
+
+## Phase 43–45 작업 요약
+
+| Phase | 내용 | 커밋 |
+|---|---|---|
+| 43 | SW 캐시 전략 고도화 (4-tier v2, SKIP_WAITING) | `37127f5` |
+| 44 | push-send 유닛 테스트 8개 (auth/CRON/410 cleanup) | `c63dc25` |
+| 45 | JSON-LD TouristAttraction + 유닛 11개 + i18n E2E 안정화 | `bad9719` |
 
 ## Phase 36–42 작업 요약
 
