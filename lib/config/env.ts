@@ -6,6 +6,7 @@ export const env = {
   USE_MOCK_DATA: process.env.USE_MOCK_DATA !== 'false',
   ENABLE_REALTIME_CITY_DATA: process.env.ENABLE_REALTIME_CITY_DATA === 'true',
   ENABLE_CULTURE_EVENTS_API: process.env.ENABLE_CULTURE_EVENTS_API === 'true',
+  ADMIN_SECRET: process.env.ADMIN_SECRET ?? '',   // 미설정 시 /admin 공개
 } as const
 
 // 런타임 시작 시 필수 환경변수 존재 여부를 검증한다.

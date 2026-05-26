@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { env } from '@/lib/config/env'
 import { MOCK_PLACES } from '@/lib/mock/places'
+import { isAdminAuthorized } from '@/lib/utils/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -76,7 +78,12 @@ function Row({ label, value, sub }: { label: string; value: React.ReactNode; sub
   )
 }
 
-export default async function AdminPage() {
+type Props = { searchParams: Promise<{ secret?: string }> }
+
+export default async function AdminPage({ searchParams }: Props) {
+  const { secret } = await searchParams
+  if (!isAdminAuthorized(secret)) notFound()
+
   const diag = await fetchDiag()
   const now = new Date().toISOString()
 
