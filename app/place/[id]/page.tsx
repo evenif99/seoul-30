@@ -110,7 +110,8 @@ export default async function PlaceDetailPage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'TouristAttraction',
     name: place.name,
-    description: place.description,
+    description: place.description ?? undefined,
+    isAccessibleForFree: place.isFree,
     ...(place.address && {
       address: {
         '@type': 'PostalAddress',
@@ -121,6 +122,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
     }),
     ...(place.phone && { telephone: place.phone }),
     ...(place.homepageUrl && { url: place.homepageUrl }),
+    ...(place.imageUrl && { image: place.imageUrl }),
     ...(place.latitude && place.longitude && {
       geo: {
         '@type': 'GeoCoordinates',

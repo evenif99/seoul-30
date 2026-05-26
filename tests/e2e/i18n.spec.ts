@@ -13,10 +13,14 @@ test('language toggle switches to English', async ({ page }) => {
   await expect(page.getByTestId('free-only-filter')).toContainText(/무료/)
 
   const langBtn = page.getByRole('button', { name: /switch language/i })
-  await langBtn.click()
+  await expect(langBtn).toBeVisible()
 
-  // window.location.reload() 후 텍스트가 영어로 바뀔 때까지 대기
-  // expect().toContainText()는 타임아웃까지 자동 재시도
+  // 버튼 클릭과 동시에 navigation 이벤트 대기 (window.location.reload() 트리거)
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+    langBtn.click(),
+  ])
+
   await expect(page.getByTestId('free-only-filter')).toContainText(/free/i)
 })
 
@@ -32,8 +36,14 @@ test('language toggle switches back to Korean', async ({ page }) => {
   await expect(page.getByTestId('free-only-filter')).toContainText(/free/i)
 
   const langBtn = page.getByRole('button', { name: /switch language/i })
-  await langBtn.click()
+  await expect(langBtn).toBeVisible()
 
-  // 한국어로 돌아올 때까지 자동 재시도 대기
+  // 버튼 클릭과 동시에 navigation 이벤트 대기
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+    langBtn.click(),
+  ])
+
+  // 한국어로 돌아올 때까지 대기
   await expect(page.getByTestId('free-only-filter')).toContainText(/무료/)
 })
