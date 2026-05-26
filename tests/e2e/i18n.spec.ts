@@ -25,22 +25,28 @@ test('language toggle switches to English', async ({ page }) => {
 
 test('language toggle switches back to Korean', async ({ page }) => {
   await page.goto('/')
-
-  // document.cookie로 설정해야 LanguageToggle 핸들러의 document.cookie 파싱에서 정상 감지됨
   await page.evaluate(() => {
     document.cookie = 'NEXT_LOCALE=en; path=/; max-age=31536000; SameSite=Lax'
   })
-  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  await page.goto('/')
 
   // 영어 상태 확인
   await expect(page.getByTestId('free-only-filter')).toContainText(/free/i)
 
+  // 클릭 시점에 toggle()이 실제로 'en'을 읽는지 확인
+  const localeBefore = await page.evaluate(() =>
+    document.cookie.split('; ').find((c) => c.startsWith('NEXT_LOCALE='))?.split('=')[1] ?? '(not set)',
+  )
+  expect(localeBefore).toBe('en')
+
   const langBtn = page.getByRole('button', { name: /switch language/i })
   await expect(langBtn).toBeVisible()
 
-  // 버튼 클릭 → NEXT_LOCALE=ko 설정 + reload
-  await langBtn.click()
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+    langBtn.click(),
+  ])
 
-  // reload 후 한국어로 복귀될 때까지 재시도
-  await expect(page.getByTestId('free-only-filter')).toContainText(/무료/, { timeout: 15000 })
+  // reload 후 한국어로 복귀 확인
+  await expect(page.getByTestId('free-only-filter')).toContainText(/무료/, { timeout: 10000 })
 })
