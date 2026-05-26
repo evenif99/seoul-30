@@ -59,11 +59,15 @@ export default async function AboutPage() {
             {[
               {
                 name: isKo ? '서울 열린데이터광장' : 'Seoul Open Data Plaza',
-                desc: isKo ? '문화행사 정보, 실시간 인구 혼잡도' : 'Cultural event listings, real-time congestion',
+                desc: isKo ? '문화행사·문화공간·도서관·공원·체육시설 정보' : 'Cultural events, spaces, libraries, parks, sports facilities',
               },
               {
-                name: 'OpenStreetMap',
-                desc: isKo ? '지도 배경 타일' : 'Map background tiles',
+                name: isKo ? '한국관광공사 TourAPI 4.0' : 'Korea Tourism Organization TourAPI 4.0',
+                desc: isKo ? '장소 실제 사진 자동 보강' : 'Real place photos automatically applied',
+              },
+              {
+                name: 'Naver Maps JavaScript API v3',
+                desc: isKo ? '지도 · 핀포인트 · 위성 뷰' : 'Map tiles, pin markers, satellite view',
               },
               {
                 name: 'Neon (PostgreSQL)',

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   title: 'Seoul 30 — 30분 안에 갈 수 있는 장소 추천',
   description: '서울 시민을 위한 30분 생활권 공공시설·문화공간 추천 서비스. 도서관, 공원, 문화공간, 스포츠시설을 무료 우선·혼잡도 반영으로 추천합니다.',
   keywords: ['서울', '공공시설', '도서관', '공원', '문화공간', '스포츠', '무료', '추천', 'Seoul', 'public space'],
-  authors: [{ name: 'Seoul 30' }],
+  authors: [{ name: 'evenif99', url: 'https://github.com/evenif99' }],
   manifest: '/manifest.json',
   metadataBase: new URL(BASE_URL),
   openGraph: {
