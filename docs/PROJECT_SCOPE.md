@@ -1,5 +1,11 @@
 # PROJECT_SCOPE
 
+## Phase 53 Scope Update (2026-05-26)
+
+- README.md 전면 재작성 — 포트폴리오용, 스크린샷 테이블, 현행 테스트 수(148/14), Phase 잡동사니 제거.
+- About 페이지 데이터 소스 수정 — OpenStreetMap → Naver Maps v3, TourAPI 4.0 추가.
+- layout.tsx authors 메타데이터 → GitHub 프로필 링크.
+
 ## Phase 52 Scope Update (2026-05-26)
 
 - Completed PWA installability polish with manifest `id`, display override, screenshots, and cache version bump.
