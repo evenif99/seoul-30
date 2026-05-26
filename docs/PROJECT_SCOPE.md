@@ -1,6 +1,6 @@
 # PROJECT_SCOPE
 
-Last updated: 2026-05-26 (Phase 48 complete)
+Last updated: 2026-05-26 (Phase 48 + Additional Phase: Filter Hard Apply)
 
 ## Current Scope Status
 
@@ -75,6 +75,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 46 | Real API Data Quality — enrichPlace() sourceType별 태그 자동 추론, PARK timefit 24/7 보정(5→10점), ScoreBadge feedbackBonus 표시, 테스트 9개 추가 |
 | 47 | Admin 보안 + 테스트 커버리지 — ADMIN_SECRET ?secret= 접근 제어, isAdminAuthorized() 유틸, coords.ts 경계 테스트 16개, 유닛 134개 |
 | 48 | 상세 페이지 성능 + MapView 북마크 — fetchByIdPrefix() 단일 소스 fetch, 스냅샷 우선 조회, 지도 팝업 BookmarkButton 추가 |
+| Additional Phase | 필터 하드 적용 — 카테고리/자치구/태그 scoring-only → client-side 하드 필터, 선택 조건 미충족 시 EmptyState 정상 출력 |
 
 ## Deferred / Not In Scope
 
