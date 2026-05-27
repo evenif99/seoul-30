@@ -5,6 +5,9 @@ export default defineConfig({
   timeout: 30_000,
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : undefined,
+  // CI에서 list reporter 사용: progress reporter 대비 Windows hang 빈도 낮음
+  // 로컬에서도 list로 통일 — 테스트별 결과를 한 줄씩 즉시 출력
+  reporter: 'list',
   expect: {
     timeout: 10_000,
   },

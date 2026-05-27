@@ -42,10 +42,16 @@ GET /api/diagnostics
 |---|---|
 | `lastSnapshotAt` | 마지막 Seoul API 캐시 시각 (null이면 한 번도 API 호출 없음) |
 | `snapshotCount` | DB에 저장된 스냅샷 총 개수 |
+| `snapshotsLast24h` | 최근 24시간 내 생성된 스냅샷 수 (신선도 지표) |
 | `feedbackCount` | 누적 👍/👎 피드백 수 |
+| `ratedPlacesCount` | 피드백이 1건 이상 있는 장소 수 |
 | `pushSubscriberCount` | 현재 웹 푸시 구독자 수 |
+| `pushCategoryStats` | Push 구독 카테고리 분포 (`total`, `allCategoriesCount`, `perCategory`) |
+| `topPlaces` | 피드백 참여도 Top 5 장소 (`placeId`, `total`, `upCount`, `downCount`, `upPct`) |
+| `snapshotTtlSeconds` | 현재 적용 중인 스냅샷 캐시 TTL (초, 기본 7200 = 2시간) |
 | `seoulApiEnabled` | `ENABLE_CULTURE_EVENTS_API` 플래그 상태 |
 | `realtimeCityDataEnabled` | `ENABLE_REALTIME_CITY_DATA` 플래그 상태 |
+| `dataQuality` | 데이터 품질 메트릭 (좌표·이미지·주소 보유율, 의심 좌표 수) |
 
 DB 장애 시 503 반환.
 
@@ -82,7 +88,7 @@ GET /api/health
 ### 2. 서울 Open API 장애 (데이터 오래됨 배너 노출)
 
 **자동 처리**: API 빈 응답 시 DB 스냅샷(캐시)으로 자동 폴백, 앰버 배너 표시
-- 캐시 TTL: 1시간. 스냅샷이 없으면 mock 데이터로 폴백
+- 캐시 TTL: `SNAPSHOT_TTL_SECONDS` 환경변수 기준 (기본 7200초 = 2시간). 스냅샷이 없으면 mock 데이터로 폴백
 
 **Phase 26 이후 데이터 소스**: 문화행사(culturalEventInfo) + 문화공간(culturalSpaceInfo) + 도서관(SeoulPublicLibraryInfo) + 공원(ListParkService) + 체육시설(ListPublicReservationSport)
 
@@ -120,7 +126,38 @@ curl -X POST https://seoul-30-webapp.vercel.app/api/push/send \
 
 **구독자가 0명인 경우**: 정상 (`sent: 0, total: 0`)
 
-### 5. 높은 오류율 (Vercel Functions)
+### 5. Naver Maps 지도 미표시
+
+**증상**: 지도 탭이 빈 화면이거나 `MapErrorFallback` 컴포넌트 표시
+
+**원인 1 — NCP 허용 도메인 미등록** (가장 흔한 원인)
+
+브라우저 콘솔에서 `Naver Maps API error: unauthorized` 또는 `401` 에러 확인.  
+NCP 콘솔 → Application → 해당 앱 → "서비스 URL" 탭에 아래 도메인이 모두 등록되어 있어야 한다:
+
+| 환경 | 등록 URL |
+|---|---|
+| 로컬 개발 | `http://localhost:3001` |
+| Vercel 프로덕션 | `https://seoul-30-webapp.vercel.app` |
+| Vercel Preview | `https://*.vercel.app` (와일드카드, NCP 지원 여부 확인 필요) |
+
+등록 후 새 Client ID를 발급받지 않아도 됨 — 도메인 추가 즉시 적용.
+
+**원인 2 — CSP 헤더 누락**
+
+`next.config.mjs`의 CSP에 아래 도메인이 포함되어 있어야 한다:
+- `oapi.map.naver.com` (SDK script)
+- `openapi.map.naver.com` (API)
+- `*.pstatic.net` (지도 타일 CDN)
+
+누락 시 `tests/unit/security-headers.test.ts` 실행 → assert 실패로 확인 가능.
+
+**원인 3 — `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` 미설정**
+
+Vercel 환경변수 또는 `.env.local`에 값이 없으면 지도 초기화 스킵됨.  
+`MapView.tsx`에서 `process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` 없을 때 `MapErrorFallback` 렌더링.
+
+### 6. 높은 오류율 (Vercel Functions)
 
 1. Vercel 대시보드 → Observability → Functions → 오류 로그 확인
 2. 오류가 Prisma 연결이면 → 시나리오 1
@@ -188,12 +225,27 @@ Vercel 대시보드 → Deployments → 직전 배포 → `...` → **Promote to
 
 ```bash
 npm run dev          # localhost:3001 (3000은 다른 프로젝트 사용 중)
-npm run test         # Vitest unit + component (48 tests)
-npm run test:e2e     # Playwright E2E
+npm run test         # Vitest unit + component (253개)
+npm run test:e2e     # Playwright E2E (16개 스펙, reporter=list)
 npx tsc --noEmit     # 타입 체크
 npm run build        # 프로덕션 빌드 검증
 npx prisma studio    # DB GUI
 ```
+
+### Windows 개발 환경 주의사항
+
+**Prisma DLL 잠금 (`EPERM` 오류)**
+- `npm run dev` 실행 중 별도 터미널에서 `prisma generate` 실행 금지
+- `npm run dev` 는 `predev` 훅으로 generate를 선행 실행함 — 별도 실행 불필요
+- schema.prisma 변경 시: `npm run dev` 중지 → `npx prisma generate` → `npx prisma db push` → `npm run dev` 재시작
+- EPERM 발생 시: `Stop-Process -Name node -Force` → `Remove-Item -Recurse -Force node_modules\.prisma` → `npx prisma generate`
+- 상세 가이드: [docs/WINDOWS_PRISMA_DLL_LOCK.md](WINDOWS_PRISMA_DLL_LOCK.md)
+
+**E2E 로컬 hang (Windows)**
+- Playwright 테스트가 모두 통과해도 명령 프롬프트가 멈출 수 있음 (CI는 정상)
+- `playwright.config.ts`에 `reporter: 'list'` 설정으로 빈도 감소
+- hang 발생 시 강제 종료: `taskkill /F /IM node.exe /T`
+- 테스트 결과 자체는 정상 — CI GitHub Actions 결과로 최종 판단
 
 ### 로그 확인 (Phase 30 통합)
 
@@ -212,8 +264,11 @@ Vercel 대시보드 → Observability → Logs 에서 확인 가능.
 | `DATABASE_URL` | ✅ | Neon PostgreSQL 연결 문자열 |
 | `SEOUL_OPEN_API_KEY` | 조건부 | `ENABLE_CULTURE_EVENTS_API=true` 시 필수 |
 | `NEXT_PUBLIC_BASE_URL` | 권장 | OG/sitemap 절대 URL |
+| `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` | 지도 사용 시 | NCP 콘솔 Application Client ID (ncpKeyId 형식) |
 | `VAPID_EMAIL` | 푸시 사용 시 | `mailto:` 형식 |
 | `VAPID_PUBLIC_KEY` | 푸시 사용 시 | `npx web-push generate-vapid-keys` |
 | `VAPID_PRIVATE_KEY` | 푸시 사용 시 | 위와 동일 커맨드 |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | 푸시 사용 시 | `VAPID_PUBLIC_KEY`와 동일 값 |
 | `CRON_SECRET` | 푸시 사용 시 | 임의 32바이트 base64url 문자열 |
+| `SNAPSHOT_TTL_SECONDS` | 선택 | 스냅샷 캐시 TTL (초, 기본 7200 = 2시간) |
+| `ADMIN_SECRET` | 선택 | `/admin` 접근 제어 — 미설정 시 공개, 설정 시 `?secret=` 파라미터 필요 |

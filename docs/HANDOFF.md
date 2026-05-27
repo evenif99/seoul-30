@@ -26,7 +26,7 @@
 
 ---
 
-## Phase 66 - 개발 환경 안정화 (예정)
+## Phase 66 - 개발 환경 안정화 ✅ 완료 (2026-05-27)
 
 **목표**: npm run dev · build · Prisma · CI 파이프라인의 반복성 문제를 정리하고, 신규 기여자(Codex 포함)가 환경 설정 없이 작업을 시작할 수 있는 루틴을 문서화한다.
 
@@ -85,6 +85,18 @@ npm run build           # 빌드 정상
 - `lib/scoring.ts`, `prisma/schema.prisma` 수정 금지
 - 새 npm 패키지 추가 금지 (문서·설정 변경만)
 - Vercel env var 추가 금지 (기존 변수 문서화만)
+
+### 완료 결과
+
+| 항목 | 변경 파일 | 내용 |
+|---|---|---|
+| LF 정규화 | `.gitattributes` (신규) | `*.ts/tsx/js/md/yml` eol=lf, 바이너리 binary |
+| Node 버전 핀 | `package.json` | `engines.node: ">=20"` 추가 |
+| E2E hang 감소 | `playwright.config.ts` | `reporter: 'list'` 추가 |
+| 환경변수 현행화 | `.env.example` | `SNAPSHOT_TTL_SECONDS`, `ADMIN_SECRET` 추가 |
+| 운영 가이드 현행화 | `docs/RUNBOOK.md` | Windows Prisma DLL·E2E hang 주의사항, Naver Maps 시나리오 5, diagnostics 필드 전체, 환경변수 표 추가 |
+
+**테스트**: 유닛 **254개** 통과 · TS 0 오류 · E2E 16개 (CI 기준)
 
 ---
 

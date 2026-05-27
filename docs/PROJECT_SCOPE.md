@@ -1,5 +1,30 @@
 # PROJECT_SCOPE
 
+## Phase 66 Scope Update (2026-05-27) — 개발 환경 안정화
+
+**목표**: 반복적으로 발생하던 환경성 문제(Prisma DLL 잠금, E2E hang, 문서 누락)를 코드 변경 최소화 원칙 하에 설정·문서로 해결.
+
+### 변경 사항
+
+- `.gitattributes` (신규): `*.ts/tsx/js/mjs/cjs/json/css/md/mdx/yml/yaml/toml/env/.env*/.sh` → `eol=lf`; 이미지·폰트 → `binary`
+- `package.json`: `engines.node: ">=20"` 추가 — CI/Vercel과 Node 버전 불일치 방지
+- `playwright.config.ts`: `reporter: 'list'` 추가 — Windows E2E hang 빈도 감소
+- `.env.example`: `SNAPSHOT_TTL_SECONDS=7200`, `ADMIN_SECRET=` 추가 — Phase 61에서 env.ts에 추가됐으나 example 미반영 상태였음
+- `docs/RUNBOOK.md` 현행화:
+  - 로컬 개발 명령 테스트 수 "48 tests" → 현행 수치 제거
+  - Windows 개발 환경 주의사항 섹션 추가 (Prisma DLL 잠금 해결, E2E hang 해결)
+  - 시나리오 5 "Naver Maps 지도 미표시" 신규 (NCP 도메인 체크리스트, CSP 확인, 환경변수 확인)
+  - `/api/diagnostics` 필드 표 전체 확장 (6개 필드 추가)
+  - 환경변수 표에 `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID`, `SNAPSHOT_TTL_SECONDS`, `ADMIN_SECRET` 추가
+  - 시나리오 5번을 6번으로 번호 변경 (Naver Maps 시나리오가 5번을 차지)
+
+### 테스트 결과
+- 유닛 **254개** 통과 (regression 없음)
+- `npx tsc --noEmit` 통과
+- 코드 로직 변경 없음 — 설정·문서만 수정
+
+---
+
 ## Phase 61/62 Follow-up Fix (2026-05-27) — TS 검증 복구 + SEO 회귀 방지
 
 ### Phase 61 검증 복구
