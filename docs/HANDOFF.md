@@ -1,5 +1,30 @@
 # HANDOFF
 
+## Phase 59 - 접근성·성능·UX 마감 (2026-05-27)
+
+- **완료**: 구조적 a11y 버그(중첩 main) 수정, 토글 버튼 ARIA 완성, PushSubscribeButton ESC 지원, bookmarks tablist/tabpanel 완성, skip link 앵커 전 페이지 적용.
+- **다음**: Phase 60 (릴리즈/포트폴리오 패키징).
+- 유닛 203개 통과 · E2E 14개 통과 · TS 0 오류.
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|---|---|
+| `app/layout.tsx` | `<main id="main-content">` → `<div>` — 중첩 main 제거 |
+| `app/page.tsx` | 정렬·뷰 토글 `aria-pressed` + `role="group"` + `aria-label` |
+| `app/bookmarks/page.tsx` | `<main>` 전환, tablist `aria-label`, tab `id`/`aria-controls`, tabpanel 완성 |
+| `app/place/[id]/page.tsx` | outer `<div>` → `<main id="main-content">` |
+| `app/about/page.tsx` | outer `<div>` → `<main id="main-content">` |
+| `app/privacy/page.tsx` | outer `<div>` → `<main id="main-content">` |
+| `app/offline/page.tsx` | outer `<div>` → `<main id="main-content">` |
+| `components/seoul30/PushSubscribeButton.tsx` | 카테고리 칩 `aria-pressed`, ESC 닫기, 패널 `role="dialog"` |
+| `messages/ko.json` + `en.json` | `sortLabel`, `viewModeLabel` 키 추가 |
+| `tests/unit/a11y-structure.test.ts` | 신규 — 18개 a11y 회귀 방지 케이스 |
+
+### 기술 결정
+- **중첩 main 문제**: layout을 `<div>`로 교체 → 각 페이지가 자체 semantic `<main>` 제공. skip link가 각 페이지의 `#main-content`로 이동. place/bookmarks/static 페이지 모두 `<main>` 변환 완료.
+- **aria-pressed vs aria-selected**: toggle button(push/pull 개념) = `aria-pressed`, tab = `aria-selected`. 역할별로 구분.
+- **ESC 닫기**: PushSubscribeButton의 `selecting/editing` 상태가 true일 때만 `keydown` 리스너 등록 → cleanup 함수로 메모리 누수 방지.
+
 ## Phase 58 - 운영 대시보드 강화 (2026-05-27)
 
 - **완료**: Push 구독 분포 + 장소 참여도 Top 5 + 스냅샷 신선도 지표 추가.

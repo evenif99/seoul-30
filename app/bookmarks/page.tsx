@@ -57,7 +57,7 @@ export default function BookmarksPage() {
   const places = activeTab === 'saved' ? savedPlaces : recentPlaces
 
   return (
-    <div className="min-h-screen bg-background">
+    <main id="main-content" className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4">
         {/* 헤더 */}
         <div className="flex items-center gap-3 py-4 border-b border-border">
@@ -72,10 +72,16 @@ export default function BookmarksPage() {
         </div>
 
         {/* 탭 */}
-        <div className="flex gap-1 mt-4 mb-5 bg-muted rounded-xl p-1" role="tablist">
+        <div
+          className="flex gap-1 mt-4 mb-5 bg-muted rounded-xl p-1"
+          role="tablist"
+          aria-label={t('title')}
+        >
           <button
+            id="tab-saved"
             role="tab"
             aria-selected={activeTab === 'saved'}
+            aria-controls="tabpanel-places"
             onClick={() => setActiveTab('saved')}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium rounded-lg transition-colors ${
               activeTab === 'saved'
@@ -86,14 +92,16 @@ export default function BookmarksPage() {
             <Bookmark className="w-3.5 h-3.5" aria-hidden="true" />
             {t('saved')}
             {bookmarks.length > 0 && (
-              <span className="text-[10px] bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 leading-none">
+              <span className="text-[10px] bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 leading-none" aria-hidden="true">
                 {bookmarks.length}
               </span>
             )}
           </button>
           <button
+            id="tab-recent"
             role="tab"
             aria-selected={activeTab === 'recent'}
+            aria-controls="tabpanel-places"
             onClick={() => setActiveTab('recent')}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium rounded-lg transition-colors ${
               activeTab === 'recent'
@@ -107,7 +115,12 @@ export default function BookmarksPage() {
         </div>
 
         {/* 장소 목록 */}
-        <section aria-label={activeTab === 'saved' ? t('savedLabel') : t('recentLabel')}>
+        <section
+          id="tabpanel-places"
+          role="tabpanel"
+          aria-labelledby={activeTab === 'saved' ? 'tab-saved' : 'tab-recent'}
+          aria-label={activeTab === 'saved' ? t('savedLabel') : t('recentLabel')}
+        >
           {places.length === 0 ? (
             activeTab === 'saved' ? (
               <EmptyMessage icon={Bookmark} message={t('emptySaved')} />
@@ -123,6 +136,6 @@ export default function BookmarksPage() {
           )}
         </section>
       </div>
-    </div>
+    </main>
   )
 }

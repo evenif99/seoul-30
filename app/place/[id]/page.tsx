@@ -133,7 +133,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <main id="main-content" className="min-h-screen bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -316,6 +316,6 @@ export default async function PlaceDetailPage({ params }: PageProps) {
           )}
         </div>
       </div>
-    </div>
+    </main>
   )
 }

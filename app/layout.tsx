@@ -87,7 +87,8 @@ export default async function RootLayout({
             {locale === 'ko' ? '본문 바로가기' : 'Skip to content'}
           </a>
           <ErrorBoundary>
-            <main id="main-content">{children}</main>
+            {/* 각 페이지가 자체 main landmark 선언 — layout이 중첩하지 않음 */}
+            <div>{children}</div>
           </ErrorBoundary>
           <ServiceWorkerRegistrar />
           {process.env.NODE_ENV === 'production' && <Analytics />}

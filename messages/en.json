@@ -129,6 +129,8 @@
     "detailTransitAccess": "Accessible within 30 min by transit",
     "sortByScore": "Best match",
     "sortByDistance": "Nearest first",
+    "sortLabel": "Sort order",
+    "viewModeLabel": "View mode",
     "showInList": "Show in list"
   },
   "desktop": {

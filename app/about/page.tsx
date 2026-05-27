@@ -23,7 +23,7 @@ export default async function AboutPage() {
   const isKo = locale === 'ko'
 
   return (
-    <div className="min-h-screen bg-background">
+    <main id="main-content" className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <Link
           href="/"
@@ -94,6 +94,6 @@ export default async function AboutPage() {
           </a>
         </p>
       </div>
-    </div>
+    </main>
   )
 }

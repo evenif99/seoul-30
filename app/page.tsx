@@ -344,9 +344,14 @@ export default function HomePage() {
             <div className="flex items-center gap-1">
               {/* GPS 활성 시 정렬 토글 */}
               {userCoords && (
-                <div className="flex rounded-lg border border-border overflow-hidden mr-1">
+                <div
+                  className="flex rounded-lg border border-border overflow-hidden mr-1"
+                  role="group"
+                  aria-label={t('common.sortLabel')}
+                >
                   <button
                     onClick={() => setSortByDistance(false)}
+                    aria-pressed={!sortByDistance}
                     className={cn(
                       'px-2 py-1 text-[11px] transition-colors',
                       !sortByDistance ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted'
@@ -356,6 +361,7 @@ export default function HomePage() {
                   </button>
                   <button
                     onClick={() => setSortByDistance(true)}
+                    aria-pressed={sortByDistance}
                     className={cn(
                       'px-2 py-1 text-[11px] border-l border-border transition-colors',
                       sortByDistance ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted'
@@ -380,9 +386,14 @@ export default function HomePage() {
                 </button>
               )}
               {/* 리스트 / 지도 토글 */}
-              <div className="flex rounded-lg border border-border overflow-hidden">
+              <div
+                className="flex rounded-lg border border-border overflow-hidden"
+                role="group"
+                aria-label={t('common.viewModeLabel')}
+              >
                 <button
                   onClick={() => setViewMode('list')}
+                  aria-pressed={viewMode === 'list'}
                   aria-label={t('common.listViewLabel')}
                   className={cn(
                     'flex items-center gap-1 px-2.5 py-1.5 text-xs transition-colors',
@@ -391,11 +402,12 @@ export default function HomePage() {
                       : 'bg-background text-muted-foreground hover:bg-muted'
                   )}
                 >
-                  <List className="w-3.5 h-3.5" />
+                  <List className="w-3.5 h-3.5" aria-hidden="true" />
                   <span>{t('common.listView')}</span>
                 </button>
                 <button
                   onClick={() => setViewMode('map')}
+                  aria-pressed={viewMode === 'map'}
                   aria-label={t('common.mapViewLabel')}
                   className={cn(
                     'flex items-center gap-1 px-2.5 py-1.5 text-xs transition-colors border-l border-border',
@@ -404,7 +416,7 @@ export default function HomePage() {
                       : 'bg-background text-muted-foreground hover:bg-muted'
                   )}
                 >
-                  <Map className="w-3.5 h-3.5" />
+                  <Map className="w-3.5 h-3.5" aria-hidden="true" />
                   <span>{t('common.mapView')}</span>
                 </button>
               </div>

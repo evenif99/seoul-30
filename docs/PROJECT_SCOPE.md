@@ -1,5 +1,27 @@
 # PROJECT_SCOPE
 
+## Phase 59 Scope Update (2026-05-27)
+
+**접근성·성능·UX 마감 — 구조적 a11y 버그 수정 + ARIA 완성도**
+
+### 구조적 수정 (critical)
+- `app/layout.tsx`: `<main id="main-content">` → `<div>` — 중첩 `<main>` + 중복 `id` 제거. 각 페이지가 자체 `<main>` 랜드마크를 선언.
+- `app/page.tsx`: 정렬 토글 버튼에 `aria-pressed`, 뷰 모드 토글 버튼에 `aria-pressed` 추가. 두 그룹 모두 `role="group"` + `aria-label` 추가.
+- `app/bookmarks/page.tsx`: tablist `aria-label`, 각 tab에 `id` + `aria-controls`, 탭 패널에 `role="tabpanel"` + `aria-labelledby` + `id="tabpanel-places"` 완성.
+- 하위 페이지 skip link 앵커 추가 — `about`, `privacy`, `offline`, `place/[id]`, `bookmarks` 모두 `id="main-content"` 선언 (from `<div>` → `<main>`).
+
+### ARIA 강화
+- `PushSubscribeButton`: 카테고리 칩 버튼에 `aria-pressed={selected.has(cat)}` 추가 (selecting + editing 패널 양쪽). ESC 키로 패널 닫기 지원 (`keydown` 리스너). 패널에 `role="dialog"` + `aria-modal` + `aria-label` 추가.
+
+### i18n 신규 키
+- `common.sortLabel`: "정렬 방식" / "Sort order" — sort group aria-label
+- `common.viewModeLabel`: "보기 방식" / "View mode" — view toggle group aria-label
+
+### 테스트
+- `tests/unit/a11y-structure.test.ts` 신규 — 18개 회귀 방지 케이스:
+  - layout 중첩 main 방지, 각 페이지 skip anchor 존재, aria-pressed 선언 확인, PushSubscribeButton ESC/aria-pressed, bookmarks tablist/tabpanel 완성도, i18n 키 존재.
+- 테스트 203개 통과 (185 → 203, 신규 18개).
+
 ## Phase 58 Scope Update (2026-05-27)
 
 - `/api/diagnostics` 강화 — `snapshotsLast24h`, `pushCategoryStats`, `topPlaces` 필드 추가.

@@ -22,7 +22,7 @@ export function PushSubscribeButton() {
 
   const panelRef = useRef<HTMLDivElement>(null)
 
-  // 패널 외부 클릭 시 닫기
+  // 패널 외부 클릭 / ESC 키 시 닫기
   useEffect(() => {
     if (!selecting && !editing) return
     function handleClick(e: MouseEvent) {
@@ -31,8 +31,18 @@ export function PushSubscribeButton() {
         setEditing(false)
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setSelecting(false)
+        setEditing(false)
+      }
+    }
     document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [selecting, editing])
 
   function toggleCategory(cat: Category) {
@@ -110,15 +120,21 @@ export function PushSubscribeButton() {
 
         {/* 카테고리 편집 패널 */}
         {editing && (
-          <div className="absolute right-0 top-full mt-2 z-50 w-72 bg-card border border-border rounded-2xl shadow-lg p-4">
-            <p className="text-xs font-semibold text-foreground mb-3">{t('editTitle')}</p>
+          <div
+            role="dialog"
+            aria-modal="false"
+            aria-label={t('editTitle')}
+            className="absolute right-0 top-full mt-2 z-50 w-72 bg-card border border-border rounded-2xl shadow-lg p-4"
+          >
+            <p className="text-xs font-semibold text-foreground mb-3" aria-hidden="true">{t('editTitle')}</p>
 
-            <div className="flex flex-wrap gap-1.5 mb-4">
+            <div className="flex flex-wrap gap-1.5 mb-4" role="group" aria-label={t('editTitle')}>
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => toggleCategory(cat)}
+                  aria-pressed={selected.has(cat)}
                   className={cn(
                     'text-xs px-2.5 py-1 rounded-full border transition-colors',
                     selected.has(cat)
@@ -176,15 +192,21 @@ export function PushSubscribeButton() {
       </button>
 
       {selecting && (
-        <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-card border border-border rounded-2xl shadow-lg p-4">
-          <p className="text-xs font-semibold text-foreground mb-3">{t('selectTitle')}</p>
+        <div
+          role="dialog"
+          aria-modal="false"
+          aria-label={t('selectTitle')}
+          className="absolute right-0 top-full mt-2 z-50 w-64 bg-card border border-border rounded-2xl shadow-lg p-4"
+        >
+          <p className="text-xs font-semibold text-foreground mb-3" aria-hidden="true">{t('selectTitle')}</p>
 
-          <div className="flex flex-wrap gap-1.5 mb-4">
+          <div className="flex flex-wrap gap-1.5 mb-4" role="group" aria-label={t('selectTitle')}>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => toggleCategory(cat)}
+                aria-pressed={selected.has(cat)}
                 className={cn(
                   'text-xs px-2.5 py-1 rounded-full border transition-colors',
                   selected.has(cat)
