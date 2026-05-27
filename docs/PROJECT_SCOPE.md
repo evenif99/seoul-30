@@ -1,5 +1,21 @@
 # PROJECT_SCOPE
 
+## Phase 60 Scope Update (2026-05-27) — 릴리즈/포트폴리오 패키징
+
+- `docs/ARCHITECTURE.md` 전면 재작성:
+  - Phase 56–59 아키텍처 노트 추가 (Push 개인화 UX, 데이터 품질 유틸리티, 운영 대시보드, a11y 구조 수정)
+  - 파일 구조 현행화 — `diagnostics/route.ts`, `admin/page.tsx`, `data-quality.ts`, `a11y-structure.test.ts` 추가; 각 페이지 `<main>` 변환 명시
+  - 테스트 수 동기화: 158 → 203 유닛, 14 E2E
+  - 운영 대시보드 섹션 신규 (Admin Dashboard 표)
+  - Web Push 아키텍처에 Phase 56 태그 개인화 패턴 추가
+  - Known Runtime Notes에 layout `<div>` 래퍼 설명 추가
+  - `ADMIN_SECRET` env var 항목 추가
+  - `Last updated` 갱신
+- `README.md` 업데이트:
+  - 테스트 수: 148 → 203
+  - 핵심 기능에 ♿ 접근성 · 📊 운영 대시보드 항목 추가
+- 테스트 203개 통과 · E2E 14개 · TS 0 오류.
+
 ## Phase 59 Scope Update (2026-05-27)
 
 **접근성·성능·UX 마감 — 구조적 a11y 버그 수정 + ARIA 완성도**

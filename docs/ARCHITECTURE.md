@@ -1,5 +1,135 @@
 # ARCHITECTURE
 
+## Phase 59 Architecture Note (2026-05-27)
+
+**접근성(a11y) 구조 정정 — 중첩 `<main>` 제거 · ARIA 완성도 강화**
+
+### 중첩 `<main>` 버그 수정 (critical HTML error)
+`app/layout.tsx`가 `<main id="main-content">` 로 자식을 감싸고, `app/page.tsx` 내부에도 `<main id="main-content">` 가 존재해 중첩 `<main>` + 중복 `id` 문제가 있었다. `layout.tsx` 의 `<main>` 을 `<div>` 로 교체하여 각 페이지가 자체 `<main>` 랜드마크를 선언하도록 역할을 분리했다.
+
+Skip link (`href="#main-content"`) 가 동작하려면 모든 페이지에 앵커가 있어야 한다. `about`, `privacy`, `offline`, `place/[id]`, `bookmarks` 5개 페이지의 최외곽 `<div>` 를 `<main id="main-content">` 로 변환했다.
+
+### ARIA 완성도
+- **토글 버튼**: 정렬 그룹(추천순/가까운순)과 뷰 모드 그룹(목록/지도) 모두에 `aria-pressed` + `role="group"` + `aria-label` 추가.
+- **PushSubscribeButton**: 카테고리 칩에 `aria-pressed={selected.has(cat)}`, 패널에 `role="dialog"` + `aria-modal` + `aria-label`, ESC 키로 패널 닫기(`keydown` 리스너, cleanup 포함).
+- **bookmarks tablist/tabpanel**: `role="tablist"` 에 `aria-label`, 각 `role="tab"` 에 `id` + `aria-controls`, 탭 패널에 `role="tabpanel"` + `aria-labelledby` + `id="tabpanel-places"` 완성.
+
+`aria-pressed` (toggle) vs `aria-selected` (tab) — WAI-ARIA 역할별로 구분해서 적용.
+
+Regression coverage: `tests/unit/a11y-structure.test.ts` (18 assertions — nested main 방지, skip anchors, aria-pressed, tablist/tabpanel 완성도, i18n 키 존재).
+
+---
+
+## Phase 58 Architecture Note (2026-05-27)
+
+**운영 대시보드 강화 — Push 구독 분포 · 장소 참여도 Top 5 · 스냅샷 신선도**
+
+### 신규 데이터 집계 (DB 쿼리 패턴)
+
+**Push 카테고리 분포 집계:**
+- `WebPushSubscription.findMany({ select: { tags: true } })` → JS에서 집계
+- 빈 `tags` = 전체 카테고리 구독으로 처리 → 해당 구독을 5개 카테고리 각각에 +1 가산
+- `allCategoriesCount` / `perCategory` 로 구조화
+
+**장소 참여도 Top 5 (2-query groupBy 패턴):**
+```
+1. groupBy(placeId, _count: id, take: 10) → top placeId 목록
+2. groupBy([placeId, vote], where: { placeId: in top }) → UP/DOWN 분리
+```
+raw SQL 없이 Prisma만으로 투표 분리를 달성. `upPct = Math.round(up/total * 100)`.
+
+**스냅샷 신선도:**
+- `count({ where: { createdAt: { gte: Date.now() - 24h } } })` — 24시간 내 생성 수
+- 마지막 스냅샷 경과 시간: `< 1h` 녹색, `< 24h` 보통, `≥ 24h` 주황 stale
+
+`/api/diagnostics` 에 `snapshotsLast24h`, `pushCategoryStats`, `topPlaces` 필드 추가.  
+`/admin` 페이지에 3개 섹션 추가 (스냅샷 신선도 · Push 구독 현황 · 장소 참여도 Top 5).
+
+---
+
+## Phase 57 Architecture Note (2026-05-27)
+
+**데이터 품질/정합성 강화 — 품질 메트릭 유틸리티 + 의심 좌표 탐지**
+
+### `lib/utils/data-quality.ts` (신규)
+
+```typescript
+export function calcDataQuality(places: NormalizedPlace[]): PlaceDataQuality
+```
+
+`PlaceDataQuality`: 좌표·이미지·주소·전화·홈페이지·운영시간·태그 각 필드에 대해 `{ count, total, pct }` (`FieldCoverage`) + `suspiciousCoords: number` + `bySource: Record<string, SourceSummary>`.
+
+`pct` 는 `Math.round(count/total * 1000) / 10` (소수점 1자리 반올림).
+
+### `isSuspiciousCoord(lat, lng)` in `lib/utils/coords.ts`
+
+소수점 3자리 미만 좌표는 ~100m+ 오차 가능 → 의심 좌표로 분류.  
+`toSeoulLatLng()` 는 수정하지 않음 — 기존 유효성 검사 로직 불변.
+
+```typescript
+// 소수점 자릿수 카운트
+const decimalPlaces = (n: number) => {
+  const dot = n.toString().indexOf('.')
+  return dot === -1 ? 0 : n.toString().length - dot - 1
+}
+return decimalPlaces(lat) < 3 || decimalPlaces(lng) < 3
+```
+
+### Admin / Diagnostics 강화
+
+`/api/diagnostics` 에 `dataQuality` 필드 추가:
+- 최근 스냅샷의 `resultJson` 이 있으면 실 API 장소 기반 (`source: 'snapshot'`)
+- 없으면 `MOCK_PLACES` 기반 (`source: 'mock'`)
+
+`/admin` 페이지에 데이터 품질 섹션 추가:
+- `PctBar` 컴포넌트 — 색상 코딩 (red < 50%, amber < 70% warn, green)
+- sourceType별 좌표/이미지 보유율 테이블
+
+MOCK_PLACES 품질 게이트 (자동화): 좌표 ≥ 80%, 주소 ≥ 90%, 태그 ≥ 70%, 의심좌표 < 20%.
+
+---
+
+## Phase 56 Architecture Note (2026-05-27)
+
+**Push 개인화 UX 완성 — 구독 태그 조회·편집 + notificationclick URL 네비게이션**
+
+### PushSubscribeButton 재작성
+
+구독 상태별 4-state UI:
+- `loading` / `unsupported` → `null`
+- `denied` → 비활성 표시 버튼
+- `unsubscribed` → 구독 버튼 → 카테고리 선택 패널 (ChevronDown 토글)
+- `subscribed` → `"알림 구독 중 · 문화, 도서관"` 형태로 현재 태그 요약 표시 → 클릭 시 편집 패널
+
+### `hooks/use-push.ts` 강화
+
+```typescript
+const PUSH_TAGS_KEY = 'seoul30:push:tags'
+
+// 신규
+currentTags: string[]          // localStorage 복원 (빈 배열 = 전체)
+updateTags(tags: string[])     // PushManager 재구독 없이 서버 태그만 갱신
+```
+
+`subscribe` 시 localStorage에 tags 저장, `unsubscribe` 시 삭제.  
+`updateTags` 는 기존 endpoint를 재사용해 `/api/push/subscribe` POST upsert 재호출 — 브라우저 알림 권한 팝업 없이 태그만 갱신.
+
+### notificationclick URL 네비게이션 수정
+
+```javascript
+// 이전 (버그): URL로 이동하지 않고 focus만
+existing.focus()
+
+// 이후 (수정): 카테고리 딥링크 URL로 실제 이동
+existing.navigate(url).then((client) => client?.focus())
+```
+
+`WindowClient.navigate(url)` 이 필요한 이유: 기존 창이 열려 있을 때 `focus()` 만으로는 창을 앞으로 가져오지만 URL이 변경되지 않는다. 알림 딥링크(`/?category=xxx`)가 실제로 로드되어야 카테고리 필터가 적용된다.
+
+SW 캐시 버전 `v5` 범프 (v4 → v5).
+
+---
+
 ## Phase 55 Architecture Note (2026-05-27)
 
 Next.js image optimization is fully enabled. `unoptimized: true` is removed and replaced with a `remotePatterns` allowlist in `next.config.mjs`, covering Unsplash, Seoul culture API, Seoul subdomains (`*.seoul.go.kr`), TourAPI (`*.visitkorea.or.kr`), and Naver pstatic CDN (`*.pstatic.net`). Images served via `<Image>` are now converted to WebP/AVIF and cached through Vercel's image CDN.
@@ -46,7 +176,7 @@ Lighthouse CI audits `http://localhost:3001/` only, using `npx next start -p 300
 
 ## Phase 49 Architecture Note (2026-05-26)
 
-PWA install UX is browser-event driven. `hooks/use-pwa-install.ts` listens for `beforeinstallprompt`, stores the deferred prompt, wraps `prompt()`, and hides the CTA after install, standalone launch, or a `localStorage` “later” decision. `components/seoul30/PwaInstallBanner.tsx` is mounted near the top of `app/page.tsx`.
+PWA install UX is browser-event driven. `hooks/use-pwa-install.ts` listens for `beforeinstallprompt`, stores the deferred prompt, wraps `prompt()`, and hides the CTA after install, standalone launch, or a `localStorage` "later" decision. `components/seoul30/PwaInstallBanner.tsx` is mounted near the top of `app/page.tsx`.
 
 Offline recommendation UX is service-worker driven. `public/sw.js` uses a network-first strategy for `/api/places`; when the network fails and a cached API response exists, it returns JSON with `isStale: true`, `isOfflineCache: true`, and a `snapshotAt` value. `app/page.tsx` renders this as an explicit cached-place notice.
 
@@ -84,42 +214,51 @@ app/
     push/subscribe/route.ts          # POST|DELETE — Web Push subscription
     push/send/route.ts               # GET|POST — broadcast push (Vercel Cron)
     realtime/[areaCode]/route.ts     # GET — real-time congestion (external)
+    diagnostics/route.ts             # GET — 운영 상태 요약 (DB 카운트, 품질, Push 분포, Top 5)
   place/[id]/
-    page.tsx                         # place detail (server component)
+    page.tsx                         # place detail (server component) — <main id="main-content">
     opengraph-image.tsx              # OG image generation
-  bookmarks/page.tsx
-  offline/page.tsx
-  layout.tsx                         # NextIntlClientProvider + html lang
-  page.tsx                           # main recommendation list + map view
+  admin/page.tsx                     # 운영 대시보드 (secret 인증) — Phase 47+
+  bookmarks/page.tsx                 # tablist/tabpanel ARIA 완성 — <main id="main-content">
+  about/page.tsx                     # <main id="main-content">
+  privacy/page.tsx                   # <main id="main-content">
+  offline/page.tsx                   # <main id="main-content">
+  layout.tsx                         # NextIntlClientProvider + skip link + <div> 래퍼 (main 중첩 방지)
+  page.tsx                           # main recommendation list + map view — <main id="main-content">
   robots.ts
   sitemap.ts
 
 components/seoul30/
-  BottomTabBar.tsx
+  BottomTabBar.tsx                   # aria-current="page" 포함
   BookmarkButton.tsx
-  DesktopNav.tsx
+  DesktopNav.tsx                     # aria-current="page" 포함
   DistrictSelector.tsx
   EmptyState.tsx
   FeedbackPanel.tsx                  # 👍/👎 rating UI (Phase 13)
-  FilterBar.tsx
+  FilterBar.tsx                      # aria-pressed on all filter/tag buttons
   Header.tsx
   Hero.tsx                           # suppressHydrationWarning on greeting (hydration fix)
   LanguageToggle.tsx                 # ko/en toggle (Phase 15)
-  LocationOnboardingModal.tsx        # GPS permission onboarding (first visit)
+  LocationOnboardingModal.tsx        # GPS permission onboarding (shadcn Dialog — focus trap 내장)
   MapView.tsx                        # dynamic import wrapper (ssr: false)
   MapViewInner.tsx                   # Naver Maps view + grid clustering + onSelectPlace
-  PlaceCard.tsx                      # data-testid="place-card-link" on Link
+  PlaceCard.tsx                      # data-testid="place-card-link" on Link; aria-label on Link
   PlaceImage.tsx                     # <Image> wrapper with remotePatterns + fallback
   PlaceMiniMap.tsx                   # 단일 마커 Naver Maps 미니맵 (zoom 15)
-  PlaceCardSkeleton.tsx              # shimmer skeleton (Phase 18)
-  PushSubscribeButton.tsx            # Web Push subscribe/unsubscribe + category chip panel (Phase 14/54)
+  PlaceCardSkeleton.tsx              # shimmer skeleton
+  PushSubscribeButton.tsx            # 4-state UI; subscribed 상태에서 태그 요약 + 편집 패널;
+                                     # aria-pressed chips, ESC 닫기, role="dialog" 패널
   RecentTracker.tsx
-  ScoreBadge.tsx                     # score breakdown badge (Phase 16)
+  ScoreBadge.tsx                     # score breakdown badge
   ShareButton.tsx
 
 hooks/
-  use-feedback.ts                    # optimistic rating state (Phase 13)
-  use-push.ts                        # push permission + subscribe flow (Phase 14)
+  use-feedback.ts                    # optimistic rating state
+  use-push.ts                        # push permission + subscribe flow;
+                                     # currentTags(localStorage), updateTags(no re-subscribe)
+  use-bookmark.ts
+  use-recent.ts
+  use-pwa-install.ts
 
 i18n/
   request.ts                         # next-intl getRequestConfig (cookie-based)
@@ -133,16 +272,19 @@ lib/
   data/ddareungi.ts                  # Seoul bikeList fetcher with 10-minute cache
   data/tourImages.ts                 # TourAPI 4.0 image enrichment (searchKeyword2 + detailImage2)
   data/place-detail.ts               # real API detail lookup with mock fallback
-  data/seoulLibrary.ts               # SeoulPublicLibraryInfo fetcher (Phase 27)
-  data/seoulParks.ts                 # ListParkService fetcher (Phase 27)
-  data/seoulSports.ts                # ListPublicReservationSport fetcher (Phase 27)
+  data/seoulLibrary.ts               # SeoulPublicLibraryInfo fetcher
+  data/seoulParks.ts                 # ListParkService fetcher
+  data/seoulSports.ts                # ListPublicReservationSport fetcher
   utils/transit-time.ts              # Haversine + transit estimate helpers
-  utils/coords.ts                    # toSeoulLatLng() — Seoul bounds validation utility
+  utils/coords.ts                    # toSeoulLatLng() — Seoul bounds validation;
+                                     # isSuspiciousCoord() — decimal precision < 3 = suspect
+  utils/data-quality.ts              # calcDataQuality() — field coverage metrics + bySource + suspicious
   utils/place-distance.ts            # nearby places, coordinate-only Haversine ranking
+  utils/admin-auth.ts                # isAdminAuthorized() — ADMIN_SECRET 비교
   prisma.ts                          # singleton Prisma client
   types/place.ts                     # NormalizedPlace, PlaceSourceType, PlaceTag
   types/recommendation.ts
-  mock/places.ts                     # 38 mock places (Phase 31+), tags + nearestStation
+  mock/places.ts                     # 38 mock places, tags + nearestStation
   mock/realtime.ts
   adapters/
   cache/recommendation.cache.ts
@@ -153,7 +295,10 @@ prisma/
   schema.prisma
 
 public/
-  sw.js                              # service worker (offline + push events)
+  sw.js                              # service worker — 4-tier cache (static/api/pages/images);
+                                     # image cache: pathname.startsWith('/_next/image');
+                                     # notificationclick: existing.navigate(url).then(focus);
+                                     # CACHE_VERSION = 'v5'
   manifest.json
   offline/index.html
 
@@ -161,7 +306,7 @@ tests/
   unit/
     scoring.test.ts
     transit-time.test.ts
-    coords.test.ts                    # toSeoulLatLng bounds (16 cases)
+    coords.test.ts                    # toSeoulLatLng bounds (20 cases) + isSuspiciousCoord (4)
     tag-filter.test.ts
     feedback-scoring.test.ts
     place-enrichment.test.ts
@@ -171,15 +316,17 @@ tests/
     tourImages.test.ts
     mock-places.test.ts
     seoulCongestion.test.ts
-    diagnostics.test.ts
-    json-ld.test.ts                   # schema.org JSON-LD (Phase 45)
-    admin-auth.test.ts                # isAdminAuthorized() (Phase 47)
-    push-send.test.ts                 # push broadcast + category filter (Phase 44/54)
+    diagnostics.test.ts               # pushCategoryStats, topPlaces, snapshotsLast24h, dataQuality
+    json-ld.test.ts                   # schema.org JSON-LD
+    admin-auth.test.ts
+    push-send.test.ts                 # push broadcast + category filter
     manifest.test.ts
-    service-worker-cache.test.ts
+    service-worker-cache.test.ts      # v5, /_next/image pathname, notificationclick navigate
     security-headers.test.ts
     lighthouse-ci.test.ts
-    image-config.test.ts              # remotePatterns regression (Phase 55)
+    image-config.test.ts              # remotePatterns regression
+    data-quality.test.ts              # calcDataQuality (7) + isSuspiciousCoord (6) + MOCK 품질 게이트 (5)
+    a11y-structure.test.ts            # 중첩 main 방지, skip anchors, aria-pressed, tablist/tabpanel (18)
   components/
     PlaceCard.test.tsx
     FilterBar.test.tsx
@@ -193,11 +340,11 @@ tests/
   setup.tsx
   __mocks__/next-intl-server.ts
 
-# Total: 158 unit tests, 14 E2E specs
+# Total: 203 unit tests, 14 E2E specs
 
 proxy.ts                             # rate limiting (/api/* only)
 vercel.json                          # Vercel Cron (daily 09:00 KST → /api/push/send)
-next.config.mjs                      # createNextIntlPlugin + headers
+next.config.mjs                      # createNextIntlPlugin + headers + remotePatterns
 vitest.config.ts
 playwright.config.ts
 .github/workflows/ci.yml
@@ -216,8 +363,8 @@ export interface NormalizedPlace {
   isFree: boolean; feeText?: string
   openTimeText?: string; closeTimeText?: string   // "HH:MM"
   homepageUrl?: string; phone?: string; description?: string; imageUrl?: string
-  tags?: PlaceTag[]          // Phase 32 — 태그 칩
-  nearestStation?: string    // Phase 32 — 가장 가까운 역
+  tags?: PlaceTag[]          // 태그 칩
+  nearestStation?: string    // 가장 가까운 역
   eventStartDate?: string    // "YYYY-MM-DD" — freshness scoring (CULTURE_EVENT only)
 }
 ```
@@ -229,7 +376,7 @@ Seoul 경계 검증 + 0값 거부 유틸리티:
 - Seoul 경계: lat 37.413–37.715, lng 126.734–127.270
 - NaN, 0, 경계 밖 좌표는 `{}` 반환 → map 핀 미표시 처리
 - seoulLibrary/Parks/Sports 3개 fetcher 모두 이 유틸리티 사용
-- seoul-culture.adapter also validates culture event/space coordinates through this utility
+- `isSuspiciousCoord(lat, lng)` → boolean — 소수점 3자리 미만 좌표 = 정밀도 낮음 (~100m+ 오차)
 - Seoul `culturalSpaceInfo`: observed `X_COORD=latitude`, `Y_COORD=longitude`; do not assume conventional X=longitude for that service
 - Naver Maps API 좌표 순서: `new naver.maps.LatLng(lat, lng)` (위도 먼저)
 - Seoul Sports API: X=경도(longitude), Y=위도(latitude)
@@ -278,12 +425,13 @@ Client-side UI filters (no server round-trip):
 - Server components: `getTranslations(namespace)` (async)
 - `LanguageToggle` sets cookie and calls `window.location.reload()`
 
-## Web Push Architecture (Phase 14 + 54)
+## Web Push Architecture (Phase 14 + 54 + 56)
 
 - VAPID keys set via env vars (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL`)
 - `NEXT_PUBLIC_VAPID_PUBLIC_KEY` exposed to browser for `PushManager.subscribe`
 - Subscriptions stored in `WebPushSubscription` (endpoint-unique upsert) with `tags String[] @default([])`
 - **Category filtering** (Phase 54): `?category=xxx` on send endpoint targets subscriptions where `tags` is empty OR `tags` contains `xxx`; empty `tags` = subscribed to all categories
+- **Tag personalization UX** (Phase 56): `currentTags` from `localStorage('seoul30:push:tags')`; `updateTags()` re-POSTs without permission dialog; subscribed state shows tag summary
 - Valid categories: `culture`, `library`, `park`, `sports`, `welfare`
 - `/api/push/send` (GET|POST) triggered daily by Vercel Cron at 09:00 KST
 - Expired subscriptions (410/404) auto-deleted on send failure
@@ -311,6 +459,20 @@ Transit access estimate:
 - subway: 35 km/h, 7 min overhead
 - access buckets: <=10 min 30, <=20 min 25, <=30 min 18, <=40 min 10, <=50 min 4, else 0
 
+## Admin Dashboard (/admin?secret=…)
+
+`app/admin/page.tsx` — DB 직접 조회 (no internal API call), force-dynamic.
+
+| 섹션 | 내용 |
+|---|---|
+| 데이터베이스 | 마지막 스냅샷·스냅샷 수·피드백 수·평가된 장소·Push 구독자 |
+| 스냅샷 신선도 | 24h 생성 수 + 경과 시간 색상 코딩 |
+| Push 구독 현황 | 전체/카테고리별 구독 수 + PctBar |
+| 장소 참여도 Top 5 | placeId · 총 피드백 · 👍 비율 (색상 코딩) |
+| 피처 플래그 | 서울 API · 실시간 혼잡도 · Mock 모드 |
+| 데이터 품질 | 필드 보유율 바 차트 + sourceType별 테이블 + 의심 좌표 경고 |
+| 장소 데이터 | Mock 장소 수·태그 보유·무료 장소 |
+
 ## Env Vars
 
 | Variable | Scope | Purpose |
@@ -328,6 +490,7 @@ Transit access estimate:
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | browser | PushManager.subscribe |
 | `CRON_SECRET` | server | guard /api/push/send |
 | `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` | browser | Naver Maps public key id (`ncpKeyId`) |
+| `ADMIN_SECRET` | server | /admin 페이지 인증 (쿼리 파라미터 `?secret=`) |
 
 ## CI Pipeline
 
@@ -341,7 +504,8 @@ install → prisma generate → tsc --noEmit → vitest → playwright → next 
 - Playwright process exit can hang on Windows after all tests pass (CI 통과 확인됨).
 - Prisma generate requires dev server to be stopped on Windows (DLL file lock on `query_engine-windows.dll.node`).
 - `PlaceImage.tsx` uses Next.js `<Image>` with `remotePatterns` allowlist (no `unoptimized: true`); images converted to WebP/AVIF via Vercel CDN.
-- `public/sw.js` image cache intercepts `url.pathname.startsWith('/_next/image')` — NOT `url.hostname`. Phase 55에서 `unoptimized: true` 제거 이후 모든 `<Image>` 요청이 `/_next/image?url=...` (동일 출처)로 프록시되므로, hostname 체크는 동작하지 않음. 캐시 버전 `v4` (Additional Phase 수정).
+- `public/sw.js` image cache intercepts `url.pathname.startsWith('/_next/image')` — NOT `url.hostname`. Phase 55에서 `unoptimized: true` 제거 이후 모든 `<Image>` 요청이 `/_next/image?url=...` (동일 출처)로 프록시되므로 hostname 체크는 동작하지 않음. 캐시 버전 `v5` (Phase 56 — notificationclick navigate 수정 후 범프).
 - i18n cookie `NEXT_LOCALE` must be set via `page.evaluate(() => document.cookie = ...)` in Playwright tests — `page.context().addCookies()` causes domain mismatch resulting in duplicate cookies.
+- `app/layout.tsx` wraps children in `<div>` (not `<main>`) — each individual page declares its own `<main id="main-content">` to avoid nested landmark elements. Skip link `href="#main-content"` resolves on all pages.
 
-Last updated: 2026-05-27 (Additional Phase — SW 이미지 캐시 회귀 수정 + PushSubscribeButton 취소 초기화)
+Last updated: 2026-05-27 (Phase 59 — a11y 구조 수정, Phase 60 — 릴리즈 패키징)

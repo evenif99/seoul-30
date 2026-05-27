@@ -31,6 +31,8 @@
 | ⭐ 평점 | 익명 👍/👎 피드백 (세션 기반 중복 방지, Prisma + Neon) |
 | 🔖 북마크 | localStorage 저장 — 실 API 장소 포함 |
 | 🔍 복합 필터 | 카테고리·태그·자치구·시간·무료·운영중·검색어, URL 동기화 |
+| ♿ 접근성 | Skip link · ARIA 랜드마크 · aria-pressed 토글 · tablist/tabpanel · ESC 닫기 |
+| 📊 운영 대시보드 | `/admin` — Push 구독 분포·장소 참여도 Top 5·스냅샷 신선도·데이터 품질 |
 
 ---
 
@@ -86,7 +88,7 @@ npm run dev                  # http://localhost:3001
 ## 테스트
 
 ```bash
-npm run test        # Vitest 유닛 + 컴포넌트 (148개)
+npm run test        # Vitest 유닛 + 컴포넌트 (203개)
 npm run test:e2e    # Playwright E2E (14개)
 npx tsc --noEmit   # TypeScript 타입 체크
 npm run build       # 프로덕션 빌드

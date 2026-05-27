@@ -1,5 +1,32 @@
 # HANDOFF
 
+## Phase 60 - 릴리즈/포트폴리오 패키징 (2026-05-27)
+
+- **완료**: ARCHITECTURE.md 전면 재작성, README 테스트 수 동기화, 포트폴리오 패키징 완료.
+- **프로젝트 상태**: 모든 계획 Phase(53–60) 완료. 유지보수 모드로 전환.
+- 유닛 203개 · E2E 14개 · TS 0 오류 · 커밋 master 최신.
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|---|---|
+| `docs/ARCHITECTURE.md` | Phase 56–59 아키텍처 노트, 파일 구조 현행화, 테스트 수 203, Admin Dashboard 섹션 신규 |
+| `README.md` | 테스트 수 148→203, 접근성·운영 대시보드 핵심 기능 추가 |
+| `docs/PROJECT_SCOPE.md` | Phase 60 항목 추가 |
+| `docs/HANDOFF.md` | 이 항목 |
+
+### 기술 결정 기록 (Phase 56–60 종합)
+| Phase | 핵심 결정 | 이유 |
+|---|---|---|
+| 56 | `updateTags()` — PushManager 재구독 없이 서버 태그만 갱신 | 권한 팝업 없이 태그 변경 가능 |
+| 56 | `existing.navigate(url)` — notificationclick URL 실제 이동 | `focus()` 만으로는 URL 미변경 |
+| 57 | `isSuspiciousCoord` — `toSeoulLatLng()` 수정 없이 별도 분리 | 기존 유효성 검사 로직 불변 |
+| 57 | `dataQuality.source` — `'snapshot' \| 'mock'` 명시 | 소비자가 메트릭 신뢰도 판단 가능 |
+| 58 | 2-query groupBy (placeId → placeId+vote) | raw SQL 없이 UP/DOWN 분리 |
+| 58 | empty tags = 전체 카테고리로 JS 확산 | DB 쿼리 추가 없이 정확한 집계 |
+| 59 | layout `<main>` → `<div>` | 각 페이지가 단일 `<main>` 랜드마크 소유 |
+| 59 | `aria-pressed` vs `aria-selected` | WAI-ARIA 역할 준수 — toggle ≠ tab |
+| 60 | ARCHITECTURE.md 단일 파일 종합 | 신규 기여자가 하나의 파일로 전체 파악 가능 |
+
 ## Phase 59 - 접근성·성능·UX 마감 (2026-05-27)
 
 - **완료**: 구조적 a11y 버그(중첩 main) 수정, 토글 버튼 ARIA 완성, PushSubscribeButton ESC 지원, bookmarks tablist/tabpanel 완성, skip link 앵커 전 페이지 적용.
