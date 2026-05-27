@@ -2,14 +2,316 @@
 
 ---
 
-## ▶ 다음 작업 계획 — Phase 62–65 (Codex 인계)
+## ▶ 다음 작업 계획 — Phase 66–70 (Codex 인계)
 
 > **인계 기준일**: 2026-05-27<br>
 > **현재 브랜치**: master<br>
 > **현재 테스트**: 유닛 253개 · E2E 16개 · TS 0 오류<br>
 > **배포 URL**: https://seoul-30-webapp.vercel.app<br>
+> **Phase 62–65**: 완료 (이 파일 하단 기록 참조)<br>
 > **작업 원칙**: 각 Phase는 독립적으로 완료 가능. Phase 연달아 진행 금지 — 완료 보고 후 다음 진행.<br>
 > **배포 원칙**: 각 Phase 완료 후 검증 결과를 문서화하고 `master`에 커밋/푸시하여 GitHub Actions와 Vercel 자동 배포를 확인한다.
+
+### Phase 방향 요약 (66–70)
+
+| Phase | 분류 | 핵심 목표 |
+|---|---|---|
+| 66 | 유지보수 | 개발 환경 안정화 — dev/build/Prisma/CI 루틴 정비 |
+| 67 | 유지보수 | 지도·위치 회귀 테스트 강화 — MapView Playwright smoke |
+| 68 | 유지보수 | 문서·인코딩 정리 — HANDOFF/RUNBOOK/known issues 갱신 |
+| 69 | 소규모 기능 | 추천 설명력 개선 — 스코어 breakdown 사용자 노출 |
+| 70 | 소규모 기능 | 저장함·최근본 UX 고도화 — 정렬·카드 UI 개선 |
+
+> **우선순위 원칙**: 66–68 유지보수 완료 후 69–70 기능확장. 환경성 문제가 해결되지 않은 상태에서 기능확장 금지.
+
+---
+
+## Phase 66 - 개발 환경 안정화 (예정)
+
+**목표**: npm run dev · build · Prisma · CI 파이프라인의 반복성 문제를 정리하고, 신규 기여자(Codex 포함)가 환경 설정 없이 작업을 시작할 수 있는 루틴을 문서화한다.
+
+### 배경 (수정 동기)
+
+아래 문제들이 반복적으로 발생했으며, 코드 변경과 무관하게 환경성 원인으로 시간을 소모했다:
+
+- **Prisma 7.8.0 DLL 잠금**: Windows에서 `npm run dev` 실행 중 `prisma generate` 재실행 시 `.prisma/` DLL 잠금으로 `EPERM` 에러 발생
+- **npm 10 lockfile 불일치**: `package-lock.json` 버전이 CI(Node 20 + npm 10)와 로컬에서 달라 `npm ci` 실패
+- **Naver Maps CSP 누락**: NCP 콘솔 등록 도메인 불일치로 지도 렌더링 실패 (로컬 `localhost:3001` 미등록)
+- **E2E 로컬 hang**: Windows에서 Playwright 프로세스 종료 후 명령 프롬프트가 반응 없이 멈춤 (CI 정상)
+
+### 작업 범위
+
+**1. Prisma DLL 잠금 방지 루틴 문서화 및 `package.json` scripts 정비**
+- `docs/WINDOWS_PRISMA_DLL_LOCK.md` 내용을 `docs/RUNBOOK.md`의 "로컬 개발" 섹션으로 통합
+- `package.json`의 `predev` 훅(`prisma generate`) 동작을 주석 및 README에 명시
+- `.prisma/` 캐시 디렉토리를 `.gitignore`에 있는지 확인 (없으면 추가)
+- **코드 변경 최소화** — 스크립트 변경 없이 문서로만 해결
+
+**2. npm 10 lockfile 동기화**
+- 로컬에서 `npm install` 재실행 후 `package-lock.json` 을 `npm ci` 호환 상태로 커밋
+- `.github/workflows/ci.yml`에서 `npm ci` 실패 시 원인이 lockfile인지 판별하는 주석 추가
+- Node 버전 핀: `.nvmrc` 또는 `engines` 필드에 `"node": ">=20"` 명시 여부 확인 → 없으면 추가
+
+**3. Naver Maps NCP 도메인 등록 체크리스트**
+- `docs/RUNBOOK.md`에 "Naver Maps 지도 미표시 대응" 섹션 추가:
+  - NCP 콘솔 → Application → Web 서비스 URL에 등록해야 하는 도메인 목록
+  - 로컬: `http://localhost:3001`
+  - 프로덕션: `https://seoul-30-webapp.vercel.app`
+  - Preview: Vercel preview URL 와일드카드 등록 방법 (`*.vercel.app`)
+- 이 정보가 현재 어디에도 명시되지 않음 — 문서만 추가, 코드 변경 없음
+
+**4. E2E 로컬 hang 해결책 문서화**
+- `docs/RUNBOOK.md`에 "Windows E2E hang 해결" 추가:
+  - `npx playwright test --reporter=list` 사용 권장 (progress reporter가 hang 빈도 낮음)
+  - hang 발생 시: `taskkill /F /IM node.exe /T` 로 강제 종료
+  - CI는 정상이므로 로컬 실패 시 CI 결과로 판단
+- `.github/workflows/ci.yml`에 `--reporter=list` 옵션이 이미 있는지 확인
+
+**5. `.env.example` 최신화**
+- `SNAPSHOT_TTL_SECONDS`, `ADMIN_SECRET` 항목이 `.env.example`에 있는지 확인 → 없으면 추가 (Phase 61에서 env.ts에 추가됐으나 example 미반영 가능성)
+- 각 변수에 한 줄 주석으로 용도 설명 추가
+
+### 검증 방법
+```bash
+# lockfile 동기화 후
+npm ci                  # CI 환경과 동일하게 클린 인스톨
+npx tsc --noEmit        # TS 0 오류
+npm run test            # 기존 테스트 수 이상 통과 (regression 없음)
+npm run build           # 빌드 정상
+# RUNBOOK 문서 추가 후 파일 존재 및 링크 유효성만 확인
+```
+
+### 금지 사항
+- `lib/scoring.ts`, `prisma/schema.prisma` 수정 금지
+- 새 npm 패키지 추가 금지 (문서·설정 변경만)
+- Vercel env var 추가 금지 (기존 변수 문서화만)
+
+---
+
+## Phase 67 - 지도·위치 회귀 테스트 강화 (예정)
+
+**목표**: Naver Maps 관련 런타임 장애(CSP, SDK 재마운트, 위치 기반 추천 흐름)가 배포 후 무음으로 터지지 않도록 Playwright smoke 테스트로 고정한다.
+
+### 배경 (수정 동기)
+
+- Naver Maps는 코드 자체보다 **next/script 재마운트**, **CSP 헤더 누락**, **NCP SDK runtime asset** 같은 배포 환경 조건이 실제 사용자 흐름에서 장애를 유발
+- 현재 E2E(`home.spec.ts`)는 지도 탭 전환, 마커 표시, 위치 기반 추천 흐름을 검증하지 않음
+- CSP의 Naver 허용 도메인이 변경될 때 자동으로 감지할 테스트가 없음
+
+### 작업 범위
+
+**1. MapView 탭 전환 Playwright smoke (`tests/e2e/home.spec.ts` 또는 신규 `map.spec.ts`)**
+- "지도 보기" 탭 클릭 → `[data-testid="map-view"]` 또는 Naver Maps canvas 요소가 DOM에 존재하는지 확인
+- 지도 렌더링 실패 시 `MapErrorFallback` 컴포넌트가 표시되는지 확인 (긍정/부정 케이스 분리)
+- GPS 권한은 `page.context().grantPermissions(['geolocation'])` + `setGeolocation()` 으로 모킹
+- **주의**: 실제 Naver SDK 로딩은 CI 샌드박스에서 차단될 수 있음 → `USE_MOCK_DATA=true` 상태에서만 실행, SDK 로딩 완료 assert는 제외
+
+**2. CSP 헤더 Naver 도메인 회귀 테스트 (`tests/unit/security-headers.test.ts`)**
+- 기존 테스트에 Naver Maps CSP 도메인 항목 추가 확인:
+  - `oapi.map.naver.com` (SDK script)
+  - `openapi.map.naver.com` (API)
+  - `*.pstatic.net` (타일 이미지 CDN)
+- 이미 있으면 pass, 없으면 assert 추가
+- CSP 변경 시 자동으로 실패하도록 고정
+
+**3. 위치 기반 추천 흐름 smoke (`tests/e2e/home.spec.ts`)**
+- `setGeolocation({ latitude: 37.5665, longitude: 126.9780 })` (서울 시청 좌표)
+- LocationOnboardingModal "허용" 버튼 클릭 → 장소 목록이 정렬 업데이트되는지 확인
+- 에러 없이 `[data-testid="place-card-link"]` 가 하나 이상 표시되면 pass
+
+**4. `next/script` Naver SDK 재마운트 방어 확인**
+- 현재 `MapView.tsx` / `MapViewInner.tsx`가 SDK 중복 로드를 방어하는지 코드 확인
+- 방어 로직(`window.naver` 존재 체크 또는 `onLoad` 콜백 중복 방지)이 없으면 추가
+- 단위 테스트로 검증 불가 → Playwright에서 페이지 재방문 후 지도 에러 없음으로 확인
+
+### 검증 방법
+```bash
+npm run test                       # 유닛 regression 없음
+npm run test:e2e                   # 신규 smoke 포함 전체 통과
+npm run test:e2e -- map.spec.ts    # 지도 smoke 개별 실행
+```
+
+### 금지 사항
+- 실제 Naver SDK 네트워크 호출을 CI에서 성공으로 assert 하지 말 것 (환경 의존)
+- `MapViewInner.tsx` 리팩토링 금지 — smoke 통과에 필요한 최소한의 `data-testid` 추가만 허용
+- GPS 기능 변경 금지 — 테스트용 `grantPermissions` 설정만 추가
+
+---
+
+## Phase 68 - 문서·인코딩 정리 (예정)
+
+**목표**: 운영 판단에 사용되는 문서들을 현행 상태와 일치시키고, 인코딩 문제로 가독성이 떨어지는 문서를 수정한다. 코드 변경 없음.
+
+### 배경 (수정 동기)
+
+- 일부 `.md` 파일이 CRLF/LF 혼재 또는 인코딩 문제로 GitHub/Codex 환경에서 한글 깨짐 발생
+- `docs/RUNBOOK.md`가 Phase 62–67 변경 사항을 반영하지 않아 운영 판단 시 오래된 정보 제공
+- `docs/TASKS.md`가 완료된 항목과 미완료 항목이 혼재해 현행 상태를 파악하기 어려움
+- `docs/ARCHITECTURE.md`의 파일 구조, 테스트 수가 Phase 65 기준으로 미동기화 가능성 있음
+
+### 작업 범위
+
+**1. 인코딩 문제 점검 및 수정**
+- `docs/` 하위 `.md` 파일 전체를 UTF-8 BOM 없음 + LF 기준으로 정규화
+- Windows CRLF로 저장된 파일 확인: `git diff --check` 또는 `file` 명령으로 파악
+- `.gitattributes`에 `*.md text eol=lf` 규칙이 있는지 확인 → 없으면 추가
+- **주의**: 코드 파일(`.ts`, `.tsx`, `.js`)은 건드리지 말 것 — `.md`만 대상
+
+**2. `docs/RUNBOOK.md` 현행화**
+- "헬스체크" 섹션: `/api/health` 응답 형식이 현재 코드와 일치하는지 확인
+- "환경변수" 섹션: `SNAPSHOT_TTL_SECONDS`, `ADMIN_SECRET` 항목 추가 (Phase 61·47에서 추가됐지만 RUNBOOK 미반영 가능)
+- "Naver Maps 지도 미표시" 섹션: Phase 66에서 추가한 NCP 도메인 체크리스트 연결
+- "배포 롤백" 섹션: Vercel 롤백 절차가 현재 프로젝트 URL(`seoul-30-webapp.vercel.app`)과 일치하는지 확인
+- "알려진 제한사항" 갱신: Windows E2E hang, Playwright 로컬 hang 항목 최신화
+
+**3. `docs/TASKS.md` 정리**
+- 완료된 Phase(53–67) 항목은 접어두거나 "완료" 섹션으로 이동
+- 진행 중(68–70) 항목을 상단에 명확히 표시
+- 형식: `- [x] 완료 항목` / `- [ ] 미완료 항목`
+
+**4. `docs/ARCHITECTURE.md` 파일 구조 + 테스트 수 동기화**
+- Phase 65 완료 후 변경된 파일(`EmptyState.tsx` 'use client' 제거, `ScoreBadge.tsx` 'use client' 제거, `next.config.mjs` analyzer 추가) 파일 구조 주석 갱신
+- `# Total: 253 unit tests, 16 E2E specs` 수치 확인 후 업데이트
+- `vitest.config.ts`, `next.config.mjs` 설명 현행화
+
+**5. `README.md` 테스트 수 재확인**
+- `npm run test` 주석의 테스트 수가 현재 실제 수(253개)와 일치하는지 확인 → 불일치 시 수정
+
+### 검증 방법
+```bash
+git diff --check                   # CRLF 혼재 파일 없음 확인
+npm run test                       # 문서 변경으로 테스트 영향 없음 확인
+# GitHub에서 .md 파일 한글 렌더링 육안 확인
+```
+
+### 금지 사항
+- `.ts`, `.tsx`, `.js` 코드 파일 수정 금지 — 문서·설정만 대상
+- `package.json`, `package-lock.json` 수정 금지
+- 새 기능 추가 금지
+
+---
+
+## Phase 69 - 추천 설명력 개선 (예정)
+
+**목표**: 사용자가 "왜 이 장소가 추천됐는가"를 직관적으로 이해할 수 있도록 스코어 breakdown을 UI에 노출한다. 스코어링 로직 자체는 변경하지 않는다.
+
+### 배경
+
+- `lib/scoring.ts`의 6차원 스코어(`accessScore`, `categoryScore`, `costScore`, `crowdScore`, `timefitScore`, `freshnessScore`)가 내부적으로 계산되지만 사용자에게는 총점만 노출됨
+- `ScoreBadge.tsx`에 `SCORE_REASONS` 기반 피드백 뱃지가 있지만 조건이 좁아 대부분의 장소에 표시되지 않음
+- "도보 5분", "무료", "지금 운영 중" 같은 핵심 이유 2–3개를 카드에 칩 형태로 노출하면 전환율(상세 페이지 방문) 개선 가능
+
+### 작업 범위
+
+**1. `RecommendationResult` 타입에 `reasons` 필드 추가 (`lib/types/recommendation.ts`)**
+```typescript
+// 기존
+export interface RecommendationResult {
+  place: NormalizedPlace
+  score: number
+  transitMinutes?: number
+}
+
+// 추가
+export interface RecommendationResult {
+  place: NormalizedPlace
+  score: number
+  transitMinutes?: number
+  reasons: RecommendReason[]   // 상위 2–3개 추천 이유
+}
+
+export type RecommendReason =
+  | 'free'           // 무료
+  | 'open_now'       // 지금 운영 중
+  | 'nearby'         // 가까운 거리 (10분 이내)
+  | 'low_crowd'      // 혼잡도 낮음
+  | 'high_rated'     // 이용자 호평
+  | 'new_event'      // 최근 행사 (7일 이내 시작)
+```
+
+**2. `scorePlace()` 함수에서 `reasons` 생성 (`lib/scoring.ts`)**
+- **로직 변경 없음** — 기존 스코어 계산 결과를 읽어 `reasons` 배열만 추가로 반환
+- 규칙 (단순, 명확한 조건만):
+  - `isFree === true` → `'free'`
+  - `timefitScore >= 8` → `'open_now'` (운영시간 내)
+  - `accessScore >= 8` → `'nearby'` (이동시간 10분 이내 기준)
+  - `crowdScore >= 8` → `'low_crowd'`
+  - feedbackBonus >= 2 → `'high_rated'`
+  - `freshnessScore >= 8` → `'new_event'`
+- 최대 3개까지만 포함 (우선순위: nearby > free > open_now > high_rated > low_crowd > new_event)
+
+**3. `PlaceCard.tsx`에 reasons 칩 표시**
+- 카드 하단 또는 점수 뱃지 옆에 최대 2개 칩 표시
+- 칩 스타일: Tailwind `text-xs font-medium px-2 py-0.5 rounded-full` + 카테고리 색상
+- i18n: `ko.json` / `en.json`에 `reasons.free`, `reasons.open_now`, `reasons.nearby`, `reasons.low_crowd`, `reasons.high_rated`, `reasons.new_event` 키 추가
+
+**4. 회귀 테스트 (`tests/unit/scoring.test.ts`)**
+- `reasons` 필드가 올바르게 생성되는지 기존 테스트 케이스에 assert 추가
+- `scorePlace()` 반환값 타입이 `RecommendationResult`와 일치하는지 TypeScript 수준에서 보장
+
+### 검증 방법
+```bash
+npx tsc --noEmit        # 타입 오류 없음
+npm run test            # scoring.test.ts 포함 전체 통과
+npm run build           # 빌드 통과
+```
+
+### 금지 사항
+- `lib/scoring.ts`의 기존 점수 계산 공식 변경 금지
+- `reasons` 로직이 스코어 계산에 영향을 주어선 안 됨 (부가 필드만 추가)
+- `components/ui/` shadcn 파일 수정 금지
+
+---
+
+## Phase 70 - 저장함·최근본 UX 고도화 (예정)
+
+**목표**: bookmarks 페이지의 정렬·필터·카드 UI를 개선해 실제 사용 패턴(재방문 판단, 비교)을 지원한다.
+
+### 배경
+
+- 현재 북마크/최근본 장소 목록은 저장 순서 고정, 정렬 없음
+- PlaceCard가 홈 추천 목록과 동일한 레이아웃 — bookmarks 문맥에 맞는 정보(저장 일시, 마지막 방문)가 없음
+- 모바일 기준 카드 목록이 스크롤이 길어질 때 페이지 내 탭 전환이 비직관적
+
+### 작업 범위
+
+**1. 북마크 목록 정렬 옵션 추가 (`app/bookmarks/page.tsx`)**
+- 정렬 기준: "저장 최신순" (기본) / "이름순" / "카테고리순"
+- 정렬 상태는 `useState`로만 관리 (URL sync 불필요)
+- i18n 키: `bookmarks.sortByDate`, `bookmarks.sortByName`, `bookmarks.sortByCategory`
+
+**2. 최근본 목록 날짜 표시**
+- `RecentTracker` 에서 `visitedAt` 타임스탬프가 localStorage에 저장되고 있는지 확인
+- 저장 중이면: 카드에 "3일 전 방문" 형태 상대 시간 표시 (`lib/utils/relative-time.ts` 재사용)
+- 저장 안 되고 있으면: `visitedAt: Date.now()` 함께 저장하도록 RecentTracker 수정 후 표시
+
+**3. 빈 상태 UX 개선 (`app/bookmarks/page.tsx`)**
+- 북마크 0개: "아직 저장한 장소가 없어요. 홈에서 마음에 드는 장소를 저장해보세요" + 홈 링크 버튼
+- 최근본 0개: "최근에 방문한 장소가 없어요" + 홈 링크 버튼
+- 현재 EmptyState 컴포넌트를 재사용하되, `action` prop으로 링크 버튼 추가 (없으면 추가)
+- i18n 키: `bookmarks.emptyBookmarks`, `bookmarks.emptyRecent`, `bookmarks.goHome`
+
+**4. 탭 스크롤 개선 (모바일)**
+- 탭 전환 시 목록 상단으로 `window.scrollTo(0, 0)` 호출 — 현재 탭 전환 후 스크롤 위치가 유지되어 비직관적
+- `useEffect([activeTab])` 에서 처리
+
+### 검증 방법
+```bash
+npx tsc --noEmit        # 타입 오류 없음
+npm run test            # 기존 테스트 regression 없음
+npm run build           # 빌드 통과
+npm run test:e2e        # bookmarks 관련 E2E 통과
+```
+
+### 금지 사항
+- localStorage 스키마 변경 시 기존 저장 데이터와 하위 호환 유지 필수
+  - `visitedAt` 없는 기존 항목은 표시 시 "방문 시간 미기록"으로 처리
+- `components/ui/` 수정 금지
+- 북마크 데이터를 서버(DB)로 이전하지 말 것 — localStorage 전략 유지
+
+---
+
+## Phase 완료 루틴
 
 ---
 
