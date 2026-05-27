@@ -440,6 +440,15 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `tests/e2e/filter.spec.ts` — 복합 URL 복원 및 reset query 제거 테스트 추가
 - [x] `npx tsc --noEmit`, `npm run test`, `npm run build` — 통과
 
+### Phase 65 — Performance Optimization
+- [x] `package.json` + `package-lock.json` — `@next/bundle-analyzer` devDependency 추가
+- [x] `next.config.mjs` — `ANALYZE=true` 조건부 bundle analyzer 래퍼 추가
+- [x] `.gitignore` — `.next/analyze/` 산출물 제외 명시
+- [x] `components/seoul30/EmptyState.tsx`, `ScoreBadge.tsx` — 불필요한 명시적 `'use client'` 제거
+- [x] `components/seoul30/PlaceImage.tsx` — priority 이미지에 `fetchPriority="high"` 전달
+- [x] Analyzer 확인 — lucide-react named export tree-shaking 정상, `components/ui/` 수정 불필요
+- [x] `npx tsc --noEmit`, `npm run build`, analyzer webpack build — 통과
+
 ## Completed Post-Phase-20 Fixes
 
 - [x] `middleware.ts` → `proxy.ts` 리네임, export `middleware` → `proxy` (Next.js 16 deprecation 해결)

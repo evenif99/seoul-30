@@ -94,6 +94,12 @@ npx tsc --noEmit   # TypeScript 타입 체크
 npm run build       # 프로덕션 빌드
 ```
 
+번들 리포트가 필요할 때는 Windows PowerShell 기준으로 다음을 실행합니다.
+
+```powershell
+$env:ANALYZE='true'; npx next build --webpack; Remove-Item Env:ANALYZE
+```
+
 ---
 
 ## 환경변수

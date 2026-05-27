@@ -1,8 +1,10 @@
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
+import bundleAnalyzer from '@next/bundle-analyzer'
 import createNextIntlPlugin from 'next-intl/plugin'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
 const securityHeaders = [
@@ -78,4 +80,4 @@ const nextConfig = {
   },
 }
 
-export default withNextIntl(nextConfig)
+export default withBundleAnalyzer(withNextIntl(nextConfig))

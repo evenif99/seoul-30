@@ -163,7 +163,7 @@ npm run test:e2e       # filter.spec.ts 통과 확인
 
 ---
 
-## Phase 65 - 성능 최적화 (예정)
+## Phase 65 - 성능 최적화 (2026-05-27 완료)
 
 **목표**: 번들 크기 분석 및 불필요한 Client Component를 Server Component로 이동. LCP·INP·CLS 지표 개선.
 
@@ -193,6 +193,21 @@ npm run test:e2e       # filter.spec.ts 통과 확인
 - `components/ui/` (shadcn 자동 생성) 수정 금지
 - `ANALYZE=true` 빌드 산출물(`.next/analyze/`)은 `.gitignore`에 추가
 - Server Component 전환은 실제 파일을 읽어 확인 후 진행 — 추정으로 수정 금지
+
+### 완료 결과
+- `@next/bundle-analyzer` devDependency 추가, `next.config.mjs`에 `ANALYZE=true` 조건부 analyzer 래퍼 적용.
+- `.gitignore`에 `.next/analyze/` 명시 추가.
+- `components/seoul30/EmptyState.tsx`, `components/seoul30/ScoreBadge.tsx`: 상태/이벤트가 없는 순수 표시 컴포넌트라 명시적 `'use client'` 제거.
+- `components/seoul30/PlaceImage.tsx`: 기존 `priority` 전달 구조를 유지하고 LCP 후보 이미지에 `fetchPriority="high"`가 같이 전달되도록 보강.
+- `PlaceImage.tsx`는 `onError` fallback 상태가 있어 Client Component 유지.
+- Analyzer 확인 결과 `lucide-react`는 개별 ESM icon 파일 단위로 tree-shaking됨. 직접 `dist/esm/icons/*` import 전환은 이득이 작아 보류.
+- `components/ui/` 자동 생성 파일들은 수정하지 않음. 분석 리포트상 실제 라우트 번들에는 사용된 UI 컴포넌트만 포함됨.
+
+### 검증 결과
+- `npx tsc --noEmit` — 통과.
+- `npm run build` — 통과.
+- `ANALYZE=true` + `npx next build --webpack` — 통과, `.next/analyze/client.html`, `nodejs.html`, `edge.html` 생성 확인.
+- 참고: Next 16 기본 `next build`는 Turbopack이라 기존 `@next/bundle-analyzer` 리포트를 생성하지 않음. 분석 시 PowerShell 기준 `$env:ANALYZE='true'; npx next build --webpack; Remove-Item Env:ANALYZE` 사용.
 
 ---
 

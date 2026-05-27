@@ -575,6 +575,19 @@ Transit access estimate:
 install → prisma generate → tsc --noEmit → vitest → playwright → next build
 ```
 
+## Bundle Analysis
+
+- `@next/bundle-analyzer` is wired in `next.config.mjs` behind `ANALYZE=true`.
+- Next 16 production builds use Turbopack by default; the legacy analyzer does not emit reports for Turbopack builds.
+- To generate local reports on Windows PowerShell, run:
+
+```
+$env:ANALYZE='true'; npx next build --webpack; Remove-Item Env:ANALYZE
+```
+
+- Reports are written to `.next/analyze/client.html`, `nodejs.html`, and `edge.html`; `.next/analyze/` is ignored by git.
+- Phase 65 analysis confirmed `lucide-react` named imports resolve to individual ESM icon modules, so direct icon-path imports are not needed.
+
 ## Known Runtime Notes
 
 - `proxy.ts` (formerly `middleware.ts`) — rate limiting, Next.js 15 proxy convention 적용 완료.
@@ -586,4 +599,4 @@ install → prisma generate → tsc --noEmit → vitest → playwright → next 
 - i18n cookie `NEXT_LOCALE` must be set via `page.evaluate(() => document.cookie = ...)` in Playwright tests — `page.context().addCookies()` causes domain mismatch resulting in duplicate cookies.
 - `app/layout.tsx` wraps children in `<div>` (not `<main>`) — each individual page declares its own `<main id="main-content">` to avoid nested landmark elements. Skip link `href="#main-content"` resolves on all pages.
 
-Last updated: 2026-05-27 (Phase 64 — 필터 UX 및 URL sync 안정화)
+Last updated: 2026-05-27 (Phase 65 — 성능 최적화 및 bundle analyzer 설정)

@@ -281,6 +281,7 @@ Dual purpose: working portfolio piece + real deployable service at $0/month.
 | 48 | 상세 페이지 성능 + MapView 북마크 — fetchByIdPrefix() 단일 소스 fetch, 스냅샷 우선 조회, 지도 팝업 BookmarkButton 추가 |
 | Additional Phase | 필터 하드 적용 — 카테고리/자치구/태그 scoring-only → client-side 하드 필터, 선택 조건 미충족 시 EmptyState 정상 출력 |
 | 64 | 필터 UX 개선 — 활성 필터 수 배지, 초기화 버튼, time 포함 URL sync, 새로고침/뒤로가기 상태 복원 테스트 |
+| 65 | 성능 최적화 — bundle analyzer 조건부 설정, 순수 표시 컴포넌트 client 지시어 제거, LCP 이미지 fetchPriority 보강 |
 
 ## Deferred / Not In Scope
 

@@ -36,6 +36,7 @@ export function PlaceImage({ src, alt, category, sizes, priority = false, iconSi
         sizes={sizes}
         priority={priority}
         loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : undefined}
         onError={() => setFailed(true)}
       />
     )
