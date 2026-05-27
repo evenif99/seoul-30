@@ -1,5 +1,27 @@
 # HANDOFF
 
+## Phase 57 - 데이터 품질/정합성 강화 (2026-05-27)
+
+- **완료**: 데이터 품질 메트릭 유틸리티 + 의심 좌표 탐지 + admin/diagnostics 강화.
+- **다음**: Phase 58 (운영 대시보드 강화).
+- 유닛 182개 통과 · E2E 14개 통과 · TS 0 오류.
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|---|---|
+| `lib/utils/data-quality.ts` | 신규 — `calcDataQuality`, `FieldCoverage`, `SourceSummary`, `PlaceDataQuality` |
+| `lib/utils/coords.ts` | `isSuspiciousCoord(lat, lng)` 추가 — 소수점 3자리 미만 의심 판별 |
+| `app/api/diagnostics/route.ts` | `dataQuality` 필드 추가, resultJson 스냅샷에서 실 데이터 추출 |
+| `app/admin/page.tsx` | 데이터 품질 섹션 추가 (보유율 바 + sourceType 테이블 + 의심 좌표 경고) |
+| `tests/unit/data-quality.test.ts` | 신규 — 22개 테스트 (함수 유닛 + MOCK 품질 게이트) |
+| `tests/unit/coords.test.ts` | isSuspiciousCoord 4케이스 추가 |
+| `tests/unit/diagnostics.test.ts` | dataQuality 필드 검증 추가 |
+
+### 기술 결정
+- `isSuspiciousCoord`: `toSeoulLatLng()`를 건드리지 않고 별도 함수로 분리 — 기존 유효성 검사 로직 불변
+- `dataQuality.source`: `'snapshot' | 'mock'` 명시로 메트릭이 어떤 데이터 기반인지 소비자가 알 수 있음
+- MOCK_PLACES 품질 게이트: 자동화 테스트로 mock 데이터 품질 저하 회귀 방지
+
 ## Phase 56 - Push 개인화 UX 완성 (2026-05-27)
 
 - **완료**: 구독 태그 조회·편집 UI + notificationclick 카테고리 랜딩 수정.

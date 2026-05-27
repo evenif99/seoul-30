@@ -86,4 +86,22 @@ describe('GET /api/diagnostics', () => {
     expect(status).toBe(503)
     expect(body.error).toBe('db_error')
   })
+
+  it('includes dataQuality with mock source when no snapshot', async () => {
+    const { prisma } = await import('@/lib/prisma')
+    vi.mocked(prisma.recommendationSnapshot.findFirst).mockResolvedValue(null)
+    vi.mocked(prisma.recommendationSnapshot.count).mockResolvedValue(0)
+    vi.mocked(prisma.placeFeedback.count).mockResolvedValue(0)
+    vi.mocked(prisma.placeFeedback.findMany).mockResolvedValue([] as any)
+    vi.mocked(prisma.webPushSubscription.count).mockResolvedValue(0)
+
+    const { status, body } = await callDiagnostics()
+
+    expect(status).toBe(200)
+    expect(body.dataQuality).toBeDefined()
+    expect(body.dataQuality.source).toBe('mock')
+    expect(body.dataQuality.total).toBeGreaterThan(0)
+    expect(body.dataQuality.withCoords).toBeDefined()
+    expect(typeof body.dataQuality.withCoords.pct).toBe('number')
+  })
 })

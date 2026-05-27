@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { env } from '@/lib/config/env'
+import { MOCK_PLACES } from '@/lib/mock/places'
+import { calcDataQuality } from '@/lib/utils/data-quality'
+import type { RecommendationResult } from '@/lib/types/recommendation'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +14,7 @@ export async function GET() {
     const [lastSnapshot, snapshotCount, feedbackCount, pushSubscriberCount, ratedPlacesRaw] = await Promise.all([
       prisma.recommendationSnapshot.findFirst({
         orderBy: { createdAt: 'desc' },
-        select: { createdAt: true },
+        select: { createdAt: true, resultJson: true },
       }),
       prisma.recommendationSnapshot.count(),
       prisma.placeFeedback.count(),
@@ -22,6 +25,20 @@ export async function GET() {
       }),
     ])
 
+    // 데이터 품질: 스냅샷 있으면 실 API 장소 기반, 없으면 MOCK_PLACES 기반
+    let qualitySource: 'snapshot' | 'mock' = 'mock'
+    let qualityPlaces = MOCK_PLACES
+    if (lastSnapshot?.resultJson) {
+      try {
+        const results = lastSnapshot.resultJson as unknown as RecommendationResult[]
+        if (results.length > 0) {
+          qualityPlaces = results.map((r) => r.place)
+          qualitySource = 'snapshot'
+        }
+      } catch { /* 파싱 실패 시 mock 유지 */ }
+    }
+    const dataQuality = { ...calcDataQuality(qualityPlaces), source: qualitySource }
+
     return NextResponse.json({
       lastSnapshotAt: lastSnapshot?.createdAt ?? null,
       snapshotCount,
@@ -30,6 +47,7 @@ export async function GET() {
       pushSubscriberCount,
       seoulApiEnabled: env.ENABLE_CULTURE_EVENTS_API,
       realtimeCityDataEnabled: env.ENABLE_REALTIME_CITY_DATA,
+      dataQuality,
       timestamp,
     })
   } catch {

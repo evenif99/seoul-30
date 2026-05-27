@@ -16,3 +16,20 @@ export function toSeoulLatLng(
   }
   return { latitude: lat, longitude: lng }
 }
+
+/**
+ * 좌표 정밀도가 낮아 정확도를 신뢰하기 어려운 의심 좌표인지 판별한다.
+ * 소수점 3자리 미만 = 약 100m 이상 오차 가능 → 의심 좌표.
+ *
+ * 예) 37.5, 127.0 → true (1자리)
+ *     37.56, 126.97 → true (2자리)
+ *     37.566, 126.978 → false (3자리, 정상)
+ */
+export function isSuspiciousCoord(lat: number, lng: number): boolean {
+  const decimalPlaces = (n: number): number => {
+    const str = n.toString()
+    const dot = str.indexOf('.')
+    return dot === -1 ? 0 : str.length - dot - 1
+  }
+  return decimalPlaces(lat) < 3 || decimalPlaces(lng) < 3
+}

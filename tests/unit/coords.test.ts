@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { toSeoulLatLng } from '@/lib/utils/coords'
+import { toSeoulLatLng, isSuspiciousCoord } from '@/lib/utils/coords'
 
 describe('toSeoulLatLng', () => {
   // 정상 케이스
@@ -75,5 +75,23 @@ describe('toSeoulLatLng', () => {
     // DDP: X_COORD=37.567, Y_COORD=127.009
     const result = toSeoulLatLng('37.567', '127.009')
     expect(result).toEqual({ latitude: 37.567, longitude: 127.009 })
+  })
+})
+
+describe('isSuspiciousCoord', () => {
+  it('소수점 3자리 이상은 정상 반환', () => {
+    expect(isSuspiciousCoord(37.566, 126.978)).toBe(false)
+  })
+
+  it('소수점 1자리(정수에 가까운 대략 좌표)는 의심 판별', () => {
+    expect(isSuspiciousCoord(37.5, 127.0)).toBe(true)
+  })
+
+  it('소수점 2자리도 의심 판별', () => {
+    expect(isSuspiciousCoord(37.56, 126.97)).toBe(true)
+  })
+
+  it('한 축만 정밀도 낮아도 의심 판별', () => {
+    expect(isSuspiciousCoord(37.5665, 126.97)).toBe(true)
   })
 })

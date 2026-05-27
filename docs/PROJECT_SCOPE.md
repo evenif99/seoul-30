@@ -1,5 +1,16 @@
 # PROJECT_SCOPE
 
+## Phase 57 Scope Update (2026-05-27)
+
+- `lib/utils/data-quality.ts` 신규 — `calcDataQuality(places)` 유틸리티: 좌표/이미지/주소/전화/홈페이지/운영시간/태그 보유율(FieldCoverage), 소스별 요약(bySource), 의심 좌표 수.
+- `lib/utils/coords.ts` — `isSuspiciousCoord(lat, lng)` 추가: 소수점 3자리 미만 좌표 = 정밀도 낮은 의심 좌표 판별 (~100m+ 오차 가능).
+- `/api/diagnostics` 강화 — `dataQuality` 필드 추가: 최근 스냅샷 있으면 실 API 장소 기반, 없으면 MOCK_PLACES 기반, `source: 'snapshot' | 'mock'` 명시.
+- `/admin` 페이지 강화 — 데이터 품질 섹션 신규: 필드별 보유율 바 차트, sourceType별 좌표/이미지 보유율 테이블, 의심 좌표 경고.
+- `tests/unit/data-quality.test.ts` 신규 — `isSuspiciousCoord` 6케이스 + `calcDataQuality` 7케이스 + MOCK_PLACES 품질 게이트(좌표 80%↑, 주소 90%↑, 태그 70%↑, 의심좌표 20%↓).
+- `tests/unit/coords.test.ts` — `isSuspiciousCoord` 4케이스 추가.
+- `tests/unit/diagnostics.test.ts` — `dataQuality` 필드 검증 케이스 추가.
+- 테스트 182개 통과 (160 → 182, 신규 22개).
+
 ## Phase 56 Scope Update (2026-05-27)
 
 - `hooks/use-push.ts` — `currentTags: string[]` 상태 추가 (localStorage `seoul30:push:tags` 복원), `updateTags(tags)` 함수 신규 (PushManager 재구독 없이 서버 태그만 갱신), `subscribe`/`unsubscribe` 시 localStorage 동기화.
