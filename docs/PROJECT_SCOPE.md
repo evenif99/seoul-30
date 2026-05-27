@@ -1,5 +1,15 @@
 # PROJECT_SCOPE
 
+## Phase 54 Scope Update (2026-05-27)
+
+- `WebPushSubscription` 모델에 `tags String[] @default([])` 추가 → `npx prisma db push` 적용.
+- subscribe API — `tags` 수신·저장 (알 수 없는 카테고리 제거).
+- send API — `?category=xxx` 쿼리 파라미터로 타겟 발송 (빈 tags = 전체 대상 포함), 카테고리별 제목·딥링크.
+- `usePush` hook — `subscribe(tags: string[])` 파라미터 추가.
+- `PushSubscribeButton` — 구독 전 카테고리 chip 선택 UI (기본 전체 선택, 외부 클릭 닫기).
+- i18n 키 추가: `selectTitle`, `confirm`, `cancel`, `categories.*` (ko + en).
+- 테스트 152개 통과 (카테고리 필터 4개 추가).
+
 ## Phase 53 Scope Update (2026-05-26)
 
 - README.md 전면 재작성 — 포트폴리오용, 스크린샷 테이블, 현행 테스트 수(148/14), Phase 잡동사니 제거.

@@ -1,5 +1,12 @@
 # HANDOFF
 
+## Phase 54 - Push Tag Personalization (2026-05-27)
+
+- **완료**: Push 태그 개인화 — Neon 스키마 변경 (`tags String[]`) + subscribe/send API + 카테고리 선택 UI.
+- **다음**: Phase 55 (Core Web Vitals 최적화).
+- Neon DB: `WebPushSubscription` 테이블에 `tags TEXT[]` 컬럼 추가됨.
+- 유닛 152개 통과 · E2E 14개 통과 · TS 0 오류.
+
 ## Phase 53 - Portfolio Polish (2026-05-26)
 
 - **완료**: README.md 포트폴리오용 전면 재작성 + About 페이지 데이터 소스 정정 + layout.tsx authors 메타데이터.
