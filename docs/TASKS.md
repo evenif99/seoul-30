@@ -1,5 +1,34 @@
 # TASKS
 
+## Phase 68 - 문서·인코딩 정리 (진행 중, 2026-05-27)
+
+- [x] `git diff --check` — CRLF 혼재 파일 없음 확인 (`.gitattributes` Phase 66에서 이미 처리)
+- [x] `docs/ARCHITECTURE.md` — `map.spec.ts` E2E 항목 추가, 테스트 수 동기화 (254/20)
+- [x] `README.md` — 테스트 수 253→254, E2E 16→20 수정
+- [x] `docs/TASKS.md` — Phase 66/67/68 항목 추가, 현행화
+- [ ] `npm run test` — 254개 통과 확인 후 커밋
+
+---
+
+## Phase 67 - 지도·위치 회귀 테스트 강화 ✅ (2026-05-27)
+
+- [x] `tests/e2e/map.spec.ts` 신규 — 지도 탭 전환 smoke 2개 + 위치 기반 smoke 2개
+- [x] `app/page.tsx` — 지도 뷰 wrapper에 `data-testid="map-view-container"` 추가
+- [x] `tests/unit/security-headers.test.ts` — 이미 Naver CSP 도메인 전체 커버 확인 (추가 불필요)
+- [x] `components/seoul30/MapView.tsx` — `window.naver?.maps` SDK 재마운트 방어 확인 (변경 불필요)
+- [x] `npm run test` 254개 + E2E 20개 통과
+
+## Phase 66 - 개발 환경 안정화 ✅ (2026-05-27)
+
+- [x] `.gitattributes` 신규 — `*.ts/tsx/js/md/yml` eol=lf, 바이너리 binary
+- [x] `package.json` — `engines.node: ">=20"` 추가
+- [x] `playwright.config.ts` — `reporter: 'list'` 추가 (Windows E2E hang 빈도 감소)
+- [x] `.env.example` — `SNAPSHOT_TTL_SECONDS`, `ADMIN_SECRET` 누락 항목 추가
+- [x] `docs/RUNBOOK.md` — Windows Prisma DLL·E2E hang 주의사항, 시나리오 5 Naver Maps, diagnostics 필드 전체, 환경변수 표 현행화
+- [x] `npm run test` 254개 통과
+
+---
+
 ## Phase 61/62 Follow-up Fix (2026-05-27)
 
 - [x] `tsconfig.json` — `@tests/*` alias 추가, `target` ES2017 상향으로 Phase 61 테스트의 전체 TS 검증 복구.

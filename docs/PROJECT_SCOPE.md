@@ -1,5 +1,25 @@
 # PROJECT_SCOPE
 
+## Phase 68 Scope Update (2026-05-27) — 문서·인코딩 정리
+
+**목표**: 운영 판단과 인계에 사용되는 문서를 현행 상태와 일치시킨다. 코드 변경 없음.
+
+### 변경 사항
+
+- `docs/TASKS.md`: Phase 66/67 완료 기록 추가, Phase 68 in-progress 항목 상단 배치
+- `docs/ARCHITECTURE.md`: `map.spec.ts` E2E 항목 추가 (파일 구조 동기화)
+- `README.md`: 유닛 테스트 수 253→254, E2E 16→20 수정
+
+### 확인된 사항 (변경 불필요)
+- `git diff --check`: CRLF 혼재 없음 (Phase 66 `.gitattributes` 이미 처리)
+- `docs/RUNBOOK.md`: Phase 66에서 전면 현행화 완료 — 추가 수정 불필요
+- `docs/ARCHITECTURE.md` 테스트 수: 이미 254/20 동기화됨
+
+### 테스트 결과
+- 유닛 **254개** 통과 (문서 변경만 — regression 없음)
+
+---
+
 ## Phase 67 Scope Update (2026-05-27) — 지도·위치 회귀 테스트 강화
 
 **목표**: Naver Maps 뷰 전환 및 위치 기반 추천 흐름이 배포 후 무음 장애 없이 작동하는지 E2E smoke 테스트로 고정.

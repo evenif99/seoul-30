@@ -414,6 +414,7 @@ tests/
     place-detail.spec.ts
     admin.spec.ts
     i18n.spec.ts
+    map.spec.ts                         # Phase 67 — 지도 탭 전환 smoke + 위치 기반 smoke (4)
   setup.tsx
   __mocks__/next-intl-server.ts
 
