@@ -20,6 +20,7 @@ describe('security headers', () => {
     expect(nextConfig).toContain('https://*.ssl.naver.com')
     expect(nextConfig).toContain('https://*.pstatic.net')
     expect(nextConfig).toContain('https://*.naver.net')
+    expect(nextConfig).toContain('https://*.navercorp.com')
     expect(nextConfig).toContain('https://*.ntruss.com')
   })
 

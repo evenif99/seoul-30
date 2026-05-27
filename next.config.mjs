@@ -12,11 +12,11 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://oapi.map.naver.com https://openapi.map.naver.com https://*.map.naver.com https://*.ssl.naver.com https://va.vercel-scripts.com https://vercel.live",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://oapi.map.naver.com https://openapi.map.naver.com https://*.map.naver.com https://*.ssl.naver.com https://*.pstatic.net https://va.vercel-scripts.com https://vercel.live",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://images.unsplash.com https://culture.seoul.go.kr https://*.seoul.go.kr https://*.visitkorea.or.kr https://*.kto.visitkorea.or.kr https://*.pstatic.net https://*.naver.net https://*.naver.com https://*.map.naver.com https://*.ssl.naver.com https://*.ntruss.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.map.naver.com https://*.ssl.naver.com https://oapi.map.naver.com https://openapi.map.naver.com https://map.naver.com https://*.pstatic.net https://*.naver.net https://*.naver.com https://*.ntruss.com https://*.vercel-insights.com https://vitals.vercel-insights.com",
+      "connect-src 'self' https://*.map.naver.com https://*.ssl.naver.com https://oapi.map.naver.com https://openapi.map.naver.com https://map.naver.com https://*.pstatic.net https://*.naver.net https://*.naver.com https://*.navercorp.com https://*.ntruss.com https://*.vercel-insights.com https://vitals.vercel-insights.com",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
       "media-src 'self' data: blob:",
