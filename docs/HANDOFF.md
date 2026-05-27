@@ -100,7 +100,7 @@ npm run build           # 빌드 정상
 
 ---
 
-## Phase 67 - 지도·위치 회귀 테스트 강화 (예정)
+## Phase 67 - 지도·위치 회귀 테스트 강화 ✅ 완료 (2026-05-27)
 
 **목표**: Naver Maps 관련 런타임 장애(CSP, SDK 재마운트, 위치 기반 추천 흐름)가 배포 후 무음으로 터지지 않도록 Playwright smoke 테스트로 고정한다.
 
@@ -147,6 +147,21 @@ npm run test:e2e -- map.spec.ts    # 지도 smoke 개별 실행
 - 실제 Naver SDK 네트워크 호출을 CI에서 성공으로 assert 하지 말 것 (환경 의존)
 - `MapViewInner.tsx` 리팩토링 금지 — smoke 통과에 필요한 최소한의 `data-testid` 추가만 허용
 - GPS 기능 변경 금지 — 테스트용 `grantPermissions` 설정만 추가
+
+### 완료 결과
+
+| 항목 | 변경 파일 | 내용 |
+|---|---|---|
+| CSP 회귀 | `tests/unit/security-headers.test.ts` | 이미 oapi/openapi/pstatic 등 Naver 도메인 전체 커버 — 추가 불필요 |
+| 지도 탭 smoke | `tests/e2e/map.spec.ts` (신규) | 지도 뷰 전환 · 리스트 복귀 2개 테스트 |
+| 위치 기반 smoke | `tests/e2e/map.spec.ts` (신규) | 온보딩 모달 허용 · 버튼 직접 클릭 2개 테스트 |
+| map-view-container | `app/page.tsx` | 지도 뷰 wrapper에 `data-testid="map-view-container"` 추가 |
+| SDK 재마운트 방어 | `components/seoul30/MapView.tsx` 코드 확인 | `window.naver?.maps` 체크 이미 구현됨 — 변경 불필요 |
+
+**설계 원칙**: SDK 로딩 결과(fallback/로딩/실제 지도)에 의존하지 않고 뷰 전환 동작만 검증.
+CLIENT_ID 미설정 → `map-fallback` 렌더 케이스는 `MapView.test.tsx` 유닛 테스트가 담당.
+
+**테스트**: 유닛 **254개** 통과 · E2E **20개** 통과 (신규 4개 추가)
 
 ---
 

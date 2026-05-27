@@ -470,7 +470,7 @@ export default function HomePage() {
 
           {/* 지도 뷰 */}
           {viewMode === 'map' && !loading && (
-            <div className="max-w-2xl mx-auto w-full">
+            <div className="max-w-2xl mx-auto w-full" data-testid="map-view-container">
               {displayResultsDeduped.length === 0 ? (
                 <EmptyState suggestions={results.slice(0, 2).map((r) => r.place)} />
               ) : (

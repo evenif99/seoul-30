@@ -1,5 +1,33 @@
 # PROJECT_SCOPE
 
+## Phase 67 Scope Update (2026-05-27) — 지도·위치 회귀 테스트 강화
+
+**목표**: Naver Maps 뷰 전환 및 위치 기반 추천 흐름이 배포 후 무음 장애 없이 작동하는지 E2E smoke 테스트로 고정.
+
+### 변경 사항
+
+- `tests/e2e/map.spec.ts` (신규, 4개 테스트):
+  - `지도 탭 전환 smoke > 지도 뷰 전환 시 map-view-container 렌더 + 장소 카드 숨겨짐`
+  - `지도 탭 전환 smoke > 지도 → 리스트 뷰 복귀 시 장소 카드 재표시`
+  - `위치 기반 smoke > 온보딩 모달 "위치 허용하기" → 내 위치 기반 배지 표시`
+  - `위치 기반 smoke > "내 위치 기반 추천" 버튼 직접 클릭 → 배지 표시`
+- `app/page.tsx`: 지도 뷰 wrapper `div`에 `data-testid="map-view-container"` 추가 (smoke 식별용)
+- 코드 확인 (변경 없음):
+  - `MapView.tsx`: `window.naver?.maps` 체크로 SDK 재마운트 방어 이미 구현
+  - `tests/unit/security-headers.test.ts`: Naver CSP 도메인 전체(oapi/openapi/pstatic 등) 이미 커버
+
+### 테스트 설계 원칙
+- CLIENT_ID 유무·SDK 로딩 결과에 의존하지 않음 — 뷰 전환 동작과 위치 배지 표시만 검증
+- `getByText('내 위치 기반', { exact: true })` — 버튼 텍스트 "내 위치 기반 추천"과 구분
+- 지오로케이션: `context.grantPermissions(['geolocation']) + context.setGeolocation(SEOUL_CITY_HALL)`
+
+### 테스트 결과
+- 유닛 **254개** 통과 (regression 없음)
+- E2E **20개** 통과 (기존 16 + 신규 4)
+- `npx tsc --noEmit` 통과
+
+---
+
 ## Phase 66 Scope Update (2026-05-27) — 개발 환경 안정화
 
 **목표**: 반복적으로 발생하던 환경성 문제(Prisma DLL 잠금, E2E hang, 문서 누락)를 코드 변경 최소화 원칙 하에 설정·문서로 해결.
