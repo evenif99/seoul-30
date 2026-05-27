@@ -318,51 +318,31 @@ npm run build           # 빌드 통과
 
 ---
 
-## Phase 70 - 저장함·최근본 UX 고도화 (예정)
+## Phase 70 - 저장함·최근본 UX 고도화 ✅ 완료 (2026-05-27)
 
-**목표**: bookmarks 페이지의 정렬·필터·카드 UI를 개선해 실제 사용 패턴(재방문 판단, 비교)을 지원한다.
+**목표**: bookmarks 페이지의 정렬·타임스탬프·탭 스크롤을 개선해 재방문 판단 및 비교 사용 패턴을 지원한다.
 
-### 배경
+### 구현 내용
 
-- 현재 북마크/최근본 장소 목록은 저장 순서 고정, 정렬 없음
-- PlaceCard가 홈 추천 목록과 동일한 레이아웃 — bookmarks 문맥에 맞는 정보(저장 일시, 마지막 방문)가 없음
-- 모바일 기준 카드 목록이 스크롤이 길어질 때 페이지 내 탭 전환이 비직관적
+**`hooks/use-recent.ts`**
+- `seoul30:recent_timestamps: Record<string, number>` 신규 localStorage 키 추가
+- `push(id, place?)` 호출 시 `Date.now()` 저장
+- `useRecent()` 반환값에 `timestamps` 추가 (`{ recent, push, timestamps }`)
+- 기존 `recent`/`push` 인터페이스 변경 없음 — 호환성 유지
 
-### 작업 범위
+**`app/bookmarks/page.tsx`**
+- `SortOrder = 'date' | 'name' | 'category'` + `sortPlaces()` 순수함수
+- 저장됨 탭: 정렬 버튼 3개 (최신 저장순 / 이름순 / 카테고리순), aria-pressed 접근성
+- 최근본 탭: 각 카드 위에 `relativeTime()` 기반 상대 시간 표시 ("방금 전 방문", "3일 전 방문")
+- 타임스탬프 없는 기존 항목: "방문 시간 미기록" 폴백 (하위 호환)
+- `useEffect([activeTab])` → `window.scrollTo(0, 0)`
 
-**1. 북마크 목록 정렬 옵션 추가 (`app/bookmarks/page.tsx`)**
-- 정렬 기준: "저장 최신순" (기본) / "이름순" / "카테고리순"
-- 정렬 상태는 `useState`로만 관리 (URL sync 불필요)
-- i18n 키: `bookmarks.sortByDate`, `bookmarks.sortByName`, `bookmarks.sortByCategory`
+**`messages/ko.json` + `messages/en.json`**
+- `bookmarks.sortByDate/sortByName/sortByCategory/visitedAt/visitedUnknown` 추가
 
-**2. 최근본 목록 날짜 표시**
-- `RecentTracker` 에서 `visitedAt` 타임스탬프가 localStorage에 저장되고 있는지 확인
-- 저장 중이면: 카드에 "3일 전 방문" 형태 상대 시간 표시 (`lib/utils/relative-time.ts` 재사용)
-- 저장 안 되고 있으면: `visitedAt: Date.now()` 함께 저장하도록 RecentTracker 수정 후 표시
-
-**3. 빈 상태 UX 개선 (`app/bookmarks/page.tsx`)**
-- 북마크 0개: "아직 저장한 장소가 없어요. 홈에서 마음에 드는 장소를 저장해보세요" + 홈 링크 버튼
-- 최근본 0개: "최근에 방문한 장소가 없어요" + 홈 링크 버튼
-- 현재 EmptyState 컴포넌트를 재사용하되, `action` prop으로 링크 버튼 추가 (없으면 추가)
-- i18n 키: `bookmarks.emptyBookmarks`, `bookmarks.emptyRecent`, `bookmarks.goHome`
-
-**4. 탭 스크롤 개선 (모바일)**
-- 탭 전환 시 목록 상단으로 `window.scrollTo(0, 0)` 호출 — 현재 탭 전환 후 스크롤 위치가 유지되어 비직관적
-- `useEffect([activeTab])` 에서 처리
-
-### 검증 방법
-```bash
-npx tsc --noEmit        # 타입 오류 없음
-npm run test            # 기존 테스트 regression 없음
-npm run build           # 빌드 통과
-npm run test:e2e        # bookmarks 관련 E2E 통과
-```
-
-### 금지 사항
-- localStorage 스키마 변경 시 기존 저장 데이터와 하위 호환 유지 필수
-  - `visitedAt` 없는 기존 항목은 표시 시 "방문 시간 미기록"으로 처리
-- `components/ui/` 수정 금지
-- 북마크 데이터를 서버(DB)로 이전하지 말 것 — localStorage 전략 유지
+### 테스트 결과
+- 유닛 **263개** 통과 (regression 없음)
+- `npx tsc --noEmit` 통과
 
 ---
 

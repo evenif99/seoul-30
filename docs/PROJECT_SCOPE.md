@@ -1,5 +1,31 @@
 # PROJECT_SCOPE
 
+## Phase 70 Scope Update (2026-05-27) — 저장함·최근본 UX 고도화
+
+**목표**: 북마크 목록 정렬 옵션 추가, 최근본 방문 타임스탬프 표시, 탭 전환 시 스크롤 초기화.
+
+### 변경 사항
+
+- `hooks/use-recent.ts`: `seoul30:recent_timestamps` (Record\<string, number\>) 추가. `push()` 시 `Date.now()` 저장. `useRecent()` → `{ recent, push, timestamps }` 반환.
+- `app/bookmarks/page.tsx`:
+  - `SortOrder = 'date' | 'name' | 'category'` 상태 + `sortPlaces()` 함수 — 저장됨 탭에만 적용
+  - 정렬 버튼 3개 (최신 저장순/이름순/카테고리순) — aria-pressed 접근성 포함
+  - `useEffect([activeTab])` → `window.scrollTo(0, 0)` 탭 전환 시 스크롤 최상단
+  - 최근본 탭: `timestamps[place.id]` 기반 상대 시간 표시 (`relativeTime()` 재사용). 타임스탬프 없는 구항목은 "방문 시간 미기록" 폴백
+  - `useLocale()` 추가 — relativeTime 로케일 전달
+- `messages/ko.json` + `messages/en.json`: `bookmarks` 네임스페이스에 `sortByDate`, `sortByName`, `sortByCategory`, `visitedAt`, `visitedUnknown` 추가
+
+### 설계 결정
+- `sortByDate`는 배열 원래 순서(최신 prepend) — 새 정렬 연산 없음
+- 기존 `seoul30:recent_timestamps` 없는 항목: `timestamps[id]` → `undefined` → "방문 시간 미기록" 표시 (하위 호환)
+- 최근본 탭은 정렬 옵션 없음 (시간순이 자연스러운 UX)
+
+### 테스트 결과
+- 유닛 **263개** 통과
+- `npx tsc --noEmit` 통과
+
+---
+
 ## Phase 69 Scope Update (2026-05-27) — 추천 설명력 개선
 
 **목표**: 장소 카드에 "왜 추천됐는지" 이유 칩을 최대 2개 표시. 스코어링 로직 변경 없음.

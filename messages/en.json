@@ -101,7 +101,12 @@
     "emptyRecent": "No recently viewed places. Start exploring.",
     "backToExplore": "Explore places",
     "savedLabel": "Saved places list",
-    "recentLabel": "Recently viewed list"
+    "recentLabel": "Recently viewed list",
+    "sortByDate": "Date saved",
+    "sortByName": "By name",
+    "sortByCategory": "By category",
+    "visitedAt": "Visited {time}",
+    "visitedUnknown": "Visit time unknown"
   },
   "common": {
     "loading": "Loading...",

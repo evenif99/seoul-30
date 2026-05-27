@@ -101,7 +101,12 @@
     "emptyRecent": "최근 본 장소가 없어요. 장소를 탐색해보세요.",
     "backToExplore": "장소 탐색하러 가기",
     "savedLabel": "저장된 장소 목록",
-    "recentLabel": "최근 본 장소 목록"
+    "recentLabel": "최근 본 장소 목록",
+    "sortByDate": "최신 저장순",
+    "sortByName": "이름순",
+    "sortByCategory": "카테고리순",
+    "visitedAt": "{time} 방문",
+    "visitedUnknown": "방문 시간 미기록"
   },
   "common": {
     "loading": "불러오는 중...",

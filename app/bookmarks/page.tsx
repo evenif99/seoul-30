@@ -1,16 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Bookmark, Clock } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useBookmark } from '@/hooks/use-bookmark'
 import { useRecent } from '@/hooks/use-recent'
 import { MOCK_PLACES } from '@/lib/mock/places'
 import { PlaceCard } from '@/components/seoul30/PlaceCard'
+import { relativeTime } from '@/lib/utils/relative-time'
 import type { NormalizedPlace } from '@/lib/types/place'
 
 type Tab = 'saved' | 'recent'
+type SortOrder = 'date' | 'name' | 'category'
 
 /** localStorage에 저장된 장소 데이터를 읽어 ID로 resolve.
  *  북마크/최근본 저장 시 place 데이터도 함께 저장하므로 실 API 장소도 표시 가능. */
@@ -31,6 +33,13 @@ function resolvePlaces(ids: string[]): NormalizedPlace[] {
     .filter((p): p is NormalizedPlace => p !== undefined)
 }
 
+function sortPlaces(places: NormalizedPlace[], order: SortOrder): NormalizedPlace[] {
+  if (order === 'date') return places // 이미 최신순 (배열 앞이 최신)
+  if (order === 'name') return [...places].sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+  if (order === 'category') return [...places].sort((a, b) => a.category.localeCompare(b.category))
+  return places
+}
+
 function EmptyMessage({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
   const t = useTranslations('bookmarks')
   return (
@@ -47,11 +56,18 @@ function EmptyMessage({ icon: Icon, message }: { icon: React.ElementType; messag
 export default function BookmarksPage() {
   const t = useTranslations('bookmarks')
   const tNav = useTranslations('nav')
+  const locale = useLocale() as 'ko' | 'en'
   const [activeTab, setActiveTab] = useState<Tab>('saved')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('date')
   const { bookmarks } = useBookmark()
-  const { recent } = useRecent()
+  const { recent, timestamps } = useRecent()
 
-  const savedPlaces = resolvePlaces(bookmarks)
+  // 탭 전환 시 스크롤 최상단 이동
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [activeTab])
+
+  const savedPlaces = sortPlaces(resolvePlaces(bookmarks), sortOrder)
   const recentPlaces = resolvePlaces(recent)
 
   const places = activeTab === 'saved' ? savedPlaces : recentPlaces
@@ -73,7 +89,7 @@ export default function BookmarksPage() {
 
         {/* 탭 */}
         <div
-          className="flex gap-1 mt-4 mb-5 bg-muted rounded-xl p-1"
+          className="flex gap-1 mt-4 bg-muted rounded-xl p-1"
           role="tablist"
           aria-label={t('title')}
         >
@@ -114,12 +130,33 @@ export default function BookmarksPage() {
           </button>
         </div>
 
+        {/* 저장됨 탭 정렬 옵션 */}
+        {activeTab === 'saved' && savedPlaces.length > 0 && (
+          <div className="flex gap-1.5 mt-3 mb-1" role="group" aria-label={locale === 'ko' ? '정렬 기준' : 'Sort order'}>
+            {(['date', 'name', 'category'] as SortOrder[]).map((order) => (
+              <button
+                key={order}
+                onClick={() => setSortOrder(order)}
+                aria-pressed={sortOrder === order}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  sortOrder === order
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background text-muted-foreground border-border hover:text-foreground hover:border-foreground/30'
+                }`}
+              >
+                {t(order === 'date' ? 'sortByDate' : order === 'name' ? 'sortByName' : 'sortByCategory')}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* 장소 목록 */}
         <section
           id="tabpanel-places"
           role="tabpanel"
           aria-labelledby={activeTab === 'saved' ? 'tab-saved' : 'tab-recent'}
           aria-label={activeTab === 'saved' ? t('savedLabel') : t('recentLabel')}
+          className="mt-4"
         >
           {places.length === 0 ? (
             activeTab === 'saved' ? (
@@ -129,9 +166,25 @@ export default function BookmarksPage() {
             )
           ) : (
             <div className="flex flex-col gap-3 pb-10">
-              {places.map((place) => (
-                <PlaceCard key={place.id} place={place} />
-              ))}
+              {places.map((place) => {
+                const ts = activeTab === 'recent' ? timestamps[place.id] : undefined
+                const visitedLabel = ts != null
+                  ? t('visitedAt', { time: relativeTime(new Date(ts).toISOString(), locale) })
+                  : activeTab === 'recent'
+                    ? t('visitedUnknown')
+                    : undefined
+                return (
+                  <div key={place.id}>
+                    {visitedLabel && (
+                      <p className="text-[11px] text-muted-foreground mb-1 pl-1 flex items-center gap-1">
+                        <Clock className="w-3 h-3 inline-block" aria-hidden="true" />
+                        {visitedLabel}
+                      </p>
+                    )}
+                    <PlaceCard place={place} />
+                  </div>
+                )
+              })}
             </div>
           )}
         </section>
