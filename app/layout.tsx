@@ -10,12 +10,14 @@ import './globals.css'
 const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
+  display: 'swap',   // 폰트 로딩 중 텍스트 즉시 표시 → CLS 방지
   variable: '--font-sans',
 })
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
+  display: 'swap',
   variable: '--font-body',
 })
 
@@ -68,9 +70,13 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${notoSansKR.variable} ${inter.variable} bg-background`}>
       <head>
+        {/* LCP 이미지 소스 preconnect — 실제 장소 이미지 도메인 */}
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://culture.seoul.go.kr" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://culture.seoul.go.kr" />
         <link rel="dns-prefetch" href="https://openapi.map.naver.com" />
+        <link rel="dns-prefetch" href="https://tong.visitkorea.or.kr" />
       </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>

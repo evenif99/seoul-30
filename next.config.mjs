@@ -37,7 +37,15 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    unoptimized: true,
+    // remotePatterns으로 허용 도메인 명시 → Next.js 이미지 최적화(WebP/AVIF) 활성화
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'culture.seoul.go.kr' },
+      { protocol: 'https', hostname: '*.seoul.go.kr' },
+      { protocol: 'https', hostname: '*.visitkorea.or.kr' },
+      { protocol: 'https', hostname: '*.kto.visitkorea.or.kr' },
+      { protocol: 'https', hostname: '*.pstatic.net' },
+    ],
   },
   turbopack: {
     root: __dirname,
