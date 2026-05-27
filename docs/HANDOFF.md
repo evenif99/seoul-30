@@ -1,5 +1,11 @@
 # HANDOFF
 
+## Phase 55 - Core Web Vitals Optimization (2026-05-27)
+
+- **완료**: 이미지 최적화 + 폰트 CLS 수정 + preconnect 추가.
+- **다음**: 신규 Phase 계획 필요 (53–55 완료).
+- 유닛 158개 통과 · E2E 14개 통과 · TS 0 오류.
+
 ## Phase 54 - Push Tag Personalization (2026-05-27)
 
 - **완료**: Push 태그 개인화 — Neon 스키마 변경 (`tags String[]`) + subscribe/send API + 카테고리 선택 UI.

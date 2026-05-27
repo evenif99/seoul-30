@@ -1,5 +1,12 @@
 # PROJECT_SCOPE
 
+## Phase 55 Scope Update (2026-05-27)
+
+- `unoptimized: true` 제거 → `remotePatterns` 설정으로 Next.js 이미지 최적화(WebP/AVIF) 활성화.
+- `display: 'swap'` 폰트 명시 → FOIT 제거, CLS 개선.
+- `preconnect` 추가: `culture.seoul.go.kr`, `dns-prefetch` 추가: `tong.visitkorea.or.kr`.
+- `tests/unit/image-config.test.ts` 신규 — remotePatterns 회귀 검증 (158개 통과).
+
 ## Phase 54 Scope Update (2026-05-27)
 
 - `WebPushSubscription` 모델에 `tags String[] @default([])` 추가 → `npx prisma db push` 적용.
