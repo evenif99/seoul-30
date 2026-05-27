@@ -40,6 +40,7 @@ declare namespace naver {
         handler: (...args: unknown[]) => void,
       ): unknown
       function removeListener(listener: unknown): void
+      function trigger(target: object, event: string): void
     }
     namespace MapTypeId {
       const NORMAL: string

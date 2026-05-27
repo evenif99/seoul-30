@@ -26,6 +26,20 @@ export function MapView({ results, onSelectPlace }: MapViewProps) {
     setMounted(true)
   }, [])
 
+  useEffect(() => {
+    if (!mounted || !CLIENT_ID) return
+    if (window.naver?.maps) {
+      setReady(true)
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      if (!window.naver?.maps) setLoadFailed(true)
+    }, 12000)
+
+    return () => window.clearTimeout(timeout)
+  }, [mounted])
+
   if (!CLIENT_ID) {
     return <MapFallback title={t('mapUnavailable')} body={t('mapMissingKey')} />
   }
@@ -38,21 +52,29 @@ export function MapView({ results, onSelectPlace }: MapViewProps) {
     <div className="relative">
       {mounted && (
         <Script
+          id="naver-maps-sdk"
           src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${CLIENT_ID}`}
           strategy="afterInteractive"
-          onLoad={() => {
+          onReady={() => {
             if (window.naver?.maps) {
               setReady(true)
               return
             }
             setLoadFailed(true)
           }}
+          onLoad={() => {
+            if (window.naver?.maps) setReady(true)
+          }}
           onError={() => setLoadFailed(true)}
         />
       )}
       {mounted && ready ? (
         <ErrorBoundary fallback={<MapFallback title={t('mapUnavailable')} body={t('mapLoadFailed')} canRetry />}>
-          <MapViewInner results={results} onSelectPlace={onSelectPlace} />
+          <MapViewInner
+            results={results}
+            onSelectPlace={onSelectPlace}
+            onMapError={() => setLoadFailed(true)}
+          />
         </ErrorBoundary>
       ) : (
         <div className="flex items-center justify-center h-[60vh] text-sm text-muted-foreground px-4">

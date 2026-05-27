@@ -19,6 +19,8 @@ describe('security headers', () => {
     expect(nextConfig).toContain('https://*.map.naver.com')
     expect(nextConfig).toContain('https://*.ssl.naver.com')
     expect(nextConfig).toContain('https://*.pstatic.net')
+    expect(nextConfig).toContain('https://*.naver.net')
+    expect(nextConfig).toContain('https://*.ntruss.com')
   })
 
   it('allows real place image providers in CSP', () => {

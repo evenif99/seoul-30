@@ -13,6 +13,7 @@ type PlaceWithCoords = NormalizedPlace & { latitude: number; longitude: number }
 interface Props {
   results: RecommendationResult[]
   onSelectPlace?: (place: NormalizedPlace) => void
+  onMapError?: () => void
 }
 
 interface Cluster {
@@ -61,7 +62,7 @@ function selectedIcon(): naver.maps.MarkerIcon {
   }
 }
 
-export function MapViewInner({ results, onSelectPlace }: Props) {
+export function MapViewInner({ results, onSelectPlace, onMapError }: Props) {
   const t = useTranslations('common')
   const mapDivRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<naver.maps.Map | null>(null)
@@ -122,26 +123,40 @@ export function MapViewInner({ results, onSelectPlace }: Props) {
   useEffect(() => {
     if (!mapDivRef.current || !window.naver?.maps) return
 
-    const initialCenter = placesRef.current.length > 0
-      ? { lat: placesRef.current.reduce((s, p) => s + p.latitude, 0) / placesRef.current.length, lng: placesRef.current.reduce((s, p) => s + p.longitude, 0) / placesRef.current.length }
-      : { lat: 37.5665, lng: 126.978 }
+    let resizeTimer: number | undefined
+    try {
+      const initialCenter = places.length > 0
+        ? { lat: places.reduce((s, p) => s + p.latitude, 0) / places.length, lng: places.reduce((s, p) => s + p.longitude, 0) / places.length }
+        : { lat: 37.5665, lng: 126.978 }
 
-    const map = new naver.maps.Map(mapDivRef.current, {
-      center: new naver.maps.LatLng(initialCenter.lat, initialCenter.lng),
-      zoom: 11,
-      scaleControl: false,
-      logoControl: true,
-      mapDataControl: false,
-      zoomControl: true,
-    })
-    mapRef.current = map
+      const map = new naver.maps.Map(mapDivRef.current, {
+        center: new naver.maps.LatLng(initialCenter.lat, initialCenter.lng),
+        zoom: 11,
+        scaleControl: false,
+        logoControl: true,
+        mapDataControl: false,
+        zoomControl: true,
+      })
+      mapRef.current = map
 
-    naver.maps.Event.addListener(map, 'zoom_changed', () => {
-      rebuildMarkers(map, placesRef.current)
-    })
+      naver.maps.Event.addListener(map, 'zoom_changed', () => {
+        rebuildMarkers(map, placesRef.current)
+      })
+
+      resizeTimer = window.setTimeout(() => {
+        try {
+          naver.maps.Event.trigger(map, 'resize')
+        } catch {}
+      }, 0)
+    } catch {
+      onMapError?.()
+    }
 
     return () => {
-      map.destroy()
+      if (resizeTimer != null) window.clearTimeout(resizeTimer)
+      markersRef.current.forEach((m) => { try { m.setMap(null) } catch {} })
+      markersRef.current = []
+      mapRef.current?.destroy()
       mapRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -75,7 +75,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://culture.seoul.go.kr" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://culture.seoul.go.kr" />
-        <link rel="dns-prefetch" href="https://openapi.map.naver.com" />
+        <link rel="dns-prefetch" href="https://oapi.map.naver.com" />
         <link rel="dns-prefetch" href="https://tong.visitkorea.or.kr" />
       </head>
       <body className="font-sans antialiased">
