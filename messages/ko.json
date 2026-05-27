@@ -1,4 +1,12 @@
 {
+  "reasons": {
+    "free": "무료",
+    "open_now": "운영 중",
+    "nearby": "가까워요",
+    "low_crowd": "여유 있음",
+    "high_rated": "호평",
+    "new_event": "새 행사"
+  },
   "place": {
     "viewDetail": "상세 보기",
     "ariaLabel": "{name} 상세 보기",

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { scorePlace } from '@/lib/scoring'
+import { buildReasons, scorePlace } from '@/lib/scoring'
 import type { NormalizedPlace } from '@/lib/types/place'
+import type { ScoreBreakdown } from '@/lib/types/recommendation'
 
 const basePlace: NormalizedPlace = {
   id: 'test-place',
@@ -94,5 +95,79 @@ describe('scorePlace', () => {
     expect(score.total).toBe(
       score.access + score.relevance + score.cost + score.congestion + score.timefit + score.freshness,
     )
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// buildReasons — Phase 69
+// ─────────────────────────────────────────────────────────────────────────────
+const baseScore: ScoreBreakdown = {
+  access: 10,
+  relevance: 12,
+  cost: 5,
+  congestion: 8,
+  timefit: 5,
+  freshness: 0,
+  feedbackBonus: 0,
+  total: 40,
+}
+
+describe('buildReasons', () => {
+  it('returns empty array when no conditions are met', () => {
+    const place = { ...basePlace, isFree: false }
+    const score: ScoreBreakdown = { ...baseScore, timefit: 0, congestion: 8, feedbackBonus: 0, freshness: 0 }
+    expect(buildReasons(place, score)).toEqual([])
+  })
+
+  it('includes "free" for a free place', () => {
+    const reasons = buildReasons(basePlace, { ...baseScore, timefit: 0 })
+    expect(reasons).toContain('free')
+  })
+
+  it('includes "open_now" when timefit >= 8', () => {
+    const reasons = buildReasons({ ...basePlace, isFree: false }, { ...baseScore, timefit: 10 })
+    expect(reasons).toContain('open_now')
+  })
+
+  it('includes "nearby" when transitMinutes <= 10', () => {
+    const reasons = buildReasons({ ...basePlace, isFree: false }, { ...baseScore, transitMinutes: 8 })
+    expect(reasons).toContain('nearby')
+  })
+
+  it('does NOT include "nearby" when transitMinutes is undefined', () => {
+    const reasons = buildReasons(basePlace, { ...baseScore })
+    expect(reasons).not.toContain('nearby')
+  })
+
+  it('includes "low_crowd" when congestion >= 12', () => {
+    const reasons = buildReasons({ ...basePlace, isFree: false }, { ...baseScore, congestion: 15, timefit: 0 })
+    expect(reasons).toContain('low_crowd')
+  })
+
+  it('includes "high_rated" when feedbackBonus >= 2', () => {
+    const reasons = buildReasons({ ...basePlace, isFree: false }, { ...baseScore, feedbackBonus: 2, timefit: 0 })
+    expect(reasons).toContain('high_rated')
+  })
+
+  it('includes "new_event" when freshness >= 3', () => {
+    const reasons = buildReasons({ ...basePlace, isFree: false }, { ...baseScore, freshness: 5, timefit: 0 })
+    expect(reasons).toContain('new_event')
+  })
+
+  it('caps result at 3 reasons (priority: nearby > free > open_now)', () => {
+    const score: ScoreBreakdown = {
+      ...baseScore,
+      transitMinutes: 5,
+      timefit: 10,
+      congestion: 15,
+      feedbackBonus: 2,
+      freshness: 5,
+    }
+    const reasons = buildReasons(basePlace, score)
+    expect(reasons).toHaveLength(3)
+    // 우선순위: nearby > free > open_now
+    expect(reasons[0]).toBe('nearby')
+    expect(reasons[1]).toBe('free')
+    expect(reasons[2]).toBe('open_now')
   })
 })

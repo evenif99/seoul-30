@@ -1,6 +1,6 @@
 import type { NormalizedPlace } from './types/place'
 import type { RealtimeSignal } from './types/realtime'
-import type { RecommendationInput, ScoreBreakdown } from './types/recommendation'
+import type { RecommendationInput, RecommendReason, ScoreBreakdown } from './types/recommendation'
 import { estimateTransit, haversineKm, transitAccessScore } from './utils/transit-time'
 
 export interface FeedbackStats {
@@ -100,6 +100,44 @@ function calcFreshness(place: NormalizedPlace): number {
   if (daysUntil <= 7) return 5   // 7일 이내 개막
   if (daysUntil <= 30) return 3  // 30일 이내 개막
   return 0
+}
+
+/**
+ * 스코어 결과에서 추천 이유 칩을 생성한다 (Phase 69).
+ * scorePlace() 의 계산 로직은 변경하지 않고, 결과값을 읽어 reasons 배열만 반환.
+ *
+ * 우선순위: nearby > free > open_now > high_rated > low_crowd > new_event
+ * 최대 3개 반환.
+ */
+export function buildReasons(place: NormalizedPlace, score: ScoreBreakdown): RecommendReason[] {
+  const reasons: RecommendReason[] = []
+
+  // GPS 활성 + 10분 이내 이동 가능
+  if (score.transitMinutes != null && score.transitMinutes <= 10) {
+    reasons.push('nearby')
+  }
+  // 무료 입장
+  if (place.isFree) {
+    reasons.push('free')
+  }
+  // 지금 운영 중 (timefit 8점 이상 = 운영 시간 내)
+  if (score.timefit >= 8) {
+    reasons.push('open_now')
+  }
+  // 이용자 호평 (feedbackBonus 2점 = 긍정 투표 75% 이상)
+  if (score.feedbackBonus >= 2) {
+    reasons.push('high_rated')
+  }
+  // 혼잡도 낮음 (congestion 12점 이상 = 여유 상태)
+  if (score.congestion >= 12) {
+    reasons.push('low_crowd')
+  }
+  // 최근 행사 (freshness 3점 이상 = 30일 이내 행사 시작)
+  if (score.freshness >= 3) {
+    reasons.push('new_event')
+  }
+
+  return reasons.slice(0, 3)
 }
 
 // 사용자 평가 반영 (-3–+2) — 3표 미만이면 중립 0점

@@ -1,4 +1,12 @@
 {
+  "reasons": {
+    "free": "Free",
+    "open_now": "Open now",
+    "nearby": "Nearby",
+    "low_crowd": "Not crowded",
+    "high_rated": "Highly rated",
+    "new_event": "New event"
+  },
   "place": {
     "viewDetail": "View details",
     "ariaLabel": "View details for {name}",

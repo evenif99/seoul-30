@@ -459,9 +459,9 @@ export default function HomePage() {
               ) : displayResultsDeduped.length === 0 ? (
                 <EmptyState suggestions={results.slice(0, 2).map((r) => r.place)} />
               ) : (
-                displayResultsDeduped.map(({ place, score }, i) => (
+                displayResultsDeduped.map(({ place, score, reasons }, i) => (
                   <div key={place.id} id={`place-card-${place.id}`}>
-                    <PlaceCard place={place} score={score} priority={i < 3} />
+                    <PlaceCard place={place} score={score} reasons={reasons} priority={i < 3} />
                   </div>
                 ))
               )}

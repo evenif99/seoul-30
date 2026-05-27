@@ -1,5 +1,14 @@
 import type { NormalizedPlace } from './place'
 
+/** 카드에 표시되는 추천 이유 (최대 3개, buildReasons() 생성) */
+export type RecommendReason =
+  | 'free'       // 무료 입장
+  | 'open_now'   // 지금 운영 중
+  | 'nearby'     // 10분 이내 (GPS 활성 시)
+  | 'low_crowd'  // 혼잡도 낮음 (여유)
+  | 'high_rated' // 이용자 호평
+  | 'new_event'  // 최근 행사 (30일 이내)
+
 export interface RecommendationInput {
   district?: string
   category?: string
@@ -26,4 +35,6 @@ export interface RecommendationResult {
   place: NormalizedPlace
   score: ScoreBreakdown
   isMock: boolean
+  /** 추천 이유 칩 (Phase 69). 캐시된 구형 결과에는 undefined 가능 */
+  reasons?: RecommendReason[]
 }

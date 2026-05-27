@@ -1,5 +1,32 @@
 # PROJECT_SCOPE
 
+## Phase 69 Scope Update (2026-05-27) — 추천 설명력 개선
+
+**목표**: 장소 카드에 "왜 추천됐는지" 이유 칩을 최대 2개 표시. 스코어링 로직 변경 없음.
+
+### 변경 사항
+
+- `lib/types/recommendation.ts`: `RecommendReason` 유니온 타입 추가, `RecommendationResult.reasons?` optional 필드
+- `lib/scoring.ts`: `buildReasons(place, score)` 함수 추가 및 export. 우선순위 nearby > free > open_now > high_rated > low_crowd > new_event, 최대 3개
+- `app/api/places/route.ts`: `reasons: buildReasons(place, score)` 결과에 포함
+- `components/seoul30/PlaceCard.tsx`: `reasons?` prop 추가, 최대 2개 에메랄드 칩 표시
+- `app/page.tsx`: `reasons` prop 전달
+- `messages/ko.json` + `messages/en.json`: `reasons` 네임스페이스 (free/open_now/nearby/low_crowd/high_rated/new_event)
+- `tests/unit/scoring.test.ts`: `buildReasons` 9개 테스트 추가
+
+### 임계값 결정
+- `nearby`: `transitMinutes <= 10` (GPS 활성 시만 의미 있음)
+- `open_now`: `timefit >= 8` (timefit 10 = 운영 중, 5 = 중립)
+- `low_crowd`: `congestion >= 12` (15=여유, 10=보통, 3=약간붐빔 구분)
+- `high_rated`: `feedbackBonus >= 2` (투표 75% 이상 긍정)
+- `new_event`: `freshness >= 3` (30일 이내, 5=7일 이내)
+
+### 테스트 결과
+- 유닛 **263개** 통과 (기존 254 + 신규 9)
+- `npx tsc --noEmit` 통과
+
+---
+
 ## Phase 68 Scope Update (2026-05-27) — 문서·인코딩 정리
 
 **목표**: 운영 판단과 인계에 사용되는 문서를 현행 상태와 일치시킨다. 코드 변경 없음.

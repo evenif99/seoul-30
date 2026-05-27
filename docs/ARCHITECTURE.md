@@ -418,7 +418,7 @@ tests/
   setup.tsx
   __mocks__/next-intl-server.ts
 
-# Total: 254 unit tests, 20 E2E specs
+# Total: 263 unit tests, 20 E2E specs
 
 proxy.ts                             # rate limiting (/api/* only)
 vercel.json                          # Vercel Cron (daily 09:00 KST → /api/push/send)

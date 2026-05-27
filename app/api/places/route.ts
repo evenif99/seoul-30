@@ -8,7 +8,7 @@ import { fetchSeoulCongestion } from '@/lib/adapters/seoul-citydata.adapter'
 import { getSnapshot, getStaleSnapshot, setSnapshot } from '@/lib/cache/recommendation.cache'
 import { getDdareungiStations } from '@/lib/data/ddareungi'
 import { mergeTourImages } from '@/lib/data/tourImages'
-import { scorePlace, type FeedbackStats } from '@/lib/scoring'
+import { buildReasons, scorePlace, type FeedbackStats } from '@/lib/scoring'
 import { nearestDdareungiStation } from '@/lib/utils/transit-time'
 import type { RecommendationInput } from '@/lib/types/recommendation'
 import type { ApiResponse } from '@/lib/types/api'
@@ -123,10 +123,12 @@ export async function GET(request: Request) {
           ? true
           : nearestDdareungiStation(place.latitude, place.longitude, stations) !== null
 
+      const score = scorePlace(place, input, realtime, ddareungiNearUser, ddareungiNearDest, feedbackMap[place.id])
       return {
         place,
-        score: scorePlace(place, input, realtime, ddareungiNearUser, ddareungiNearDest, feedbackMap[place.id]),
+        score,
         isMock,
+        reasons: buildReasons(place, score),
       }
     })
     .sort((a, b) => b.score.total - a.score.total)

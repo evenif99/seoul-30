@@ -7,12 +7,13 @@ import { BookmarkButton } from '@/components/seoul30/BookmarkButton'
 import { PlaceImage } from '@/components/seoul30/PlaceImage'
 import { ScoreBadge } from '@/components/seoul30/ScoreBadge'
 import type { NormalizedPlace } from '@/lib/types/place'
-import type { ScoreBreakdown } from '@/lib/types/recommendation'
+import type { RecommendReason, ScoreBreakdown } from '@/lib/types/recommendation'
 import { cn } from '@/lib/utils'
 
 interface PlaceCardProps {
   place: NormalizedPlace
   score?: ScoreBreakdown
+  reasons?: RecommendReason[]
   priority?: boolean
 }
 
@@ -25,10 +26,11 @@ const TRANSIT_MODE_KEYS: Record<NonNullable<ScoreBreakdown['transitMode']>, stri
   지하철: 'subway',
 }
 
-export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
+export function PlaceCard({ place, score, reasons, priority = false }: PlaceCardProps) {
   const t = useTranslations('place')
   const tCommon = useTranslations('common')
   const tTransit = useTranslations('transit')
+  const tReasons = useTranslations('reasons')
 
   const categoryLabel = KNOWN_CATEGORIES.has(place.category)
     ? t(`category.${place.category}` as Parameters<typeof t>[0])
@@ -89,6 +91,20 @@ export function PlaceCard({ place, score, priority = false }: PlaceCardProps) {
                 </span>
               )}
             </div>
+
+            {/* 추천 이유 칩 (최대 2개) */}
+            {reasons && reasons.length > 0 && (
+              <div className="flex items-center gap-1 flex-wrap">
+                {reasons.slice(0, 2).map((reason) => (
+                  <span
+                    key={reason}
+                    className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100"
+                  >
+                    {tReasons(reason)}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* 운영 시간 */}
             {(place.openTimeText || place.closeTimeText) && (

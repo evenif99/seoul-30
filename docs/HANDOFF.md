@@ -230,7 +230,7 @@ npm run test                       # 문서 변경으로 테스트 영향 없음
 
 ---
 
-## Phase 69 - 추천 설명력 개선 (예정)
+## Phase 69 - 추천 설명력 개선 ✅ 완료 (2026-05-27)
 
 **목표**: 사용자가 "왜 이 장소가 추천됐는가"를 직관적으로 이해할 수 있도록 스코어 breakdown을 UI에 노출한다. 스코어링 로직 자체는 변경하지 않는다.
 
@@ -299,6 +299,22 @@ npm run build           # 빌드 통과
 - `lib/scoring.ts`의 기존 점수 계산 공식 변경 금지
 - `reasons` 로직이 스코어 계산에 영향을 주어선 안 됨 (부가 필드만 추가)
 - `components/ui/` shadcn 파일 수정 금지
+
+### 완료 결과
+
+| 항목 | 변경 파일 | 내용 |
+|---|---|---|
+| 타입 추가 | `lib/types/recommendation.ts` | `RecommendReason` 유니온 타입, `RecommendationResult.reasons?` optional 필드 |
+| buildReasons | `lib/scoring.ts` | `buildReasons(place, score)` export — scorePlace 로직 변경 없음 |
+| API | `app/api/places/route.ts` | `reasons: buildReasons(place, score)` 결과에 포함 |
+| UI | `components/seoul30/PlaceCard.tsx` | `reasons?` prop, 최대 2개 에메랄드 칩 표시 |
+| 연결 | `app/page.tsx` | `reasons` prop 전달 |
+| i18n | `messages/ko.json`, `messages/en.json` | `reasons` 네임스페이스 6개 키 |
+| 테스트 | `tests/unit/scoring.test.ts` | `buildReasons` 9개 테스트 추가 |
+
+**설계 결정**: `reasons?` optional로 선언 — 캐시된 구형 결과에도 하위 호환. 임계값: nearby≤10분, open_now≥8점, low_crowd≥12점, high_rated≥2점, new_event≥3점.
+
+**테스트**: 유닛 **263개** 통과 (신규 9개) · TS 0 오류
 
 ---
 
