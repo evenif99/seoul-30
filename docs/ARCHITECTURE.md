@@ -578,6 +578,7 @@ install → prisma generate → tsc --noEmit → vitest → playwright → next 
 ## Known Runtime Notes
 
 - `proxy.ts` (formerly `middleware.ts`) — rate limiting, Next.js 15 proxy convention 적용 완료.
+- Home filter state is normalized from URL search params in `app/page.tsx`; non-default `time` is included in query sync, invalid categories/times/tags fall back to defaults, and `popstate` reapplies URL state for browser back/forward navigation.
 - Playwright process exit can hang on Windows after all tests pass (CI 통과 확인됨).
 - Prisma generate requires dev server to be stopped on Windows (DLL file lock on `query_engine-windows.dll.node`).
 - `PlaceImage.tsx` uses Next.js `<Image>` with `remotePatterns` allowlist (no `unoptimized: true`); images converted to WebP/AVIF via Vercel CDN.
@@ -585,4 +586,4 @@ install → prisma generate → tsc --noEmit → vitest → playwright → next 
 - i18n cookie `NEXT_LOCALE` must be set via `page.evaluate(() => document.cookie = ...)` in Playwright tests — `page.context().addCookies()` causes domain mismatch resulting in duplicate cookies.
 - `app/layout.tsx` wraps children in `<div>` (not `<main>`) — each individual page declares its own `<main id="main-content">` to avoid nested landmark elements. Skip link `href="#main-content"` resolves on all pages.
 
-Last updated: 2026-05-27 (Phase 59 — a11y 구조 수정, Phase 60 — 릴리즈 패키징)
+Last updated: 2026-05-27 (Phase 64 — 필터 UX 및 URL sync 안정화)

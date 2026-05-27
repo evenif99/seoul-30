@@ -432,6 +432,14 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 - [x] `tests/e2e/admin.spec.ts` — 1개 스펙: admin 페이지 렌더링
 - [x] E2E 1 → 13개 스펙, 13/13 통과 | 유닛 80/80 통과
 
+### Phase 64 — Filter UX Improvements
+- [x] `components/seoul30/FilterBar.tsx` — 활성 필터 수 배지와 `common.resetFilters` 초기화 버튼 추가
+- [x] `app/page.tsx` — `time` query sync, URL 상태 정규화, 새로고침/브라우저 뒤·앞 이동 복원 로직 추가
+- [x] `messages/ko.json` + `messages/en.json` — `common.resetFilters`, `common.activeFiltersCount` 추가
+- [x] `tests/components/FilterBar.test.tsx` — active count/reset callback 테스트 추가
+- [x] `tests/e2e/filter.spec.ts` — 복합 URL 복원 및 reset query 제거 테스트 추가
+- [x] `npx tsc --noEmit`, `npm run test`, `npm run build` — 통과
+
 ## Completed Post-Phase-20 Fixes
 
 - [x] `middleware.ts` → `proxy.ts` 리네임, export `middleware` → `proxy` (Next.js 16 deprecation 해결)

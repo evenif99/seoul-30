@@ -89,3 +89,32 @@ test('tag filter: wheelchair filter toggles and narrows results', async ({ page 
   await expect(wheelchairBtn).toHaveAttribute('aria-pressed', 'false')
   await expect(placeLinks).toHaveCount(totalCount)
 })
+
+test('reset button clears active filters and URL query', async ({ page }) => {
+  await page.goto('/?category=park&time=15&freeOnly=true&openNow=true&tags=outdoor,wifi&search=서울')
+
+  await expect(page.getByTestId('active-filter-count')).toContainText('필터 7')
+  await expect(page.getByTestId('free-only-filter')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('open-now-filter')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('tag-filter-outdoor')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('tag-filter-wifi')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('place-search-input')).toHaveValue('서울')
+
+  await page.getByTestId('reset-filters-button').click()
+
+  await expect(page.getByTestId('active-filter-count')).toBeHidden()
+  await expect(page.getByTestId('free-only-filter')).toHaveAttribute('aria-pressed', 'false')
+  await expect(page.getByTestId('open-now-filter')).toHaveAttribute('aria-pressed', 'false')
+  await expect(page.getByTestId('tag-filter-outdoor')).toHaveAttribute('aria-pressed', 'false')
+  await expect(page.getByTestId('tag-filter-wifi')).toHaveAttribute('aria-pressed', 'false')
+  await expect(page.getByTestId('place-search-input')).toHaveValue('')
+  expect(new URL(page.url()).search).toBe('')
+})
+
+test('URL restores time and tag filters on reload', async ({ page }) => {
+  await page.goto('/?time=20&tags=indoor')
+
+  await expect(page.getByTestId('active-filter-count')).toContainText('필터 2')
+  await expect(page.getByRole('button', { name: '20분 이내' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('tag-filter-indoor')).toHaveAttribute('aria-pressed', 'true')
+})

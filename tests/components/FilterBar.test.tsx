@@ -16,7 +16,15 @@ describe('FilterBar', () => {
   it('emits search changes', async () => {
     const onFiltersChange = vi.fn()
 
-    render(<FilterBar filters={baseFilters} onFiltersChange={onFiltersChange} />)
+    render(
+      <FilterBar
+        filters={baseFilters}
+        onFiltersChange={onFiltersChange}
+        activeFilterCount={0}
+        showResetButton={false}
+        onResetFilters={vi.fn()}
+      />,
+    )
 
     fireEvent.change(screen.getByTestId('place-search-input'), {
       target: { value: 'park' },
@@ -32,7 +40,15 @@ describe('FilterBar', () => {
     const user = userEvent.setup()
     const onFiltersChange = vi.fn()
 
-    render(<FilterBar filters={baseFilters} onFiltersChange={onFiltersChange} />)
+    render(
+      <FilterBar
+        filters={baseFilters}
+        onFiltersChange={onFiltersChange}
+        activeFilterCount={0}
+        showResetButton={false}
+        onResetFilters={vi.fn()}
+      />,
+    )
 
     await user.click(screen.getByTestId('free-only-filter'))
 
@@ -40,5 +56,26 @@ describe('FilterBar', () => {
       ...baseFilters,
       freeOnly: true,
     })
+  })
+
+  it('shows active filter count and emits reset', async () => {
+    const user = userEvent.setup()
+    const onResetFilters = vi.fn()
+
+    render(
+      <FilterBar
+        filters={{ ...baseFilters, category: 'park', freeOnly: true }}
+        onFiltersChange={vi.fn()}
+        activeFilterCount={2}
+        showResetButton={true}
+        onResetFilters={onResetFilters}
+      />,
+    )
+
+    expect(screen.getByTestId('active-filter-count')).toHaveTextContent('activeFiltersCount')
+
+    await user.click(screen.getByTestId('reset-filters-button'))
+
+    expect(onResetFilters).toHaveBeenCalledOnce()
   })
 })

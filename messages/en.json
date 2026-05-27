@@ -97,6 +97,8 @@
   },
   "common": {
     "loading": "Loading...",
+    "resetFilters": "Reset",
+    "activeFiltersCount": "Filters {count}",
     "useMyLocation": "Recommend Near Me",
     "locating": "Locating...",
     "locationActive": "Near Me",

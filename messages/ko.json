@@ -97,6 +97,8 @@
   },
   "common": {
     "loading": "불러오는 중...",
+    "resetFilters": "초기화",
+    "activeFiltersCount": "필터 {count}",
     "useMyLocation": "내 위치 기반 추천",
     "locating": "위치 확인 중...",
     "locationActive": "내 위치 기반",

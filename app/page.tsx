@@ -21,7 +21,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { relativeTime } from '@/lib/utils/relative-time'
 import { cn } from '@/lib/utils'
 import type { RecommendationResult } from '@/lib/types/recommendation'
-import type { NormalizedPlace } from '@/lib/types/place'
+import type { NormalizedPlace, PlaceTag } from '@/lib/types/place'
 
 const DEFAULT_FILTERS: ActiveFilters = {
   category: 'all',
@@ -30,6 +30,34 @@ const DEFAULT_FILTERS: ActiveFilters = {
   search: '',
   openNow: false,
   tags: [],
+}
+
+const VALID_CATEGORIES = new Set(['all', 'culture', 'library', 'park', 'sports', 'welfare'])
+const VALID_TIMES = new Set(['30', '20', '15'])
+const VALID_TAGS = new Set<PlaceTag>(['indoor', 'outdoor', 'wheelchair', 'family', 'pet', 'parking', 'wifi'])
+
+function parseUrlState(search: string): { district: string; filters: ActiveFilters } {
+  const params = new URLSearchParams(search)
+  const category = params.get('category') ?? DEFAULT_FILTERS.category
+  const time = params.get('time') ?? DEFAULT_FILTERS.time
+  const rawTags = params.get('tags') ?? ''
+  const tags = Array.from(new Set(
+    rawTags
+      .split(',')
+      .filter((tag): tag is PlaceTag => VALID_TAGS.has(tag as PlaceTag)),
+  ))
+
+  return {
+    district: params.get('district') ?? '',
+    filters: {
+      category: VALID_CATEGORIES.has(category) ? category : DEFAULT_FILTERS.category,
+      time: VALID_TIMES.has(time) ? time : DEFAULT_FILTERS.time,
+      freeOnly: params.get('freeOnly') === 'true',
+      openNow: params.get('openNow') === 'true',
+      search: params.get('search') ?? DEFAULT_FILTERS.search,
+      tags,
+    },
+  }
 }
 
 function isOpenNow(place: NormalizedPlace): boolean {
@@ -47,6 +75,7 @@ function syncUrl(district: string, filters: ActiveFilters) {
   const params = new URLSearchParams()
   if (district) params.set('district', district)
   if (filters.category !== 'all') params.set('category', filters.category)
+  if (filters.time !== '30') params.set('time', filters.time)
   if (filters.freeOnly) params.set('freeOnly', 'true')
   if (filters.openNow) params.set('openNow', 'true')
   if (filters.search.trim()) params.set('search', filters.search.trim())
@@ -76,21 +105,17 @@ export default function HomePage() {
   const [locationDenied, setLocationDenied] = useState(false)
   const [recentIds, setRecentIds] = useState<string[]>([])
 
-  // URL에서 초기 필터 복원 (클라이언트 마운트 후)
+  // URL에서 필터 복원 (클라이언트 마운트 및 브라우저 뒤/앞 이동)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const initialDistrict = params.get('district') ?? ''
-    const rawTags = params.get('tags') ?? ''
-    const initialFilters: ActiveFilters = {
-      category: params.get('category') ?? 'all',
-      time: '30',
-      freeOnly: params.get('freeOnly') === 'true',
-      openNow: params.get('openNow') === 'true',
-      search: params.get('search') ?? '',
-      tags: rawTags ? (rawTags.split(',') as ActiveFilters['tags']) : [],
+    const applyUrlState = () => {
+      const next = parseUrlState(window.location.search)
+      setDistrict(next.district)
+      setFilters(next.filters)
     }
-    setDistrict(initialDistrict)
-    setFilters(initialFilters)
+
+    applyUrlState()
+    window.addEventListener('popstate', applyUrlState)
+    return () => window.removeEventListener('popstate', applyUrlState)
   }, [])
 
   // 첫 방문 시 위치 온보딩 모달 표시
@@ -178,6 +203,14 @@ export default function HomePage() {
     syncUrl(district, next)
   }
 
+  function handleResetFilters() {
+    setDistrict('')
+    setFilters(DEFAULT_FILTERS)
+    setUserCoords(null)
+    setSortByDistance(false)
+    window.history.replaceState(null, '', '/')
+  }
+
   // 클라이언트 사이드 필터링 (search, openNow, 시간 필터, 카테고리, 자치구, 태그)
   const maxMinutes = parseInt(filters.time) || 30
   const displayResults = results
@@ -223,15 +256,14 @@ export default function HomePage() {
         ]
       : sorted
 
-  const isFiltered =
-    filters.freeOnly ||
-    filters.openNow ||
-    filters.search.trim() !== '' ||
-    filters.time !== '30' ||
-    filters.category !== 'all' ||
-    filters.tags.length > 0 ||
-    !!district ||
-    !!userCoords
+  const activeFilterCount =
+    (district ? 1 : 0) +
+    (filters.category !== 'all' ? 1 : 0) +
+    (filters.time !== '30' ? 1 : 0) +
+    (filters.freeOnly ? 1 : 0) +
+    (filters.openNow ? 1 : 0) +
+    (filters.search.trim() ? 1 : 0) +
+    filters.tags.length
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -299,7 +331,13 @@ export default function HomePage() {
 
           <DistrictSelector value={district} onChange={handleDistrictChange} />
 
-          <FilterBar filters={filters} onFiltersChange={handleFiltersChange} />
+          <FilterBar
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            activeFilterCount={activeFilterCount}
+            showResetButton={activeFilterCount > 0 || !!userCoords}
+            onResetFilters={handleResetFilters}
+          />
 
           {/* Stale cache 배너 */}
           {isStale && (
@@ -370,20 +408,6 @@ export default function HomePage() {
                     {t('common.sortByDistance')}
                   </button>
                 </div>
-              )}
-              {isFiltered && (
-                <button
-                  onClick={() => {
-                    setDistrict('')
-                    setFilters(DEFAULT_FILTERS)
-                    setUserCoords(null)
-                    setSortByDistance(false)
-                    window.history.replaceState(null, '', '/')
-                  }}
-                  className="text-xs text-primary hover:underline mr-2"
-                >
-                  {t('filter.resetFilters')}
-                </button>
               )}
               {/* 리스트 / 지도 토글 */}
               <div

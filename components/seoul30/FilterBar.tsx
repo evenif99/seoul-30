@@ -19,10 +19,14 @@ const TAG_OPTIONS: PlaceTag[] = ['indoor', 'outdoor', 'wheelchair', 'family', 'p
 interface FilterBarProps {
   filters: ActiveFilters
   onFiltersChange: (filters: ActiveFilters) => void
+  activeFilterCount: number
+  showResetButton: boolean
+  onResetFilters: () => void
 }
 
-export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
+export function FilterBar({ filters, onFiltersChange, activeFilterCount, showResetButton, onResetFilters }: FilterBarProps) {
   const t = useTranslations('filter')
+  const commonT = useTranslations('common')
   const set = (patch: Partial<ActiveFilters>) => onFiltersChange({ ...filters, ...patch })
 
   return (
@@ -42,6 +46,31 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
           />
         </div>
       </div>
+
+      {showResetButton && (
+        <div className="flex items-center justify-between gap-3 px-4 pb-2">
+          {activeFilterCount > 0 ? (
+            <span
+              data-testid="active-filter-count"
+              className="inline-flex min-h-7 items-center rounded-full border border-primary/20 bg-primary/10 px-3 text-xs font-medium text-primary"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {commonT('activeFiltersCount', { count: activeFilterCount })}
+            </span>
+          ) : (
+            <span aria-hidden="true" />
+          )}
+          <button
+            type="button"
+            data-testid="reset-filters-button"
+            onClick={onResetFilters}
+            className="shrink-0 text-xs font-medium text-primary underline-offset-4 hover:underline focus:outline-none focus:ring-2 focus:ring-primary/30 rounded"
+          >
+            {commonT('resetFilters')}
+          </button>
+        </div>
+      )}
 
       {/* 카테고리 */}
       <div
