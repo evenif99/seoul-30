@@ -19,6 +19,7 @@ import { LanguageToggle } from '@/components/seoul30/LanguageToggle'
 import { PwaInstallBanner } from '@/components/seoul30/PwaInstallBanner'
 import { useTranslations, useLocale } from 'next-intl'
 import { relativeTime } from '@/lib/utils/relative-time'
+import { isCurrentlyOpen } from '@/lib/utils/time'
 import { cn } from '@/lib/utils'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 import type { NormalizedPlace, PlaceTag } from '@/lib/types/place'
@@ -60,15 +61,13 @@ function parseUrlState(search: string): { district: string; filters: ActiveFilte
   }
 }
 
+// isCurrentlyOpen()을 사용해 calcTimefit(scoring.ts)과 동일 기준을 유지한다.
+// 운영시간 미기록: 공원(PARK)만 개방 간주, 나머지는 닫힘 처리 (BUG-02)
 function isOpenNow(place: NormalizedPlace): boolean {
-  if (!place.openTimeText || !place.closeTimeText) return true
-  const now = new Date()
-  // scoring.ts의 calcTimefit과 동일하게 KST(UTC+9) 고정 오프셋 사용
-  const cur = (now.getUTCHours() * 60 + now.getUTCMinutes() + 9 * 60) % (24 * 60)
-  const [oh, om] = place.openTimeText.split(':').map(Number)
-  const [ch, cm] = place.closeTimeText.split(':').map(Number)
-  if (oh === 0 && om === 0 && ch === 23 && cm === 59) return true
-  return cur >= oh * 60 + om && cur < ch * 60 + cm
+  if (!place.openTimeText || !place.closeTimeText) {
+    return place.sourceType === 'PARK'
+  }
+  return isCurrentlyOpen(place.openTimeText, place.closeTimeText)
 }
 
 function syncUrl(district: string, filters: ActiveFilters) {

@@ -2,6 +2,7 @@ import type { NormalizedPlace } from './types/place'
 import type { RealtimeSignal } from './types/realtime'
 import type { RecommendationInput, RecommendReason, ScoreBreakdown } from './types/recommendation'
 import { estimateTransit, haversineKm, transitAccessScore } from './utils/transit-time'
+import { isCurrentlyOpen } from './utils/time'
 
 export interface FeedbackStats {
   upCount: number
@@ -91,11 +92,14 @@ function calcCongestion(realtime: RealtimeSignal | null): number {
 }
 
 // 행사 시작 임박 여부 (0–5) — eventStartDate 없으면 0
+// KST 기준 날짜 차이 계산: "YYYY-MM-DD"는 UTC 자정으로 파싱되므로
+// KST 오프셋(+9h)을 더해 KST 날짜 기준 일수를 산출한다.
 function calcFreshness(place: NormalizedPlace): number {
   if (!place.eventStartDate) return 0
-  const now = new Date()
-  const start = new Date(place.eventStartDate)
-  const daysUntil = Math.floor((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  const KST = 9 * 60 * 60 * 1000
+  const nowKstDay = Math.floor((Date.now() + KST) / 86400000)
+  const startKstDay = Math.floor((new Date(place.eventStartDate).getTime() + KST) / 86400000)
+  const daysUntil = startKstDay - nowKstDay
   if (daysUntil < 0) return 0    // 이미 시작됨
   if (daysUntil <= 7) return 5   // 7일 이내 개막
   if (daysUntil <= 30) return 3  // 30일 이내 개막
@@ -150,6 +154,7 @@ export function calcFeedbackBonus(stats?: FeedbackStats): number {
 }
 
 // 현재 운영 중 여부 (0–10) — 서울 서비스이므로 KST(UTC+9) 기준으로 계산
+// isCurrentlyOpen()을 사용해 비표준 시간 형식·자정 넘김을 안전하게 처리한다.
 function calcTimefit(place: NormalizedPlace): number {
   if (!place.openTimeText || !place.closeTimeText) {
     // 서울 공원은 시간 정보 없음 — 대부분 24시간 개방이므로 최고점 10점
@@ -157,14 +162,5 @@ function calcTimefit(place: NormalizedPlace): number {
     return 5
   }
 
-  const now = new Date()
-  const kstMinutes = (now.getUTCHours() * 60 + now.getUTCMinutes() + 9 * 60) % (24 * 60)
-
-  const [oh, om] = place.openTimeText.split(':').map(Number)
-  const [ch, cm] = place.closeTimeText.split(':').map(Number)
-
-  // 자정 운영(00:00–23:59)은 항상 운영 중
-  if (oh === 0 && om === 0 && ch === 23 && cm === 59) return 10
-
-  return kstMinutes >= oh * 60 + om && kstMinutes < ch * 60 + cm ? 10 : 0
+  return isCurrentlyOpen(place.openTimeText, place.closeTimeText) ? 10 : 0
 }
