@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+const VALID_TAGS = new Set(['culture', 'library', 'park', 'sports', 'welfare'])
+
+function parseTags(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  return raw.filter((t): t is string => typeof t === 'string' && VALID_TAGS.has(t))
+}
+
 // POST /api/push/subscribe — 구독 저장 (endpoint 기준 upsert)
 export async function POST(req: NextRequest) {
   let body: unknown
@@ -10,9 +17,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { endpoint, keys } = body as {
+  const { endpoint, keys, tags: rawTags } = body as {
     endpoint?: unknown
     keys?: { p256dh?: unknown; auth?: unknown }
+    tags?: unknown
   }
 
   if (
@@ -23,11 +31,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 })
   }
 
+  const tags = parseTags(rawTags)
+
   try {
     await prisma.webPushSubscription.upsert({
       where: { endpoint },
-      create: { endpoint, p256dh: keys.p256dh, auth: keys.auth },
-      update: { p256dh: keys.p256dh, auth: keys.auth },
+      create: { endpoint, p256dh: keys.p256dh, auth: keys.auth, tags },
+      update: { p256dh: keys.p256dh, auth: keys.auth, tags },
     })
   } catch {
     return NextResponse.json({ error: 'DB error' }, { status: 503 })

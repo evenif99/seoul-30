@@ -22,7 +22,8 @@ export function usePush() {
     })
   }, [])
 
-  const subscribe = useCallback(async () => {
+  // tags: 관심 카테고리 배열 (빈 배열 = 전체)
+  const subscribe = useCallback(async (tags: string[] = []) => {
     setState('loading')
     try {
       const reg = await navigator.serviceWorker.ready
@@ -39,10 +40,11 @@ export function usePush() {
         ),
       })
 
+      const subJson = sub.toJSON()
       const res = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sub.toJSON()),
+        body: JSON.stringify({ ...subJson, tags }),
       })
       if (!res.ok) throw new Error('subscribe api failed')
       setState('subscribed')

@@ -29,23 +29,36 @@ vi.mock('@/lib/config/env', () => ({ env: mockEnv }))
 
 // ── 헬퍼 ─────────────────────────────────────────────────────────────────────
 
-function makeRequest(authHeader?: string, method = 'GET') {
-  return new Request(`http://localhost/api/push/send`, {
+function makeSub(overrides: Partial<{ id: string; endpoint: string; tags: string[] }> = {}) {
+  return {
+    id: overrides.id ?? '1',
+    endpoint: overrides.endpoint ?? 'https://push.example.com/1',
+    p256dh: 'key1',
+    auth: 'auth1',
+    tags: overrides.tags ?? [],
+    createdAt: new Date(),
+  }
+}
+
+function makeRequest(authHeader?: string, method = 'GET', url = 'http://localhost/api/push/send') {
+  return new Request(url, {
     method,
     headers: authHeader ? { authorization: authHeader } : {},
   })
 }
 
-async function callGet(authHeader?: string) {
+async function callGet(authHeader?: string, category?: string) {
   vi.resetModules()
-  // process.env를 route가 직접 읽으므로 여기서 설정
   process.env.CRON_SECRET = mockEnv.CRON_SECRET
   process.env.VAPID_PUBLIC_KEY = mockEnv.VAPID_PUBLIC_KEY
   process.env.VAPID_PRIVATE_KEY = mockEnv.VAPID_PRIVATE_KEY
   process.env.VAPID_EMAIL = mockEnv.VAPID_EMAIL
 
+  const url = category
+    ? `http://localhost/api/push/send?category=${category}`
+    : 'http://localhost/api/push/send'
   const { GET } = await import('@/app/api/push/send/route')
-  const res = await GET(makeRequest(authHeader) as any)
+  const res = await GET(makeRequest(authHeader, 'GET', url) as any)
   return { status: res.status, body: await res.json() }
 }
 
@@ -82,7 +95,7 @@ describe('GET /api/push/send — 인증', () => {
   })
 })
 
-describe('GET /api/push/send — 발송 로직', () => {
+describe('GET /api/push/send — 전체 발송', () => {
   it('구독자 없으면 sent:0, total:0 반환', async () => {
     const { prisma } = await import('@/lib/prisma')
     vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([])
@@ -98,8 +111,8 @@ describe('GET /api/push/send — 발송 로직', () => {
     const webpush = (await import('web-push')).default
 
     vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([
-      { id: '1', endpoint: 'https://push.example.com/1', p256dh: 'key1', auth: 'auth1', createdAt: new Date() },
-      { id: '2', endpoint: 'https://push.example.com/2', p256dh: 'key2', auth: 'auth2', createdAt: new Date() },
+      makeSub({ id: '1', endpoint: 'https://push.example.com/1', tags: [] }),
+      makeSub({ id: '2', endpoint: 'https://push.example.com/2', tags: ['culture'] }),
     ] as any)
     vi.mocked(webpush.sendNotification).mockResolvedValue({} as any)
 
@@ -114,7 +127,7 @@ describe('GET /api/push/send — 발송 로직', () => {
     const webpush = (await import('web-push')).default
 
     vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([
-      { id: '1', endpoint: 'https://push.example.com/gone', p256dh: 'key1', auth: 'auth1', createdAt: new Date() },
+      makeSub({ endpoint: 'https://push.example.com/gone', tags: [] }),
     ] as any)
     const err = Object.assign(new Error('Gone'), { statusCode: 410 })
     vi.mocked(webpush.sendNotification).mockRejectedValue(err)
@@ -127,6 +140,44 @@ describe('GET /api/push/send — 발송 로직', () => {
     expect(prisma.webPushSubscription.deleteMany).toHaveBeenCalledWith({
       where: { endpoint: 'https://push.example.com/gone' },
     })
+  })
+})
+
+describe('GET /api/push/send — 카테고리 필터', () => {
+  it('category 파라미터 전달 시 응답에 category 포함', async () => {
+    const { prisma } = await import('@/lib/prisma')
+    vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([])
+
+    const { body } = await callGet('Bearer test-secret', 'culture')
+    expect(body.category).toBe('culture')
+  })
+
+  it('잘못된 category 값은 무시하고 전체 발송', async () => {
+    const { prisma } = await import('@/lib/prisma')
+    vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([])
+
+    const { body } = await callGet('Bearer test-secret', 'invalid')
+    expect(body.category).toBeUndefined()
+  })
+
+  it('category 지정 시 prisma.findMany에 OR 조건 전달', async () => {
+    const { prisma } = await import('@/lib/prisma')
+    vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([])
+
+    await callGet('Bearer test-secret', 'library')
+    expect(prisma.webPushSubscription.findMany).toHaveBeenCalledWith({
+      where: {
+        OR: [{ tags: { isEmpty: true } }, { tags: { has: 'library' } }],
+      },
+    })
+  })
+
+  it('category 미지정 시 where 없이 전체 조회', async () => {
+    const { prisma } = await import('@/lib/prisma')
+    vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([])
+
+    await callGet('Bearer test-secret')
+    expect(prisma.webPushSubscription.findMany).toHaveBeenCalledWith({ where: undefined })
   })
 })
 

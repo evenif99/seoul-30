@@ -65,6 +65,7 @@ model WebPushSubscription {
   endpoint  String   @unique
   p256dh    String
   auth      String
+  tags      String[] @default([]) // 관심 카테고리 (빈 배열 = 전체)
   createdAt DateTime @default(now())
 }
 

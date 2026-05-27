@@ -149,7 +149,17 @@
     "subscribe": "Get recommendations",
     "subscribed": "Subscribed",
     "denied": "Notifications blocked",
-    "deniedTitle": "Notifications are blocked in your browser"
+    "deniedTitle": "Notifications are blocked in your browser",
+    "selectTitle": "Choose categories to receive alerts for",
+    "confirm": "Subscribe",
+    "cancel": "Cancel",
+    "categories": {
+      "culture": "Culture & Exhibits",
+      "library": "Library",
+      "park": "Park",
+      "sports": "Sports",
+      "welfare": "Welfare"
+    }
   },
   "pwaInstall": {
     "title": "Install Seoul 30",

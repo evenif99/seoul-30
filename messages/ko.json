@@ -149,7 +149,17 @@
     "subscribe": "추천 알림 받기",
     "subscribed": "알림 구독 중",
     "denied": "알림 차단됨",
-    "deniedTitle": "브라우저에서 알림이 차단되어 있습니다"
+    "deniedTitle": "브라우저에서 알림이 차단되어 있습니다",
+    "selectTitle": "알림 받을 분야를 선택하세요",
+    "confirm": "알림 받기",
+    "cancel": "취소",
+    "categories": {
+      "culture": "문화/전시",
+      "library": "도서관",
+      "park": "공원",
+      "sports": "스포츠",
+      "welfare": "복지시설"
+    }
   },
   "pwaInstall": {
     "title": "Seoul 30 앱 설치",
