@@ -1,6 +1,7 @@
 import { env } from '@/lib/config/env'
 import type { NormalizedPlace } from '@/lib/types/place'
 import { toSeoulLatLng } from '@/lib/utils/coords'
+import { stableId } from '@/lib/utils/stable-id'
 
 interface SportsRow {
   SVCNM: string    // 서비스명 (시설+종목)
@@ -35,7 +36,7 @@ export async function fetchSeoulSports(): Promise<NormalizedPlace[]> {
         const isFree = r.PAYFREE === '무료'
 
         return {
-          id: `sport-${i}-${r.SVCNM.slice(0, 10).replace(/\W/g, '')}`,
+          id: stableId('sport', r.AREANM, r.SVCNM, r.PLACENM?.slice(0, 20) ?? ''),
           slug: `sports-${i}`,
           sourceType: 'SPORTS' as const,
           name: r.SVCNM,

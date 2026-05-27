@@ -1,6 +1,7 @@
 import { env } from '@/lib/config/env'
 import type { NormalizedPlace } from '@/lib/types/place'
 import { toSeoulLatLng } from '@/lib/utils/coords'
+import { stableId } from '@/lib/utils/stable-id'
 
 interface ParkRow {
   P_PARK: string       // 공원명
@@ -32,7 +33,7 @@ export async function fetchSeoulParks(): Promise<NormalizedPlace[]> {
         const { latitude, longitude } = toSeoulLatLng(r.LATITUDE, r.LONGITUDE)
 
         return {
-          id: `park-${i}-${r.P_PARK.slice(0, 10).replace(/\W/g, '')}`,
+          id: stableId('park', r.P_ZONE, r.P_PARK, r.P_ADDR?.slice(0, 20) ?? ''),
           slug: `park-${i}`,
           sourceType: 'PARK' as const,
           name: r.P_PARK,

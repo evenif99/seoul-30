@@ -138,14 +138,20 @@ describe('fetchSeoulLibraries', () => {
     }
   })
 
-  it('id에 인덱스와 도서관명 슬러그 포함', async () => {
+  it('id가 lib- 접두사를 가진 안정적 해시 형식', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => LIBRARY_API_RESPONSE,
     })
 
     const places = await fetchSeoulLibraries()
-    expect(places[0].id).toMatch(/^lib-0-/)
-    expect(places[1].id).toMatch(/^lib-1-/)
+    // BUG-03 수정: index 기반 ID → 콘텐츠 해시 기반 ID
+    // 접두사 lib- 확인, 숫자 인덱스(lib-0-, lib-1-)가 아닌 해시 형식
+    expect(places[0].id).toMatch(/^lib-[a-z0-9]+$/)
+    expect(places[1].id).toMatch(/^lib-[a-z0-9]+$/)
+    // 서로 다른 도서관은 서로 다른 ID
+    expect(places[0].id).not.toBe(places[1].id)
+    // 동일 입력은 항상 동일 ID (결정론적)
+    expect(places[0].id).toBe(places[0].id)
   })
 })

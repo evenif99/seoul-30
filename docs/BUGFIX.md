@@ -13,7 +13,7 @@
 |---|---|---|---|
 | Group A | BUG-01, 02, 04, 05 | 시간 판정 로직 공유 — 단일 커밋 필수 | ✅ 완료 (`7d4c301`) |
 | Group B | BUG-06, 07, 08 | 독립 안전 픽스 | ✅ 완료 (이 커밋) |
-| Group C | BUG-03 | 데이터 파괴적 변경 (별도 Phase) | 🔜 예정 |
+| Group C | BUG-03 | 데이터 파괴적 변경 (별도 Phase) | ✅ 완료 (커밋 3) |
 
 > **BUG-09 재평가**: `getTourApiKey()`의 `process.env.TOUR_API_KEY ?? env.TOUR_API_KEY` 패턴은  
 > `vi.stubEnv` 테스트 격리를 위해 의도된 구현. 실제 버그 아님으로 판정, 픽스 제외.
@@ -98,17 +98,43 @@
 
 ---
 
-## Group C — ID 불안정 (BUG-03) 예정
+## Group C — ID 불안정 (BUG-03) ✅ 완료 (이 커밋)
 
-**상태**: 🔜 별도 Phase로 진행  
-**이유**: 실행 시 DB `PlaceFeedback` + `RecommendationSnapshot` 전체 삭제 및 localStorage 버전 마이그레이션 수반. 다른 픽스와 분리 필수.
+**영향 파일**: `lib/utils/stable-id.ts`(신규), 어댑터 5개, `hooks/use-bookmark.ts`, `tests/unit/seoulLibrary.test.ts`  
+**테스트**: 285개 유지
+
+### BUG-03 · 장소 ID index 기반 → 콘텐츠 해시 기반 안정화
 
 | | 내용 |
 |---|---|
-| **위치** | `lib/adapters/seoul-culture.adapter.ts` 및 모든 데이터 어댑터 |
-| **원인** | `id: \`ce-${index}-...\`` — Array.map index 기반. API 응답 순서 변경 시 같은 장소가 다른 ID → 투표 데이터 孤兒(orphan) |
-| **수정 방향** | `createHash('md5').update(구+제목+날짜).digest('hex').slice(0,8)`로 콘텐츠 기반 ID 생성 |
-| **준비 사항** | DB truncate (PlaceFeedback, RecommendationSnapshot), localStorage 스키마 버전(`seoul30:schema_v`) 마이그레이션 |
+| **위치** | `lib/adapters/seoul-culture.adapter.ts`, `lib/data/seoulLibrary.ts`, `seoulParks.ts`, `seoulSports.ts` |
+| **원인** | `id: \`ce-${index}-...\`` — `Array.map`의 index 기반. API 응답 순서 변경 시 같은 장소가 다른 ID → `PlaceFeedback.placeId` 孤兒(orphan). 피드백 점수가 엉뚱한 장소에 귀속됨 |
+| **수정** | `lib/utils/stable-id.ts` 신규 — FNV-1a 32비트 해시 기반 `stableId(prefix, ...parts)`. 자치구+이름+보조키 조합으로 API 응답 순서 무관하게 동일 ID 보장 |
+| **ID 예시** | `ce-1f2a3b4c`, `lib-9e8d7c6b` (base36 해시) |
+
+**ID 생성 전략:**
+- 문화행사 `ce-` : `stableId('ce', GUNAME, TITLE, eventStartDate)`
+- 문화공간 `cs-` : `stableId('cs', GUNAME, FAC_NAME, ADDR 앞 20자)`
+- 도서관 `lib-`  : `stableId('lib', GUNAME, LBRRY_NM, ADRES 앞 20자)`
+- 공원 `park-`   : `stableId('park', P_ZONE, P_PARK, P_ADDR 앞 20자)`
+- 체육시설 `sport-`: `stableId('sport', AREANM, SVCNM, PLACENM 앞 20자)`
+
+**localStorage 마이그레이션 (`hooks/use-bookmark.ts`):**
+- 구형 ID 패턴 감지: `/^(ce|cs|lib|park)-\d+-/`
+- 구형 ID가 실제로 존재할 때만 5개 키 일괄 초기화 (테스트 임의 ID 보호)
+- `seoul30:schema_v = '2'` 버전 키 기록 (이후 재실행 방지)
+
+**DB 영향:**
+- 기존 `PlaceFeedback` 레코드는 구형 placeId 보유 → 신형 ID와 매핑 불일치 → 스코어링에서 무시됨
+- `RecommendationSnapshot`은 TTL 만료 후 자연 갱신
+- DB truncate 없이도 정상 동작 (구형 피드백 데이터는 사실상 신뢰 불가였으므로)
+
+**테스트 수정:**
+- `seoulLibrary.test.ts`: `id.toMatch(/^lib-0-/)` → `id.toMatch(/^lib-[a-z0-9]+$/)` + 결정론 검증
+
+**발견된 마이그레이션 함수 1차 버그:**
+- `SCHEMA_KEY` 부재 시 무조건 초기화 → 테스트에서 `localStorage.clear()` 후 데이터 소실
+- 해결: 구형 ID 패턴이 실제로 존재할 때만 초기화로 변경
 
 ---
 

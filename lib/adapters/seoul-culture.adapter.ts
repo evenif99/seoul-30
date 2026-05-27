@@ -5,6 +5,7 @@ import { fetchSeoulParks } from '@/lib/data/seoulParks'
 import { fetchSeoulSports } from '@/lib/data/seoulSports'
 import { toSeoulLatLng } from '@/lib/utils/coords'
 import { enrichPlace } from '@/lib/adapters/enrichment'
+import { stableId } from '@/lib/utils/stable-id'
 
 interface CultureEventRow {
   CODENAME: string   // 카테고리 (뮤지컬·오페라, 전시, 연극 등)
@@ -138,7 +139,7 @@ function normalizeEventRow(row: CultureEventRow, index: number): NormalizedPlace
   const startDate = row.STRTDATE ? row.STRTDATE.split(' ')[0] : undefined
 
   return {
-    id: `ce-${index}-${row.TITLE.slice(0, 12).replace(/\W/g, '')}`,
+    id: stableId('ce', row.GUNAME, row.TITLE, startDate ?? ''),
     slug: `culture-event-${index}`,
     sourceType: 'CULTURE_EVENT',
     name: row.TITLE,
@@ -162,7 +163,7 @@ function normalizeSpaceRow(row: CultureSpaceRow, index: number): NormalizedPlace
   const { latitude, longitude } = toSeoulLatLng(row.X_COORD, row.Y_COORD)
 
   return {
-    id: `cs-${index}-${row.FAC_NAME.slice(0, 12).replace(/\W/g, '')}`,
+    id: stableId('cs', row.GUNAME, row.FAC_NAME, row.ADDR?.slice(0, 20) ?? ''),
     slug: `culture-space-${index}`,
     sourceType: 'CULTURE_SPACE',
     name: row.FAC_NAME,

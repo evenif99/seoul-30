@@ -1,6 +1,7 @@
 import { env } from '@/lib/config/env'
 import type { NormalizedPlace } from '@/lib/types/place'
 import { toSeoulLatLng } from '@/lib/utils/coords'
+import { stableId } from '@/lib/utils/stable-id'
 
 interface LibraryRow {
   LBRRY_NM: string       // 도서관명
@@ -37,7 +38,7 @@ export async function fetchSeoulLibraries(): Promise<NormalizedPlace[]> {
         const close = r.WEEKDAY_CLOSE_TIME?.slice(0, 5) || undefined
 
         return {
-          id: `lib-${i}-${r.LBRRY_NM.slice(0, 10).replace(/\W/g, '')}`,
+          id: stableId('lib', r.GUNAME, r.LBRRY_NM, r.ADRES?.slice(0, 20) ?? ''),
           slug: `library-${i}`,
           sourceType: 'LIBRARY' as const,
           name: r.LBRRY_NM,
