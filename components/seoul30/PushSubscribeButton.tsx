@@ -116,7 +116,7 @@ export function PushSubscribeButton() {
             </button>
             <button
               type="button"
-              onClick={() => setSelecting(false)}
+              onClick={() => { setSelecting(false); setSelected(new Set(CATEGORIES)) }}
               className="flex-1 text-xs font-medium py-1.5 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
             >
               {t('cancel')}

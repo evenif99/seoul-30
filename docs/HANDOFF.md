@@ -1,5 +1,21 @@
 # HANDOFF
 
+## Additional Phase - SW 이미지 캐시 버그 수정 (2026-05-27)
+
+- **완료**: Phase 55 회귀 수정 — `/_next/image` 경로 인터셉트 + SW 캐시 v4 범프 + PushSubscribeButton 취소 초기화.
+- **다음**: 신규 Phase 계획 필요.
+- 유닛 159개 통과 · E2E 14개 통과 · TS 0 오류.
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|---|---|
+| `public/sw.js` | 이미지 인터셉트 조건 교체 (`hostname` → `pathname`), 캐시 버전 v4 |
+| `components/seoul30/PushSubscribeButton.tsx` | 취소 버튼에 `setSelected(new Set(CATEGORIES))` 추가 |
+| `tests/unit/service-worker-cache.test.ts` | v4 + `/_next/image` 인터셉트 회귀 테스트 추가 |
+| `docs/PROJECT_SCOPE.md` | Additional Phase 항목 추가 |
+| `docs/HANDOFF.md` | 이 항목 |
+| `docs/ARCHITECTURE.md` | Phase 53–55 아키텍처 노트, 파일 구조, DB 모델, Web Push 섹션 업데이트 |
+
 ## Phase 55 - Core Web Vitals Optimization (2026-05-27)
 
 - **완료**: 이미지 최적화 + 폰트 CLS 수정 + preconnect 추가.

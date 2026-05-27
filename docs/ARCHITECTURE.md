@@ -1,5 +1,27 @@
 # ARCHITECTURE
 
+## Phase 55 Architecture Note (2026-05-27)
+
+Next.js image optimization is fully enabled. `unoptimized: true` is removed and replaced with a `remotePatterns` allowlist in `next.config.mjs`, covering Unsplash, Seoul culture API, Seoul subdomains (`*.seoul.go.kr`), TourAPI (`*.visitkorea.or.kr`), and Naver pstatic CDN (`*.pstatic.net`). Images served via `<Image>` are now converted to WebP/AVIF and cached through Vercel's image CDN.
+
+Both `Noto_Sans_KR` and `Inter` now specify `display: 'swap'`, eliminating FOIT during font load and reducing CLS. `preconnect` hints are added for `culture.seoul.go.kr` and `images.unsplash.com`; `dns-prefetch` hints cover `openapi.map.naver.com` and `tong.visitkorea.or.kr`.
+
+Regression coverage for `remotePatterns` is in `tests/unit/image-config.test.ts` (6 assertions).
+
+## Phase 54 Architecture Note (2026-05-27)
+
+Web Push now supports category-based tag personalization. The Prisma `WebPushSubscription` model has a `tags String[] @default([])` field applied via `npx prisma db push` (no migration files).
+
+- **Subscribe** (`/api/push/subscribe`): accepts `tags` in the POST body; unknown categories are silently stripped.
+- **Send** (`/api/push/send?category=xxx`): filters subscriptions where `tags` is empty (= all categories) OR `tags` contains the requested category.
+- **`PushSubscribeButton`**: shows a category chip panel before subscribing (all 5 selected by default); subscribing with all selected sends `[]` (empty = all).
+- Category payload drives the push notification title and deep-link URL (`/?category=xxx`).
+- `new URL(req.url).searchParams` (not `req.nextUrl`) is used in Route Handlers for compatibility with plain `Request` objects in tests.
+
+## Phase 53 Architecture Note (2026-05-27)
+
+Portfolio polish: README fully rewritten with screenshot table, feature table, architecture notes, tech stack, and current test counts. About page data sources corrected (OpenStreetMap → Naver Maps JavaScript API v3, TourAPI 4.0 added). `layout.tsx` `authors` metadata links to GitHub profile.
+
 ## Phase 52 Architecture Note (2026-05-26)
 
 The web app manifest now includes concrete installability metadata beyond the baseline fields: `id`, `display_override`, 192/512 PNG icons, and screenshots for both narrow and wide form factors. Screenshots are real captures of the home experience served from port `3001`. The service worker cache version is `v3` so clients refresh PWA shell/API/image caches after the manifest and screenshot asset changes.
@@ -43,7 +65,7 @@ Last updated: 2026-05-21 (Phase 32 + Pin Accuracy Fix — Codex handoff)
 
 ## Stack
 
-- Next.js 16 App Router
+- Next.js 15 App Router
 - React 19 + TypeScript strict
 - Tailwind CSS v4 + shadcn/ui
 - Prisma 5 + Neon PostgreSQL (ap-southeast-1)
@@ -87,9 +109,10 @@ components/seoul30/
   MapView.tsx                        # dynamic import wrapper (ssr: false)
   MapViewInner.tsx                   # Naver Maps view + grid clustering + onSelectPlace
   PlaceCard.tsx                      # data-testid="place-card-link" on Link
+  PlaceImage.tsx                     # <Image> wrapper with remotePatterns + fallback
   PlaceMiniMap.tsx                   # 단일 마커 Naver Maps 미니맵 (zoom 15)
   PlaceCardSkeleton.tsx              # shimmer skeleton (Phase 18)
-  PushSubscribeButton.tsx            # Web Push subscribe/unsubscribe (Phase 14)
+  PushSubscribeButton.tsx            # Web Push subscribe/unsubscribe + category chip panel (Phase 14/54)
   RecentTracker.tsx
   ScoreBadge.tsx                     # score breakdown badge (Phase 16)
   ShareButton.tsx
@@ -135,12 +158,42 @@ public/
   offline/index.html
 
 tests/
-  unit/scoring.test.ts
-  components/PlaceCard.test.tsx
-  components/FilterBar.test.tsx
-  components/BookmarkButton.test.tsx
-  e2e/home.spec.ts
+  unit/
+    scoring.test.ts
+    transit-time.test.ts
+    coords.test.ts                    # toSeoulLatLng bounds (16 cases)
+    tag-filter.test.ts
+    feedback-scoring.test.ts
+    place-enrichment.test.ts
+    place-distance.test.ts
+    relative-time.test.ts
+    env.test.ts
+    tourImages.test.ts
+    mock-places.test.ts
+    seoulCongestion.test.ts
+    diagnostics.test.ts
+    json-ld.test.ts                   # schema.org JSON-LD (Phase 45)
+    admin-auth.test.ts                # isAdminAuthorized() (Phase 47)
+    push-send.test.ts                 # push broadcast + category filter (Phase 44/54)
+    manifest.test.ts
+    service-worker-cache.test.ts
+    security-headers.test.ts
+    lighthouse-ci.test.ts
+    image-config.test.ts              # remotePatterns regression (Phase 55)
+  components/
+    PlaceCard.test.tsx
+    FilterBar.test.tsx
+    BookmarkButton.test.tsx
+  e2e/
+    home.spec.ts
+    filter.spec.ts
+    place-detail.spec.ts
+    admin.spec.ts
+    i18n.spec.ts
   setup.tsx
+  __mocks__/next-intl-server.ts
+
+# Total: 158 unit tests, 14 E2E specs
 
 proxy.ts                             # rate limiting (/api/* only)
 vercel.json                          # Vercel Cron (daily 09:00 KST → /api/push/send)
@@ -188,7 +241,7 @@ Place                   # public facility data (seed-only, no admin)
 ExternalCache           # external API response cache (normalizedJson only)
 RecommendationSnapshot  # recommendation result cache with TTL
 PlaceFeedback           # anonymous UP/DOWN rating (unique: placeId+sessionId)
-WebPushSubscription     # Web Push endpoint storage (unique: endpoint)
+WebPushSubscription     # Web Push endpoint storage; tags String[] @default([]) for category personalization
 ```
 
 ## Data and API Flow
@@ -225,14 +278,17 @@ Client-side UI filters (no server round-trip):
 - Server components: `getTranslations(namespace)` (async)
 - `LanguageToggle` sets cookie and calls `window.location.reload()`
 
-## Web Push Architecture (Phase 14)
+## Web Push Architecture (Phase 14 + 54)
 
 - VAPID keys set via env vars (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL`)
 - `NEXT_PUBLIC_VAPID_PUBLIC_KEY` exposed to browser for `PushManager.subscribe`
-- Subscriptions stored in `WebPushSubscription` (endpoint-unique upsert)
-- `/api/push/send` (GET) triggered daily by Vercel Cron at 09:00 KST
+- Subscriptions stored in `WebPushSubscription` (endpoint-unique upsert) with `tags String[] @default([])`
+- **Category filtering** (Phase 54): `?category=xxx` on send endpoint targets subscriptions where `tags` is empty OR `tags` contains `xxx`; empty `tags` = subscribed to all categories
+- Valid categories: `culture`, `library`, `park`, `sports`, `welfare`
+- `/api/push/send` (GET|POST) triggered daily by Vercel Cron at 09:00 KST
 - Expired subscriptions (410/404) auto-deleted on send failure
 - `CRON_SECRET` env var guards the send endpoint
+- Route Handlers use `new URL(req.url).searchParams` (not `req.nextUrl`) for test compatibility
 
 ## Scoring Model
 
@@ -281,6 +337,11 @@ install → prisma generate → tsc --noEmit → vitest → playwright → next 
 
 ## Known Runtime Notes
 
-- `proxy.ts` (formerly `middleware.ts`) — rate limiting, Next.js 16 proxy convention 적용 완료.
-- Playwright process exit can hang on Windows after all tests pass.
-- Prisma generate requires dev server to be stopped on Windows (DLL file lock).
+- `proxy.ts` (formerly `middleware.ts`) — rate limiting, Next.js 15 proxy convention 적용 완료.
+- Playwright process exit can hang on Windows after all tests pass (CI 통과 확인됨).
+- Prisma generate requires dev server to be stopped on Windows (DLL file lock on `query_engine-windows.dll.node`).
+- `PlaceImage.tsx` uses Next.js `<Image>` with `remotePatterns` allowlist (no `unoptimized: true`); images converted to WebP/AVIF via Vercel CDN.
+- `public/sw.js` image cache intercepts `url.pathname.startsWith('/_next/image')` — NOT `url.hostname`. Phase 55에서 `unoptimized: true` 제거 이후 모든 `<Image>` 요청이 `/_next/image?url=...` (동일 출처)로 프록시되므로, hostname 체크는 동작하지 않음. 캐시 버전 `v4` (Additional Phase 수정).
+- i18n cookie `NEXT_LOCALE` must be set via `page.evaluate(() => document.cookie = ...)` in Playwright tests — `page.context().addCookies()` causes domain mismatch resulting in duplicate cookies.
+
+Last updated: 2026-05-27 (Additional Phase — SW 이미지 캐시 회귀 수정 + PushSubscribeButton 취소 초기화)

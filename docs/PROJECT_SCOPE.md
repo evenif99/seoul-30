@@ -1,5 +1,15 @@
 # PROJECT_SCOPE
 
+## Additional Phase Scope Update — SW 이미지 캐시 버그 수정 (2026-05-27)
+
+- `public/sw.js` — Phase 55에서 `unoptimized: true` 제거로 인한 이미지 캐싱 회귀 수정.
+  - 기존: `url.hostname === 'images.unsplash.com'` (Next.js Image 최적화 이후 절대 매칭 안 됨)
+  - 변경: `url.pathname.startsWith('/_next/image')` (모든 최적화 이미지 캐시)
+  - 캐시 버전 `v3` → `v4` 범프 (클라이언트 SW 강제 갱신).
+- `PushSubscribeButton` — 카테고리 취소 시 선택 상태 초기화 (전체 선택 기본값으로 복귀).
+- `tests/unit/service-worker-cache.test.ts` — `v4` + `/_next/image` 인터셉트 회귀 검증 추가.
+- 테스트 159개 통과.
+
 ## Phase 55 Scope Update (2026-05-27)
 
 - `unoptimized: true` 제거 → `remotePatterns` 설정으로 Next.js 이미지 최적화(WebP/AVIF) 활성화.

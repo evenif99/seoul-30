@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v3'
+const CACHE_VERSION = 'v4'
 const STATIC_CACHE  = `seoul30-static-${CACHE_VERSION}`
 const API_CACHE     = `seoul30-api-${CACHE_VERSION}`
 const PAGE_CACHE    = `seoul30-pages-${CACHE_VERSION}`
@@ -47,8 +47,10 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // 3) 외부 이미지 (Unsplash) — cache-first, 7일 TTL
-  if (url.hostname === 'images.unsplash.com') {
+  // 3) Next.js 최적화 이미지 — cache-first, 7일 TTL
+  // Phase 55에서 unoptimized: true 제거 후 모든 <Image> 요청이
+  // /_next/image?url=... 경로로 프록시됨. hostname 체크는 더 이상 동작하지 않음.
+  if (url.pathname.startsWith('/_next/image')) {
     event.respondWith(cacheFirstWithTTL(request, IMAGE_CACHE, IMAGE_TTL_MS))
     return
   }
