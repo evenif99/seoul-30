@@ -441,6 +441,8 @@ Last updated: 2026-05-26 (Additional Phase — 필터 하드 적용)
 | `CRON_SECRET` | server | Vercel env 설정됨 |
 | `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` | browser | Vercel env 설정됨 (ncpKeyId 형식) |
 | `TOUR_API_KEY` | server | **수동 설정 필요 — `.env.local` + Vercel env에 추가 후 재배포** |
+| `SNAPSHOT_TTL_SECONDS` | server | 선택 — 기본 7200(2h). Vercel env에서 조정 가능 |
+| `ADMIN_SECRET` | server | 선택 — 미설정 시 /admin 공개, 설정 시 ?secret= 파라미터 필요 |
 
 ---
 

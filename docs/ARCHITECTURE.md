@@ -1,5 +1,41 @@
 # ARCHITECTURE
 
+## Phase 61 Architecture Note (2026-05-27)
+
+**실 API 전환 안정화 — Fixture 기반 Adapter 테스트 + Snapshot TTL 환경변수화**
+
+### Fixture 기반 Adapter 단위 테스트
+
+`tests/fixtures/seoul-api.fixture.ts` — 5개 Seoul Open API 응답 형식을 코드로 문서화.  
+각 adapter 테스트가 이 fixture를 사용해 HTTP mock 없이 파싱 로직을 검증한다.
+
+핵심 검증 케이스:
+- 좌표 0 / 서울 경계 밖 / 빈 문자열 → `latitude`/`longitude` undefined
+- GUNAME/P_ZONE/AREANM 없는 행 → filter 제외
+- `PAYFREE=무료/유료` → `isFree`/`feeText` 정확한 판별
+- `IS_FREE=N` + `USE_FEE=0원` → `isFree=true` (무료 텍스트 감지)
+- HTTP 오류 / 네트워크 예외 → 빈 배열 graceful fallback
+
+`vitest.config.ts`에 `@tests` alias 추가 (→ `tests/` 디렉토리). tsconfig에는 추가하지 않음 — 테스트 전용이므로 프로덕션 빌드에 영향 없음.
+
+### Snapshot TTL 환경변수화
+
+```typescript
+// lib/config/env.ts
+SNAPSHOT_TTL_SECONDS: parseInt(process.env.SNAPSHOT_TTL_SECONDS ?? '7200', 10)
+
+// lib/cache/recommendation.cache.ts
+function getTTLMs(): number {
+  return (env.SNAPSHOT_TTL_SECONDS > 0 ? env.SNAPSHOT_TTL_SECONDS : 7200) * 1000
+}
+```
+
+기본값 7200초(2시간) — 기존 1시간에서 2배 상향.  
+Seoul Open API 일 쿼터 보호 효과: 같은 기간 대비 API 호출 횟수 절반.  
+`/api/diagnostics` 응답에 `snapshotTtlSeconds` 필드 추가, `/admin` 스냅샷 신선도 섹션에 TTL 표시.
+
+---
+
 ## Phase 59 Architecture Note (2026-05-27)
 
 **접근성(a11y) 구조 정정 — 중첩 `<main>` 제거 · ARIA 완성도 강화**
@@ -327,6 +363,12 @@ tests/
     image-config.test.ts              # remotePatterns regression
     data-quality.test.ts              # calcDataQuality (7) + isSuspiciousCoord (6) + MOCK 품질 게이트 (5)
     a11y-structure.test.ts            # 중첩 main 방지, skip anchors, aria-pressed, tablist/tabpanel (18)
+    seoulLibrary.test.ts              # Phase 61 — 도서관 adapter 파싱·좌표·폴백 (9)
+    seoulParks.test.ts                # Phase 61 — 공원 adapter 파싱·좌표·폴백 (8)
+    seoulSports.test.ts               # Phase 61 — 체육시설 adapter 유료/무료·좌표·폴백 (8)
+    seoulCultureAdapter.test.ts       # Phase 61 — 문화행사+공간 파싱·CODENAME·X/Y 매핑 (19)
+  fixtures/
+    seoul-api.fixture.ts              # Phase 61 — 5개 Seoul Open API 실 응답 형식 fixture
   components/
     PlaceCard.test.tsx
     FilterBar.test.tsx
@@ -340,7 +382,7 @@ tests/
   setup.tsx
   __mocks__/next-intl-server.ts
 
-# Total: 203 unit tests, 14 E2E specs
+# Total: 247 unit tests, 14 E2E specs
 
 proxy.ts                             # rate limiting (/api/* only)
 vercel.json                          # Vercel Cron (daily 09:00 KST → /api/push/send)
