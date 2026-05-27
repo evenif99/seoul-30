@@ -16,6 +16,7 @@
 - CI server checks use port `3001` only.
 - Lighthouse CI starts the production server with `npx next start -p 3001`.
 - LHCI audits `http://localhost:3001/`.
+- Playwright CI runs with one worker and one retry to reduce transient E2E flake; local Windows can still hang after all E2E tests pass.
 - Blocking gate: accessibility score must be at least `0.9`.
 - Warning gates: performance `0.8`, best-practices `0.9`, seo `0.9`.
 - PWA installability is checked with unit tests around `public/manifest.json`, icon files, and service worker references rather than a Lighthouse `pwa` category assertion.
