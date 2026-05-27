@@ -7,6 +7,9 @@ export const env = {
   ENABLE_REALTIME_CITY_DATA: process.env.ENABLE_REALTIME_CITY_DATA === 'true',
   ENABLE_CULTURE_EVENTS_API: process.env.ENABLE_CULTURE_EVENTS_API === 'true',
   ADMIN_SECRET: process.env.ADMIN_SECRET ?? '',   // 미설정 시 /admin 공개
+  // 스냅샷 캐시 TTL (초 단위, 기본 7200 = 2시간)
+  // Seoul Open API 쿼터 절약: 1h → 2h 상향 권장
+  SNAPSHOT_TTL_SECONDS: parseInt(process.env.SNAPSHOT_TTL_SECONDS ?? '7200', 10),
 } as const
 
 // 런타임 시작 시 필수 환경변수 존재 여부를 검증한다.

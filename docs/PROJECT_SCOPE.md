@@ -1,5 +1,27 @@
 # PROJECT_SCOPE
 
+## Phase 61 Scope Update (2026-05-27) — 실 API 전환 안정화
+
+**목표**: USE_MOCK_DATA=false(실 API) 환경에서 adapter 안정성 확보 + 스냅샷 캐시 TTL 운영 최적화.
+
+### Fixture 기반 Adapter 테스트 (신규)
+- `tests/fixtures/seoul-api.fixture.ts` — 5개 Seoul Open API 응답 형식 fixture 정의 (SeoulPublicLibraryInfo, ListParkService, ListPublicReservationSport, culturalEventInfo, culturalSpaceInfo)
+- `tests/unit/seoulLibrary.test.ts` — 9개 테스트: 정상 파싱, 좌표 0/범위 밖/빈 문자열 → undefined, GUNAME 필터, 운영시간, API 키 없음, HTTP 오류, 네트워크 예외
+- `tests/unit/seoulParks.test.ts` — 8개 테스트: 정상 파싱, 시간 정보 없음, 빈 좌표, P_ZONE 필터, HTTP/네트워크 폴백
+- `tests/unit/seoulSports.test.ts` — 8개 테스트: 유료/무료 판별, Y/X 좌표 순서, AREANM 필터, 폴백
+- `tests/unit/seoulCultureAdapter.test.ts` — 19개 테스트: IS_FREE+USE_FEE 조합, CODENAME→category 매핑, ORG_LINK fallback, X_COORD/Y_COORD 매핑, USAGE_DAY_WEEK_AND_TIME→description, sourceType 검증
+
+### Snapshot TTL 환경변수화
+- `lib/config/env.ts`: `SNAPSHOT_TTL_SECONDS` 추가 (기본 7200 = 2시간)
+- `lib/cache/recommendation.cache.ts`: `TTL_MS` 상수 → `getTTLMs()` 함수로 env 참조
+- `app/api/diagnostics/route.ts`: `snapshotTtlSeconds` 필드 응답 추가
+- `app/admin/page.tsx`: 스냅샷 신선도 섹션에 캐시 TTL 표시 행 추가
+- `README.md`: 환경변수 테이블에 `SNAPSHOT_TTL_SECONDS` 추가
+
+### 테스트 결과
+- 유닛 203 → **247개** (신규 44개, 기존 0개 regression)
+- E2E 14개 · TS 0 오류
+
 ## Phase 60 Scope Update (2026-05-27) — 릴리즈/포트폴리오 패키징
 
 - `docs/ARCHITECTURE.md` 전면 재작성:

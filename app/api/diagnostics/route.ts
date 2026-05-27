@@ -114,6 +114,7 @@ export async function GET() {
       topPlaces,
       seoulApiEnabled: env.ENABLE_CULTURE_EVENTS_API,
       realtimeCityDataEnabled: env.ENABLE_REALTIME_CITY_DATA,
+      snapshotTtlSeconds: env.SNAPSHOT_TTL_SECONDS,
       dataQuality,
       timestamp,
     })

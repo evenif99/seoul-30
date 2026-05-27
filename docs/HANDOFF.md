@@ -1,5 +1,36 @@
 # HANDOFF
 
+## Phase 61 - 실 API 전환 안정화 (2026-05-27)
+
+- **완료**: Fixture 기반 adapter 단위 테스트 4개 파일 신규 (44 테스트), Snapshot TTL 환경변수화 (1h→기본 2h, `SNAPSHOT_TTL_SECONDS`), 관련 admin UI·README 업데이트.
+- 유닛 247개 · E2E 14개 · TS 0 오류 · 커밋 master 최신.
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|---|---|
+| `tests/fixtures/seoul-api.fixture.ts` | 신규 — 5개 Seoul Open API 응답 fixture (Library/Park/Sports/CultureEvent/CultureSpace) |
+| `tests/unit/seoulLibrary.test.ts` | 신규 — 도서관 adapter 파싱·좌표·폴백 9개 테스트 |
+| `tests/unit/seoulParks.test.ts` | 신규 — 공원 adapter 파싱·좌표·폴백 8개 테스트 |
+| `tests/unit/seoulSports.test.ts` | 신규 — 체육시설 adapter 유료/무료·좌표·폴백 8개 테스트 |
+| `tests/unit/seoulCultureAdapter.test.ts` | 신규 — 문화행사+문화공간 파싱·좌표·CODENAME·폴백 19개 테스트 |
+| `vitest.config.ts` | `@tests` alias 추가 (`tests/` 디렉토리) |
+| `lib/config/env.ts` | `SNAPSHOT_TTL_SECONDS` 환경변수 추가 (기본 7200) |
+| `lib/cache/recommendation.cache.ts` | `TTL_MS` 상수 → `getTTLMs()` 함수, env 값 참조 |
+| `app/api/diagnostics/route.ts` | 응답에 `snapshotTtlSeconds` 필드 추가 |
+| `app/admin/page.tsx` | 스냅샷 신선도 섹션에 캐시 TTL 표시 행 추가 |
+| `README.md` | 환경변수 테이블에 `SNAPSHOT_TTL_SECONDS` 추가 |
+| `docs/PROJECT_SCOPE.md` | Phase 61 항목 추가 |
+| `docs/HANDOFF.md` | 이 항목 |
+
+### 기술 결정 기록
+| 항목 | 결정 | 이유 |
+|---|---|---|
+| Fixture 방식 | `tests/fixtures/` — 실 API 응답 형식 직접 기술 | HTTP mock보다 API 계약을 명확하게 문서화 |
+| `@tests` alias | vitest.config.ts에만 추가 (tsconfig 제외) | 테스트 전용이므로 프로덕션 빌드에 영향 없음 |
+| TTL 2h 기본값 | `SNAPSHOT_TTL_SECONDS=7200` | Seoul Open API 일 쿼터 절약, 1h 대비 호출 절반 |
+| `getTTLMs()` 함수 | 상수 대신 함수로 env 참조 | 런타임 env 변경 반영, 테스트에서 env mock 적용 |
+| CultureSpace X/Y 매핑 | `toSeoulLatLng(X_COORD, Y_COORD)` 유지 (기존 코드·주석) | API가 X=위도, Y=경도로 비관례적으로 반환; 코드 주석·fixture로 문서화 |
+
 ## Phase 60 - 릴리즈/포트폴리오 패키징 (2026-05-27)
 
 - **완료**: ARCHITECTURE.md 전면 재작성, README 테스트 수 동기화, 포트폴리오 패키징 완료.

@@ -1,7 +1,13 @@
 import { prisma } from '@/lib/prisma'
+import { env } from '@/lib/config/env'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 
-const TTL_MS = 60 * 60 * 1000  // 1시간
+// SNAPSHOT_TTL_SECONDS 환경변수로 조정 가능 (기본 2시간)
+// Seoul Open API 쿼터 최적화: 호출 빈도를 줄여 일 쿼터 보호
+function getTTLMs(): number {
+  const ttl = env.SNAPSHOT_TTL_SECONDS
+  return (Number.isFinite(ttl) && ttl > 0 ? ttl : 7200) * 1000
+}
 
 function buildQueryKey(district?: string, category?: string, freeOnly?: boolean): string {
   return [district ?? '_', category ?? 'all', freeOnly ? '1' : '0'].join('|')
@@ -53,7 +59,7 @@ export async function setSnapshot(
 ): Promise<void> {
   try {
     const queryKey = buildQueryKey(district, category, freeOnly)
-    const expiresAt = new Date(Date.now() + TTL_MS)
+    const expiresAt = new Date(Date.now() + getTTLMs())
     const resultJson = JSON.parse(JSON.stringify(results))
 
     await prisma.recommendationSnapshot.upsert({

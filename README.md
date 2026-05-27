@@ -88,7 +88,7 @@ npm run dev                  # http://localhost:3001
 ## 테스트
 
 ```bash
-npm run test        # Vitest 유닛 + 컴포넌트 (203개)
+npm run test        # Vitest 유닛 + 컴포넌트 (247개)
 npm run test:e2e    # Playwright E2E (14개)
 npx tsc --noEmit   # TypeScript 타입 체크
 npm run build       # 프로덕션 빌드
@@ -113,6 +113,9 @@ NEXT_PUBLIC_BASE_URL=https://seoul-30.vercel.app
 USE_MOCK_DATA=true                   # false 시 실제 API 사용
 ENABLE_REALTIME_CITY_DATA=false      # 따릉이 실시간 데이터
 ENABLE_CULTURE_EVENTS_API=false      # 서울 문화행사 API
+
+# 캐시 설정
+SNAPSHOT_TTL_SECONDS=7200           # 스냅샷 캐시 TTL (초, 기본 2시간 — API 쿼터 절약)
 
 # Web Push VAPID
 VAPID_EMAIL=

@@ -300,6 +300,11 @@ export default async function AdminPage({ searchParams }: Props) {
                     : <span className="text-amber-600">{snapshotAgeHours}시간 (stale)</span>
             }
           />
+          <Row
+            label="캐시 TTL"
+            value={`${Math.round(env.SNAPSHOT_TTL_SECONDS / 60)}분`}
+            sub={`(${env.SNAPSHOT_TTL_SECONDS}초)`}
+          />
         </div>
       </section>
 
