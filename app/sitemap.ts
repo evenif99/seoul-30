@@ -1,10 +1,12 @@
 import type { MetadataRoute } from 'next'
-import { MOCK_PLACES } from '@/lib/mock/places'
+import { getSnapshotPlaces } from '@/lib/data/place-detail'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://seoul-30.vercel.app'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const placeEntries: MetadataRoute.Sitemap = MOCK_PLACES.map((place) => ({
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const snapshotPlaces = await getSnapshotPlaces()
+
+  const placeEntries: MetadataRoute.Sitemap = snapshotPlaces.map((place) => ({
     url: `${BASE_URL}/place/${place.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',

@@ -88,7 +88,7 @@ npm run dev                  # http://localhost:3001
 ## 테스트
 
 ```bash
-npm run test        # Vitest 유닛 + 컴포넌트 (247개)
+npm run test        # Vitest 유닛 + 컴포넌트 (252개)
 npm run test:e2e    # Playwright E2E (14개)
 npx tsc --noEmit   # TypeScript 타입 체크
 npm run build       # 프로덕션 빌드

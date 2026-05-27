@@ -18,7 +18,21 @@ function checkAuth(req: NextRequest): boolean {
   return req.headers.get('authorization') === `Bearer ${secret}`
 }
 
-async function sendPush(category?: string) {
+function buildNotificationUrl(category?: string, campaign = 'daily') {
+  const params = new URLSearchParams()
+  if (category) params.set('category', category)
+  params.set('utm_source', 'push')
+  params.set('utm_medium', 'notification')
+  params.set('utm_campaign', campaign)
+  return `/?${params.toString()}`
+}
+
+function getCampaign(req: NextRequest) {
+  const campaign = new URL(req.url).searchParams.get('campaign')?.trim()
+  return campaign || 'daily'
+}
+
+async function sendPush(category?: string, campaign?: string) {
   const vapidPublic = process.env.VAPID_PUBLIC_KEY
   const vapidPrivate = process.env.VAPID_PRIVATE_KEY
   if (!vapidPublic || !vapidPrivate) return { sent: 0, total: 0 }
@@ -42,7 +56,7 @@ async function sendPush(category?: string) {
   const payload = JSON.stringify({
     title: label ? `Seoul 30 · ${label} 추천` : 'Seoul 30 · 오늘의 추천',
     body: '지금 주변 30분 이내 장소를 확인해보세요.',
-    url: category ? `/?category=${category}` : '/',
+    url: buildNotificationUrl(category, campaign),
   })
 
   const results = await Promise.allSettled(
@@ -73,8 +87,9 @@ export async function GET(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const category = new URL(req.url).searchParams.get('category') ?? undefined
   const validCategory = category && VALID_CATEGORIES.has(category) ? category : undefined
+  const campaign = getCampaign(req)
   try {
-    return NextResponse.json(await sendPush(validCategory))
+    return NextResponse.json(await sendPush(validCategory, campaign))
   } catch {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
@@ -85,8 +100,9 @@ export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const category = new URL(req.url).searchParams.get('category') ?? undefined
   const validCategory = category && VALID_CATEGORIES.has(category) ? category : undefined
+  const campaign = getCampaign(req)
   try {
-    return NextResponse.json(await sendPush(validCategory))
+    return NextResponse.json(await sendPush(validCategory, campaign))
   } catch {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }

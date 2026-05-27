@@ -1,5 +1,50 @@
 # PROJECT_SCOPE
 
+## Phase 61/62 Follow-up Fix (2026-05-27) — TS 검증 복구 + SEO 회귀 방지
+
+### Phase 61 검증 복구
+- `tsconfig.json`
+  - 테스트 파일이 전체 `tsc --noEmit` 대상에 포함되어 있으므로 `@tests/*` path alias 추가.
+  - Phase 61 adapter 테스트의 top-level `await import()`를 TypeScript가 허용하도록 `target`을 `ES2017`로 상향.
+- 결과: `npx tsc --noEmit` 통과.
+
+### Phase 62 버그 소지 수정
+- `app/sitemap.ts`
+  - 스냅샷이 비어 있을 때 `MOCK_PLACES`로 fallback하던 동작 제거.
+  - 장소 URL은 DB 스냅샷 장소가 있을 때만 포함하여 “mock 장소 ID sitemap 하드코딩 금지” 원칙 준수.
+- `app/place/[id]/opengraph-image.tsx`
+  - `getPlaceDetailData()`가 Prisma를 사용하므로 OG 이미지 route runtime을 `nodejs`로 명시.
+- `tests/unit/seo-metadata.test.ts`
+  - sitemap snapshot URL 포함, mock fallback 금지, robots `/admin`·`/api/` 차단 테스트 추가.
+
+### 테스트 결과
+- 유닛 **252개** 통과
+- `npx tsc --noEmit` 통과
+- `npm run build` 통과
+
+## Phase 63 Scope Update (2026-05-27) — Push 알림 열람률 추적
+
+**목표**: Push 알림 클릭 후 실제 앱 방문을 Vercel Analytics/GA에서 식별할 수 있도록 딥링크 URL에 UTM 파라미터를 추가.
+
+### 변경 사항
+- `app/api/push/send/route.ts`
+  - `buildNotificationUrl(category, campaign)` 추가.
+  - Push payload URL을 `/?category=culture&utm_source=push&utm_medium=notification&utm_campaign=daily` 형태로 생성.
+  - 기본 캠페인은 `daily`; `?campaign=` 쿼리 파라미터로 `utm_campaign` 오버라이드 가능.
+  - `CRON_SECRET` 인증, 카테고리 구독자 필터, DB 저장 로직은 변경 없음.
+- `public/sw.js`
+  - 기존 `event.notification.data.url`을 그대로 `existing.navigate(url)` / `clients.openWindow(url)`에 전달하는 구조 확인.
+- `tests/unit/push-send.test.ts`
+  - 기본 UTM 파라미터 포함 여부와 커스텀 campaign 반영 테스트 추가.
+- `tests/unit/service-worker-cache.test.ts`
+  - notificationclick URL 전달 경로가 중간 변형 없이 유지되는지 문자열 회귀 테스트 보강.
+
+### 테스트 결과
+- 유닛 **247 → 249개** (신규 2개, 기존 regression 없음)
+- `npm run test -- tests/unit/push-send.test.ts tests/unit/service-worker-cache.test.ts` 통과 (18개)
+- `npm run test` 통과 (252개)
+- `npx tsc --noEmit` 통과
+
 ## Phase 61 Scope Update (2026-05-27) — 실 API 전환 안정화
 
 **목표**: USE_MOCK_DATA=false(실 API) 환경에서 adapter 안정성 확보 + 스냅샷 캐시 TTL 운영 최적화.

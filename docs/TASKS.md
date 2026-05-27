@@ -1,5 +1,23 @@
 # TASKS
 
+## Phase 61/62 Follow-up Fix (2026-05-27)
+
+- [x] `tsconfig.json` — `@tests/*` alias 추가, `target` ES2017 상향으로 Phase 61 테스트의 전체 TS 검증 복구.
+- [x] `app/sitemap.ts` — 스냅샷 empty 시 mock place URL fallback 제거.
+- [x] `app/place/[id]/opengraph-image.tsx` — Prisma 사용 경로에 맞춰 `runtime = 'nodejs'` 명시.
+- [x] `tests/unit/seo-metadata.test.ts` — sitemap/robots 회귀 테스트 추가.
+- [x] `npx tsc --noEmit`, `npm run test`, `npm run build` 통과.
+
+## Phase 63 - Push 알림 열람률 추적 (2026-05-27)
+
+- [x] `app/api/push/send/route.ts` — Push payload 딥링크에 `utm_source=push`, `utm_medium=notification`, `utm_campaign=daily` 추가.
+- [x] `?campaign=` 쿼리 파라미터로 `utm_campaign` 오버라이드 지원.
+- [x] 카테고리 딥링크와 UTM 동시 유지 (`/?category=culture&utm_source=push&utm_medium=notification&utm_campaign=daily`).
+- [x] `public/sw.js` — notificationclick URL이 `existing.navigate(url)` / `clients.openWindow(url)`로 그대로 전달되는 구조 확인.
+- [x] `tests/unit/push-send.test.ts` — UTM 기본값과 커스텀 campaign 테스트 추가.
+- [x] `tests/unit/service-worker-cache.test.ts` — notificationclick URL 전달 회귀 테스트 보강.
+- [x] `npm run test` — 252개 통과.
+
 ## Phase 52 - PWA Installability Final Check (2026-05-26)
 
 - [x] Added manifest `id`.

@@ -15,8 +15,10 @@ describe('service worker API cache fallback', () => {
   })
 
   it('notificationclick navigates existing window to notification URL', () => {
+    expect(sw).toContain("const url = event.notification.data?.url ?? '/'")
     expect(sw).toContain('existing.navigate(url)')
     expect(sw).toContain("client?.focus()")
+    expect(sw).toContain('clients.openWindow(url)')
   })
 
   it('marks cached /api/places responses as offline stale data', () => {

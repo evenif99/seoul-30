@@ -158,10 +158,24 @@ TRUNCATE "WebPushSubscription";
 ## 배포 절차
 
 ```bash
+npx tsc --noEmit
+npm run test
+npm run build
 git push origin master
 # → Vercel 자동 배포 (약 2~3분)
 # → 배포 후: curl /api/health 확인
 ```
+
+### Phase 완료 후 배포 루틴
+
+각 Phase는 완료 보고 전에 검증·문서화·커밋·푸시·배포 확인까지 한 번의 루틴으로 마감한다.
+
+1. `git status --short`로 의도한 변경만 포함됐는지 확인.
+2. `npx tsc --noEmit`, `npm run test`, 필요 시 `npm run build` / `npm run test:e2e` 실행.
+3. `docs/HANDOFF.md`, `docs/PROJECT_SCOPE.md`, `docs/ARCHITECTURE.md`, `docs/TASKS.md`에 Phase 결과와 테스트 수 반영.
+4. `git add .` 후 Phase 단위 커밋 생성.
+5. `git push origin master`로 GitHub Actions와 Vercel 자동 배포 트리거.
+6. 배포 완료 후 `curl https://seoul-30.vercel.app/api/health` 및 Phase별 핵심 URL smoke check.
 
 ### 롤백
 

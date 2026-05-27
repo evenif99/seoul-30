@@ -42,7 +42,7 @@ async function findInSnapshots(id: string): Promise<NormalizedPlace | null> {
  * 가장 최근 스냅샷의 장소 목록을 반환한다.
  * 상세 페이지의 근처 장소 추천에 사용 — Seoul API 재호출 없이 캐시 활용.
  */
-async function getSnapshotPlaces(): Promise<NormalizedPlace[]> {
+export async function getSnapshotPlaces(): Promise<NormalizedPlace[]> {
   try {
     const snapshot = await prisma.recommendationSnapshot.findFirst({
       select: { resultJson: true },

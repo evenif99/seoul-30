@@ -1,5 +1,39 @@
 # ARCHITECTURE
 
+## Phase 61/62 Follow-up Architecture Note (2026-05-27)
+
+**TypeScript 검증 복구 + SEO metadata route 안정화**
+
+Phase 61 adapter 테스트는 `@tests/fixtures/...` alias와 top-level `await import()` 패턴을 사용한다. 전체 `tsc --noEmit` 대상에 `tests/**/*.ts`가 포함되어 있으므로 `tsconfig.json`에 `@tests/*` alias를 추가하고 `target`을 `ES2017`로 상향했다.
+
+Phase 62 sitemap은 DB 스냅샷 기반 장소 URL만 포함한다. 스냅샷이 비어 있으면 정적 라우트만 반환하며, `MOCK_PLACES` fallback은 사용하지 않는다. 이는 mock place ID가 운영 sitemap에 노출되는 것을 방지하기 위한 결정이다.
+
+`app/place/[id]/opengraph-image.tsx`는 `getPlaceDetailData()`를 통해 Prisma 접근 가능성이 있으므로 `runtime = 'nodejs'`를 명시한다.
+
+Regression coverage: `tests/unit/seo-metadata.test.ts`.
+
+---
+
+## Phase 63 Architecture Note (2026-05-27)
+
+**Push 알림 열람률 추적 — notification deep link UTM 주입**
+
+`app/api/push/send/route.ts` 에서 Push payload의 `url`을 생성할 때 UTM 파라미터를 붙인다.
+
+```typescript
+/?category=culture&utm_source=push&utm_medium=notification&utm_campaign=daily
+```
+
+기본 `utm_campaign`은 `daily`이며, `/api/push/send?campaign=...` 으로 오버라이드할 수 있다. 이 값은 사용자에게 노출되는 알림 딥링크 URL에만 포함되고 DB에는 저장하지 않는다.
+
+`public/sw.js` 의 `notificationclick` 핸들러는 `event.notification.data.url` 값을 그대로 `existing.navigate(url)` 또는 `clients.openWindow(url)` 로 전달한다. 따라서 UTM 파라미터는 서비스워커에서 탈락하지 않고 브라우저 방문 URL로 이어진다.
+
+Regression coverage:
+- `tests/unit/push-send.test.ts` — 기본 UTM 및 커스텀 campaign 검증
+- `tests/unit/service-worker-cache.test.ts` — notificationclick URL 전달 경로 검증
+
+---
+
 ## Phase 61 Architecture Note (2026-05-27)
 
 **실 API 전환 안정화 — Fixture 기반 Adapter 테스트 + Snapshot TTL 환경변수화**
@@ -16,7 +50,7 @@
 - `IS_FREE=N` + `USE_FEE=0원` → `isFree=true` (무료 텍스트 감지)
 - HTTP 오류 / 네트워크 예외 → 빈 배열 graceful fallback
 
-`vitest.config.ts`에 `@tests` alias 추가 (→ `tests/` 디렉토리). tsconfig에는 추가하지 않음 — 테스트 전용이므로 프로덕션 빌드에 영향 없음.
+`vitest.config.ts`와 `tsconfig.json`에 `@tests` alias 추가 (→ `tests/` 디렉토리). 테스트 파일이 전체 `tsc --noEmit` 대상에 포함되어 TypeScript 검증에도 동일 alias가 필요하다.
 
 ### Snapshot TTL 환경변수화
 
@@ -355,9 +389,10 @@ tests/
     diagnostics.test.ts               # pushCategoryStats, topPlaces, snapshotsLast24h, dataQuality
     json-ld.test.ts                   # schema.org JSON-LD
     admin-auth.test.ts
-    push-send.test.ts                 # push broadcast + category filter
+    push-send.test.ts                 # push broadcast + category filter + UTM deep link
     manifest.test.ts
     service-worker-cache.test.ts      # v5, /_next/image pathname, notificationclick navigate
+    seo-metadata.test.ts              # sitemap/robots SEO metadata routes
     security-headers.test.ts
     lighthouse-ci.test.ts
     image-config.test.ts              # remotePatterns regression
@@ -382,7 +417,7 @@ tests/
   setup.tsx
   __mocks__/next-intl-server.ts
 
-# Total: 247 unit tests, 14 E2E specs
+# Total: 252 unit tests, 14 E2E specs
 
 proxy.ts                             # rate limiting (/api/* only)
 vercel.json                          # Vercel Cron (daily 09:00 KST → /api/push/send)

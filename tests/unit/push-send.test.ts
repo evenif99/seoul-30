@@ -47,16 +47,18 @@ function makeRequest(authHeader?: string, method = 'GET', url = 'http://localhos
   })
 }
 
-async function callGet(authHeader?: string, category?: string) {
+async function callGet(authHeader?: string, category?: string, campaign?: string) {
   vi.resetModules()
   process.env.CRON_SECRET = mockEnv.CRON_SECRET
   process.env.VAPID_PUBLIC_KEY = mockEnv.VAPID_PUBLIC_KEY
   process.env.VAPID_PRIVATE_KEY = mockEnv.VAPID_PRIVATE_KEY
   process.env.VAPID_EMAIL = mockEnv.VAPID_EMAIL
 
-  const url = category
-    ? `http://localhost/api/push/send?category=${category}`
-    : 'http://localhost/api/push/send'
+  const params = new URLSearchParams()
+  if (category) params.set('category', category)
+  if (campaign) params.set('campaign', campaign)
+  const query = params.toString()
+  const url = `http://localhost/api/push/send${query ? `?${query}` : ''}`
   const { GET } = await import('@/app/api/push/send/route')
   const res = await GET(makeRequest(authHeader, 'GET', url) as any)
   return { status: res.status, body: await res.json() }
@@ -178,6 +180,41 @@ describe('GET /api/push/send — 카테고리 필터', () => {
 
     await callGet('Bearer test-secret')
     expect(prisma.webPushSubscription.findMany).toHaveBeenCalledWith({ where: undefined })
+  })
+
+  it('푸시 payload 딥링크에 기본 UTM 파라미터 포함', async () => {
+    const { prisma } = await import('@/lib/prisma')
+    const webpush = (await import('web-push')).default
+
+    vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([
+      makeSub({ endpoint: 'https://push.example.com/culture', tags: ['culture'] }),
+    ] as any)
+    vi.mocked(webpush.sendNotification).mockResolvedValue({} as any)
+
+    await callGet('Bearer test-secret', 'culture')
+
+    const payload = JSON.parse(vi.mocked(webpush.sendNotification).mock.calls[0][1] as string)
+    expect(payload.url).toBe(
+      '/?category=culture&utm_source=push&utm_medium=notification&utm_campaign=daily',
+    )
+  })
+
+  it('campaign 쿼리 파라미터를 utm_campaign 값으로 사용', async () => {
+    const { prisma } = await import('@/lib/prisma')
+    const webpush = (await import('web-push')).default
+
+    vi.mocked(prisma.webPushSubscription.findMany).mockResolvedValue([
+      makeSub({ endpoint: 'https://push.example.com/library', tags: ['library'] }),
+    ] as any)
+    vi.mocked(webpush.sendNotification).mockResolvedValue({} as any)
+
+    await callGet('Bearer test-secret', 'library', 'weekly_digest')
+
+    const payload = JSON.parse(vi.mocked(webpush.sendNotification).mock.calls[0][1] as string)
+    expect(payload.url).toContain('category=library')
+    expect(payload.url).toContain('utm_source=push')
+    expect(payload.url).toContain('utm_medium=notification')
+    expect(payload.url).toContain('utm_campaign=weekly_digest')
   })
 })
 

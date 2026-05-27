@@ -4,15 +4,27 @@
 
 ## ▶ 다음 작업 계획 — Phase 62–65 (Codex 인계)
 
-> **인계 기준일**: 2026-05-27  
-> **현재 브랜치**: master  
-> **현재 테스트**: 유닛 247개 · E2E 14개 · TS 0 오류  
-> **배포 URL**: https://seoul-30.vercel.app  
-> **작업 원칙**: 각 Phase는 독립적으로 완료 가능. Phase 연달아 진행 금지 — 완료 보고 후 다음 진행.
+> **인계 기준일**: 2026-05-27<br>
+> **현재 브랜치**: master<br>
+> **현재 테스트**: 유닛 252개 · E2E 14개 · TS 0 오류<br>
+> **배포 URL**: https://seoul-30.vercel.app<br>
+> **작업 원칙**: 각 Phase는 독립적으로 완료 가능. Phase 연달아 진행 금지 — 완료 보고 후 다음 진행.<br>
+> **배포 원칙**: 각 Phase 완료 후 검증 결과를 문서화하고 `master`에 커밋/푸시하여 GitHub Actions와 Vercel 자동 배포를 확인한다.
 
 ---
 
-## Phase 62 - ISR + 정적 페이지 SEO 강화 (예정)
+## Phase 완료 루틴
+
+1. 구현 범위 확인: 해당 Phase 외 파일 변경이 섞였는지 `git status --short`와 `git diff`로 점검.
+2. 검증: 최소 `npx tsc --noEmit`, `npm run test`, 위험도에 따라 `npm run build` / `npm run test:e2e` 실행.
+3. 문서화: `docs/HANDOFF.md`, `docs/PROJECT_SCOPE.md`, `docs/ARCHITECTURE.md`, `docs/TASKS.md`, 필요 시 `README.md` 테스트 수 갱신.
+4. Git 작업: `git add` → 의미 있는 메시지로 `git commit -m "..."` → `git push origin master`.
+5. 배포 확인: GitHub Actions 결과와 Vercel Production 배포 완료 여부 확인. 배포 후 Phase 성격에 맞는 URL을 smoke check.
+6. 다음 Phase 진행 전: 완료 결과와 검증/배포 상태 보고 후 사용자 승인 대기.
+
+---
+
+## Phase 62 - ISR + 정적 페이지 SEO 강화 (2026-05-27 완료 + 후속 수정)
 
 **목표**: 검색엔진 인덱싱 품질 향상 — 장소 상세 페이지를 ISR(증분 정적 재생성)으로 전환하고, sitemap·robots 설정을 정비한다.
 
@@ -52,9 +64,15 @@ curl https://seoul-30.vercel.app/sitemap.xml   # 배포 후 sitemap 확인
 - `generateStaticParams()` 로 전체 장소를 빌드 타임에 pre-render 하지 말 것 (API 쿼터 소진)
 - mock 장소 ID를 sitemap에 하드코딩하지 말 것
 
+### 후속 점검/수정 결과
+- `app/sitemap.ts`: 스냅샷이 비어 있을 때 `MOCK_PLACES`로 fallback하던 동작 제거. mock place URL이 sitemap에 노출되지 않도록 수정.
+- `app/place/[id]/opengraph-image.tsx`: Prisma 기반 상세 조회를 사용하므로 `runtime = 'nodejs'` 명시.
+- `tests/unit/seo-metadata.test.ts`: sitemap snapshot URL, mock fallback 금지, robots admin/API 차단 회귀 테스트 추가.
+- 검증: `npx tsc --noEmit`, `npm run test`(252개), `npm run build` 통과.
+
 ---
 
-## Phase 63 - Push 알림 열람률 추적 (예정)
+## Phase 63 - Push 알림 열람률 추적 (2026-05-27 완료)
 
 **목표**: Push 알림 클릭 후 실제 앱 방문을 측정할 수 있도록 UTM 파라미터를 딥링크 URL에 추가한다.
 
@@ -77,6 +95,14 @@ curl https://seoul-30.vercel.app/sitemap.xml   # 배포 후 sitemap 확인
 **4. 회귀 테스트 추가 (`tests/unit/push-send.test.ts`)**
 - 기존 `push-send.test.ts`에 UTM 파라미터 포함 여부 테스트 추가
 - `notificationData.url`에 `utm_source=push`가 포함되는지 assert
+
+### 완료 결과
+- `app/api/push/send/route.ts`: 알림 payload URL에 `utm_source=push`, `utm_medium=notification`, `utm_campaign` 자동 추가.
+- 기본 캠페인은 `daily`; `/api/push/send?campaign=weekly_digest` 처럼 호출하면 `utm_campaign` 값으로 반영.
+- 카테고리 딥링크는 `/?category=culture&utm_source=push&utm_medium=notification&utm_campaign=daily` 형태 유지.
+- `public/sw.js`: 기존 `event.notification.data.url` → `existing.navigate(url)` / `clients.openWindow(url)` 전달 구조 확인, 회귀 테스트 보강.
+- `tests/unit/push-send.test.ts`: UTM 기본값과 커스텀 캠페인 검증 추가.
+- 검증: `npm run test -- tests/unit/push-send.test.ts tests/unit/service-worker-cache.test.ts` 통과 (18개), `npm run test` 통과 (252개), `npx tsc --noEmit` 통과.
 
 ### 주의 사항
 - UTM 파라미터는 사용자에게 노출되는 URL에만 추가 (서버 로그·DB에 저장 금지)
@@ -180,7 +206,7 @@ npm run test:e2e       # filter.spec.ts 통과 확인
 | 항목 | 결정 | 이유 |
 |---|---|---|
 | Fixture 방식 | `tests/fixtures/` — 실 API 응답 형식 직접 기술 | HTTP mock보다 API 계약을 명확하게 문서화 |
-| `@tests` alias | vitest.config.ts에만 추가 (tsconfig 제외) | 테스트 전용이므로 프로덕션 빌드에 영향 없음 |
+| `@tests` alias | vitest.config.ts + tsconfig.json에 추가 | 테스트 파일이 전체 `tsc --noEmit` 대상에 포함되어 TS 검증에도 alias 필요 |
 | TTL 2h 기본값 | `SNAPSHOT_TTL_SECONDS=7200` | Seoul Open API 일 쿼터 절약, 1h 대비 호출 절반 |
 | `getTTLMs()` 함수 | 상수 대신 함수로 env 참조 | 런타임 env 변경 반영, 테스트에서 env mock 적용 |
 | CultureSpace X/Y 매핑 | `toSeoulLatLng(X_COORD, Y_COORD)` 유지 (기존 코드·주석) | API가 X=위도, Y=경도로 비관례적으로 반환; 코드 주석·fixture로 문서화 |
