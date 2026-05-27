@@ -14,12 +14,31 @@ export const metadata: Metadata = {
   robots: 'noindex, nofollow',
 }
 
+const PUSH_CATS = ['culture', 'library', 'park', 'sports', 'welfare'] as const
+
+interface TopFeedbackPlace {
+  placeId: string
+  total: number
+  upCount: number
+  downCount: number
+  upPct: number
+}
+
+interface PushCategoryStats {
+  total: number
+  allCategoriesCount: number
+  perCategory: Record<string, number>
+}
+
 interface DiagData {
   lastSnapshotAt: string | null
   snapshotCount: number
+  snapshotsLast24h: number
   feedbackCount: number
   ratedPlacesCount: number
   pushSubscriberCount: number
+  pushCategoryStats: PushCategoryStats
+  topPlaces: TopFeedbackPlace[]
   quality: PlaceDataQuality
   qualitySource: 'snapshot' | 'mock'
   error?: string
@@ -27,22 +46,83 @@ interface DiagData {
 
 async function fetchDiag(): Promise<DiagData> {
   try {
-    const [lastSnapshot, snapshotCount, feedbackCount, pushSubscriberCount, ratedPlacesRaw] =
-      await Promise.all([
-        prisma.recommendationSnapshot.findFirst({
-          orderBy: { createdAt: 'desc' },
-          select: { createdAt: true, resultJson: true },
-        }),
-        prisma.recommendationSnapshot.count(),
-        prisma.placeFeedback.count(),
-        prisma.webPushSubscription.count(),
-        prisma.placeFeedback.findMany({
-          distinct: ['placeId'],
-          select: { placeId: true },
-        }),
-      ])
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
-    // 데이터 품질: 스냅샷 우선, 없으면 mock
+    const [
+      lastSnapshot,
+      snapshotCount,
+      snapshotsLast24h,
+      feedbackCount,
+      pushSubscriberCount,
+      ratedPlacesRaw,
+      pushSubTags,
+      topByTotal,
+    ] = await Promise.all([
+      prisma.recommendationSnapshot.findFirst({
+        orderBy: { createdAt: 'desc' },
+        select: { createdAt: true, resultJson: true },
+      }),
+      prisma.recommendationSnapshot.count(),
+      prisma.recommendationSnapshot.count({ where: { createdAt: { gte: yesterday } } }),
+      prisma.placeFeedback.count(),
+      prisma.webPushSubscription.count(),
+      prisma.placeFeedback.findMany({
+        distinct: ['placeId'],
+        select: { placeId: true },
+      }),
+      prisma.webPushSubscription.findMany({ select: { tags: true } }),
+      prisma.placeFeedback.groupBy({
+        by: ['placeId'],
+        _count: { id: true },
+        orderBy: { _count: { id: 'desc' } },
+        take: 10,
+      }),
+    ])
+
+    // ── Push 카테고리 분포 집계 ───────────────────────────────────────────
+    const perCategory: Record<string, number> = {}
+    let allCategoriesCount = 0
+    for (const sub of pushSubTags) {
+      if (!sub.tags || sub.tags.length === 0) {
+        allCategoriesCount++
+        for (const cat of PUSH_CATS) perCategory[cat] = (perCategory[cat] ?? 0) + 1
+      } else {
+        for (const cat of sub.tags) {
+          perCategory[cat] = (perCategory[cat] ?? 0) + 1
+        }
+      }
+    }
+    const pushCategoryStats: PushCategoryStats = {
+      total: pushSubTags.length,
+      allCategoriesCount,
+      perCategory,
+    }
+
+    // ── 장소 참여도 Top 5 ─────────────────────────────────────────────────
+    const topPlaceIds = topByTotal.map((r) => r.placeId)
+    const voteBreakdown = topPlaceIds.length > 0
+      ? await prisma.placeFeedback.groupBy({
+          by: ['placeId', 'vote'],
+          _count: { id: true },
+          where: { placeId: { in: topPlaceIds } },
+        })
+      : []
+
+    const topPlaces: TopFeedbackPlace[] = topByTotal.slice(0, 5).map((r) => {
+      const rows = voteBreakdown.filter((v) => v.placeId === r.placeId)
+      const upCount = rows.find((v) => v.vote === 'UP')?._count.id ?? 0
+      const downCount = rows.find((v) => v.vote === 'DOWN')?._count.id ?? 0
+      const total = r._count.id
+      return {
+        placeId: r.placeId,
+        total,
+        upCount,
+        downCount,
+        upPct: total === 0 ? 0 : Math.round((upCount / total) * 100),
+      }
+    })
+
+    // ── 데이터 품질: 스냅샷 우선, 없으면 mock ────────────────────────────
     let qualitySource: 'snapshot' | 'mock' = 'mock'
     let qualityPlaces = MOCK_PLACES
     if (lastSnapshot?.resultJson) {
@@ -58,9 +138,12 @@ async function fetchDiag(): Promise<DiagData> {
     return {
       lastSnapshotAt: lastSnapshot?.createdAt?.toISOString() ?? null,
       snapshotCount,
+      snapshotsLast24h,
       feedbackCount,
       ratedPlacesCount: ratedPlacesRaw.length,
       pushSubscriberCount,
+      pushCategoryStats,
+      topPlaces,
       quality: calcDataQuality(qualityPlaces),
       qualitySource,
     }
@@ -68,9 +151,12 @@ async function fetchDiag(): Promise<DiagData> {
     return {
       lastSnapshotAt: null,
       snapshotCount: 0,
+      snapshotsLast24h: 0,
       feedbackCount: 0,
       ratedPlacesCount: 0,
       pushSubscriberCount: 0,
+      pushCategoryStats: { total: 0, allCategoriesCount: 0, perCategory: {} },
+      topPlaces: [],
       quality: calcDataQuality(MOCK_PLACES),
       qualitySource: 'mock',
       error: 'db_error',
@@ -111,6 +197,15 @@ function PctBar({ pct, warn }: { pct: number; warn?: boolean }) {
   )
 }
 
+// 카테고리 한글 레이블
+const CAT_LABEL: Record<string, string> = {
+  culture: '문화',
+  library: '도서관',
+  park: '공원',
+  sports: '체육',
+  welfare: '복지',
+}
+
 type Props = { searchParams: Promise<{ secret?: string }> }
 
 export default async function AdminPage({ searchParams }: Props) {
@@ -135,6 +230,11 @@ export default async function AdminPage({ searchParams }: Props) {
     SPORTS: '체육',
     MOCK: 'Mock',
   }
+
+  // 스냅샷 신선도 — 마지막 스냅샷 경과 시간
+  const snapshotAgeHours = diag.lastSnapshotAt
+    ? Math.floor((Date.now() - new Date(diag.lastSnapshotAt).getTime()) / (1000 * 60 * 60))
+    : null
 
   return (
     <main className="min-h-screen bg-background px-4 py-10 max-w-lg mx-auto">
@@ -168,6 +268,109 @@ export default async function AdminPage({ searchParams }: Props) {
                 sub="개소"
               />
               <Row label="Push 구독자" value={diag.pushSubscriberCount} sub="명" />
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* 스냅샷 신선도 */}
+      <section className="mb-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+          스냅샷 신선도
+        </h2>
+        <div className="bg-card border border-border rounded-xl px-4">
+          <Row
+            label="최근 24시간 생성"
+            value={
+              <span className={diag.snapshotsLast24h === 0 ? 'text-amber-600' : 'text-foreground'}>
+                {diag.snapshotsLast24h}
+              </span>
+            }
+            sub="건"
+          />
+          <Row
+            label="마지막 스냅샷 경과"
+            value={
+              snapshotAgeHours === null
+                ? <span className="text-muted-foreground">없음</span>
+                : snapshotAgeHours < 1
+                  ? <span className="text-emerald-600">1시간 미만</span>
+                  : snapshotAgeHours < 24
+                    ? <span className="text-foreground">{snapshotAgeHours}시간</span>
+                    : <span className="text-amber-600">{snapshotAgeHours}시간 (stale)</span>
+            }
+          />
+        </div>
+      </section>
+
+      {/* Push 구독 현황 */}
+      <section className="mb-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+          Push 구독 현황
+          <span className="ml-2 normal-case font-normal text-muted-foreground/60">
+            (전체 구독자 {diag.pushCategoryStats.total}명)
+          </span>
+        </h2>
+        <div className="bg-card border border-border rounded-xl px-4">
+          {diag.pushCategoryStats.total === 0 ? (
+            <div className="py-4 text-sm text-muted-foreground">구독자 없음</div>
+          ) : (
+            <>
+              <Row
+                label="전체 카테고리 구독"
+                value={diag.pushCategoryStats.allCategoriesCount}
+                sub={`명 (${diag.pushCategoryStats.total === 0 ? 0 : Math.round((diag.pushCategoryStats.allCategoriesCount / diag.pushCategoryStats.total) * 100)}%)`}
+              />
+              {PUSH_CATS.map((cat) => {
+                const count = diag.pushCategoryStats.perCategory[cat] ?? 0
+                const pct = diag.pushCategoryStats.total === 0
+                  ? 0
+                  : Math.round((count / diag.pushCategoryStats.total) * 100)
+                return (
+                  <div key={cat} className="flex items-center justify-between py-3 border-t border-border">
+                    <span className="text-sm text-muted-foreground">{CAT_LABEL[cat] ?? cat}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground tabular-nums">{count}명</span>
+                      <PctBar pct={pct} />
+                    </div>
+                  </div>
+                )
+              })}
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* 장소 참여도 Top 5 */}
+      <section className="mb-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+          장소 참여도 Top 5
+        </h2>
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          {diag.topPlaces.length === 0 ? (
+            <div className="px-4 py-4 text-sm text-muted-foreground">피드백 없음</div>
+          ) : (
+            <>
+              <div className="grid grid-cols-[1fr_auto_auto] px-4 py-2 bg-muted/40 text-[11px] font-semibold text-muted-foreground gap-3">
+                <span>장소 ID</span>
+                <span className="text-center">피드백</span>
+                <span className="text-right">👍 비율</span>
+              </div>
+              {diag.topPlaces.map((p, i) => (
+                <div
+                  key={p.placeId}
+                  className="grid grid-cols-[1fr_auto_auto] px-4 py-2.5 border-t border-border text-sm gap-3"
+                >
+                  <span className="text-muted-foreground truncate text-xs" title={p.placeId}>
+                    <span className="text-foreground font-medium mr-1">{i + 1}.</span>
+                    {p.placeId.length > 20 ? p.placeId.slice(0, 20) + '…' : p.placeId}
+                  </span>
+                  <span className="text-center tabular-nums font-medium">{p.total}</span>
+                  <span className={`text-right tabular-nums font-medium ${p.upPct >= 70 ? 'text-emerald-600' : p.upPct < 40 ? 'text-red-500' : 'text-foreground'}`}>
+                    {p.upPct}%
+                  </span>
+                </div>
+              ))}
             </>
           )}
         </div>

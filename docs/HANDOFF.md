@@ -1,5 +1,24 @@
 # HANDOFF
 
+## Phase 58 - 운영 대시보드 강화 (2026-05-27)
+
+- **완료**: Push 구독 분포 + 장소 참여도 Top 5 + 스냅샷 신선도 지표 추가.
+- **다음**: Phase 59 (접근성·성능·UX 마감).
+- 유닛 185개 통과 · E2E 14개 통과 · TS 0 오류.
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|---|---|
+| `app/api/diagnostics/route.ts` | `snapshotsLast24h`, `pushCategoryStats`, `topPlaces` 필드 추가 |
+| `app/admin/page.tsx` | 스냅샷 신선도·Push 구독 현황·장소 참여도 Top 5 섹션 추가 |
+| `tests/unit/diagnostics.test.ts` | 3개 케이스 추가 (snapshotsLast24h, pushCategoryStats, topPlaces) |
+
+### 기술 결정
+- Push 카테고리 집계: 빈 tags = 전체 카테고리 구독으로 처리 → 각 카테고리에 +1씩 가산
+- `topPlaces`: `groupBy(placeId)` → top 10 ID 추출 → 두 번째 `groupBy([placeId, vote])` 로 UP/DOWN 분리 (2-query 패턴, raw SQL 회피)
+- 스냅샷 신선도: `createdAt >= Date.now() - 24h` 카운트 + 경과 시간 색상 코딩 (green/amber)
+- DB 오류 시 모든 신규 필드 빈값(0/[]/{}로) 폴백, 기존 로직 불변
+
 ## Phase 57 - 데이터 품질/정합성 강화 (2026-05-27)
 
 - **완료**: 데이터 품질 메트릭 유틸리티 + 의심 좌표 탐지 + admin/diagnostics 강화.

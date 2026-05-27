@@ -1,5 +1,18 @@
 # PROJECT_SCOPE
 
+## Phase 58 Scope Update (2026-05-27)
+
+- `/api/diagnostics` 강화 — `snapshotsLast24h`, `pushCategoryStats`, `topPlaces` 필드 추가.
+  - `pushCategoryStats`: 전체 구독자 수, 전체 카테고리 구독자 수, 카테고리별 구독자 수 (빈 tags = 전체로 처리).
+  - `topPlaces`: `placeFeedback.groupBy(placeId)` Top 5, 각 `upCount`/`downCount`/`upPct` 포함.
+  - `snapshotsLast24h`: 최근 24시간 생성 스냅샷 수.
+- `/admin` 페이지 — 3개 섹션 추가:
+  1. **스냅샷 신선도**: 24h 생성 수 + 경과 시간 (1시간 미만 → 녹색, 24h 초과 → 주황 stale 표시).
+  2. **Push 구독 현황**: 전체 구독자 수, 전체 카테고리 구독 비율, 카테고리별 구독자 수 + PctBar.
+  3. **장소 참여도 Top 5**: placeId · 피드백 수 · 👍 비율 테이블 (70%↑ 녹색, 40%↓ 빨강).
+- `tests/unit/diagnostics.test.ts` — 3개 케이스 추가: `snapshotsLast24h`, `pushCategoryStats`, `topPlaces`.
+- 테스트 185개 통과 (182 → 185, 신규 3개).
+
 ## Phase 57 Scope Update (2026-05-27)
 
 - `lib/utils/data-quality.ts` 신규 — `calcDataQuality(places)` 유틸리티: 좌표/이미지/주소/전화/홈페이지/운영시간/태그 보유율(FieldCoverage), 소스별 요약(bySource), 의심 좌표 수.

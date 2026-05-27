@@ -51,7 +51,10 @@
       "Bash(git commit -m 'fix\\(e2e\\): stabilize i18n and place-detail E2E tests *)",
       "Bash(npx vitest *)",
       "Bash(git commit -m 'Phase 44: Add push send unit tests and verify Vercel cron config *)",
-      "PowerShell(cd c:\\\\project\\\\seoul-30-webapp; npx tsc --noEmit 2>&1; echo \"Exit: $LASTEXITCODE\")"
+      "PowerShell(cd c:\\\\project\\\\seoul-30-webapp; npx tsc --noEmit 2>&1; echo \"Exit: $LASTEXITCODE\")",
+      "Bash(node -e ' *)",
+      "Bash(npx tsx -e ' *)",
+      "PowerShell(cd c:\\\\project\\\\seoul-30-webapp; Get-ChildItem app -Recurse -Name | Where-Object { $_ -match 'about|privacy' })"
     ],
     "additionalDirectories": [
       "C:\\project\\seoul-30-webapp"
