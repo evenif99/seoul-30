@@ -63,7 +63,7 @@ GET /api/health
 | `{ "status": "degraded", "db": "error" }` | DB 연결 실패 (503) |
 | `{ "status": "error", "error": "[env] ..." }` | 필수 환경변수 누락 (503) |
 
-배포 직후 반드시 확인할 것. `curl https://seoul-30.vercel.app/api/health`
+배포 직후 반드시 확인할 것. `curl https://seoul-30-webapp.vercel.app/api/health`
 
 ---
 
@@ -111,7 +111,7 @@ Vercel → Settings → Environment Variables → 해당 변수 추가 후 Redep
 
 **수동 발송 테스트**:
 ```bash
-curl -X POST https://seoul-30.vercel.app/api/push/send \
+curl -X POST https://seoul-30-webapp.vercel.app/api/push/send \
   -H "Authorization: Bearer {CRON_SECRET}"
 ```
 
@@ -175,7 +175,7 @@ git push origin master
 3. `docs/HANDOFF.md`, `docs/PROJECT_SCOPE.md`, `docs/ARCHITECTURE.md`, `docs/TASKS.md`에 Phase 결과와 테스트 수 반영.
 4. `git add .` 후 Phase 단위 커밋 생성.
 5. `git push origin master`로 GitHub Actions와 Vercel 자동 배포 트리거.
-6. 배포 완료 후 `curl https://seoul-30.vercel.app/api/health` 및 Phase별 핵심 URL smoke check.
+6. 배포 완료 후 `curl https://seoul-30-webapp.vercel.app/api/health` 및 Phase별 핵심 URL smoke check.
 
 ### 롤백
 

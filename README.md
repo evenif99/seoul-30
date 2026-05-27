@@ -4,14 +4,14 @@
 
 현재 위치에서 대중교통 30분 이내의 도서관·공원·문화공간·스포츠시설을 무료 우선·혼잡도 반영으로 추천합니다.
 
-🔗 **Live** → [seoul-30.vercel.app](https://seoul-30.vercel.app)
+🔗 **Live** → [seoul-30-webapp.vercel.app](https://seoul-30-webapp.vercel.app)
 
 ---
 
 <table>
 <tr>
-<td><img src="https://seoul-30.vercel.app/screenshots/mobile-home.png" width="320" alt="모바일 홈 화면" /></td>
-<td><img src="https://seoul-30.vercel.app/screenshots/desktop-home.png" width="540" alt="데스크톱 홈 화면" /></td>
+<td><img src="https://seoul-30-webapp.vercel.app/screenshots/mobile-home.png" width="320" alt="모바일 홈 화면" /></td>
+<td><img src="https://seoul-30-webapp.vercel.app/screenshots/desktop-home.png" width="540" alt="데스크톱 홈 화면" /></td>
 </tr>
 </table>
 
@@ -107,7 +107,7 @@ SEOUL_OPEN_API_KEY=                  # data.seoul.go.kr 인증키
 TOUR_API_KEY=                        # 한국관광공사 TourAPI 4.0
 
 # 배포 도메인
-NEXT_PUBLIC_BASE_URL=https://seoul-30.vercel.app
+NEXT_PUBLIC_BASE_URL=https://seoul-30-webapp.vercel.app
 
 # 기능 플래그
 USE_MOCK_DATA=true                   # false 시 실제 API 사용
@@ -135,7 +135,7 @@ NEXT_PUBLIC_NAVER_MAP_CLIENT_ID=     # NCP 콘솔 Application Client ID
 ## 운영 확인
 
 ```bash
-curl https://seoul-30.vercel.app/api/health
+curl https://seoul-30-webapp.vercel.app/api/health
 # {"status":"ok","db":"ok","seoulApi":"ok"}
 ```
 

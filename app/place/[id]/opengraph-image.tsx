@@ -101,7 +101,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
 
         {/* 하단: 도메인 */}
         <div style={{ color: 'rgba(168,213,203,0.6)', fontSize: '18px' }}>
-          seoul-30.vercel.app
+          seoul-30-webapp.vercel.app
         </div>
       </div>
     ),

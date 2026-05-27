@@ -7,7 +7,7 @@
 > **인계 기준일**: 2026-05-27<br>
 > **현재 브랜치**: master<br>
 > **현재 테스트**: 유닛 252개 · E2E 14개 · TS 0 오류<br>
-> **배포 URL**: https://seoul-30.vercel.app<br>
+> **배포 URL**: https://seoul-30-webapp.vercel.app<br>
 > **작업 원칙**: 각 Phase는 독립적으로 완료 가능. Phase 연달아 진행 금지 — 완료 보고 후 다음 진행.<br>
 > **배포 원칙**: 각 Phase 완료 후 검증 결과를 문서화하고 `master`에 커밋/푸시하여 GitHub Actions와 Vercel 자동 배포를 확인한다.
 
@@ -57,7 +57,7 @@
 npm run build          # 빌드 오류 없음 확인
 npx tsc --noEmit       # TS 0 오류 확인
 npm run test           # 247개 이상 통과 (regression 없음)
-curl https://seoul-30.vercel.app/sitemap.xml   # 배포 후 sitemap 확인
+curl https://seoul-30-webapp.vercel.app/sitemap.xml   # 배포 후 sitemap 확인
 ```
 
 ### 금지 사항
@@ -409,7 +409,7 @@ Last updated: 2026-05-26 (Additional Phase — 필터 하드 적용)
 
 - **완료**: Phase 48 + Additional Phase (필터 하드 적용) 완료
 - **다음**: Phase 49 (PWA 완성도)
-- **배포 URL**: https://seoul-30.vercel.app
+- **배포 URL**: https://seoul-30-webapp.vercel.app
 - **레포**: https://github.com/evenif99/seoul-30
 - **현재 브랜치**: master
 - **테스트**: 유닛 134/134 통과 (Vitest) + E2E 15/15 통과 (Playwright)
@@ -631,7 +631,7 @@ Last updated: 2026-05-26 (Additional Phase — 필터 하드 적용)
 - `npx tsc --noEmit` — 통과 (0 오류) ✅
 - `npx vitest run` — 134/134 통과 ✅
 - `npx playwright test` — 15/15 통과 ✅
-- Vercel 배포 — 정상 (https://seoul-30.vercel.app)
+- Vercel 배포 — 정상 (https://seoul-30-webapp.vercel.app)
 - Naver Maps 핀포인트 — 최대 30개 표시, 38개 mock 좌표 보정 완료
 - 상세 페이지 — hero image, tag chips, nearest station + JSON-LD 표시 확인
 - 북마크/최근본 — place 데이터 localStorage 저장으로 실 API 장소 표시 지원

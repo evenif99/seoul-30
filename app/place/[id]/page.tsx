@@ -25,7 +25,7 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://seoul-30.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://seoul-30-webapp.vercel.app'
 
 function buildKakaoMapUrl(place: { name: string; address?: string; latitude?: number; longitude?: number }) {
   if (place.latitude && place.longitude) {

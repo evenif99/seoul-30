@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getSnapshotPlaces } from '@/lib/data/place-detail'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://seoul-30.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://seoul-30-webapp.vercel.app'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const snapshotPlaces = await getSnapshotPlaces()

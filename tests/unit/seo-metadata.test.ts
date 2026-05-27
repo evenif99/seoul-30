@@ -21,8 +21,8 @@ describe('SEO metadata routes', () => {
     const entries = await sitemap()
     const urls = entries.map((entry) => entry.url)
 
-    expect(urls).toContain('https://seoul-30.vercel.app/place/lib-1-library')
-    expect(urls).toContain('https://seoul-30.vercel.app/place/park-2-park')
+    expect(urls).toContain('https://seoul-30-webapp.vercel.app/place/lib-1-library')
+    expect(urls).toContain('https://seoul-30-webapp.vercel.app/place/park-2-park')
   })
 
   it('sitemap does not fall back to mock place URLs when snapshots are empty', async () => {
@@ -39,7 +39,7 @@ describe('SEO metadata routes', () => {
     const { default: robots } = await import('@/app/robots')
     const config = robots()
 
-    expect(config.sitemap).toBe('https://seoul-30.vercel.app/sitemap.xml')
+    expect(config.sitemap).toBe('https://seoul-30-webapp.vercel.app/sitemap.xml')
     expect(config.rules).toMatchObject({
       userAgent: '*',
       allow: '/',
