@@ -1,5 +1,159 @@
 # HANDOFF
 
+---
+
+## ▶ 다음 작업 계획 — Phase 62–65 (Codex 인계)
+
+> **인계 기준일**: 2026-05-27  
+> **현재 브랜치**: master  
+> **현재 테스트**: 유닛 247개 · E2E 14개 · TS 0 오류  
+> **배포 URL**: https://seoul-30.vercel.app  
+> **작업 원칙**: 각 Phase는 독립적으로 완료 가능. Phase 연달아 진행 금지 — 완료 보고 후 다음 진행.
+
+---
+
+## Phase 62 - ISR + 정적 페이지 SEO 강화 (예정)
+
+**목표**: 검색엔진 인덱싱 품질 향상 — 장소 상세 페이지를 ISR(증분 정적 재생성)으로 전환하고, sitemap·robots 설정을 정비한다.
+
+### 작업 범위
+
+**1. 장소 상세 페이지 ISR 전환 (`app/place/[id]/page.tsx`)**
+- 현재: `force-dynamic` (매 요청마다 서버 렌더링)
+- 목표: `revalidate = 3600` (1시간 ISR) — 스냅샷 캐시와 동일 주기
+- `generateStaticParams()` 는 구현하지 않음 (장소 ID가 동적이므로 on-demand ISR)
+- `fetch` 호출에 `next: { revalidate: 3600 }` 옵션 전달 방식으로 전환
+- 주의: `getPlaceDetailData()`가 내부적으로 Prisma를 사용하므로 ISR 적용 가능 범위 확인 필수
+
+**2. sitemap 품질 개선 (`app/sitemap.ts`)**
+- 현재 sitemap이 mock 장소 URL만 포함하거나 누락 여부 확인
+- 정적 라우트(`/`, `/about`, `/privacy`, `/bookmarks`) 우선순위 설정
+- 장소 상세 URL은 스냅샷 DB에서 placeId 목록을 조회해 동적으로 포함
+- `changeFrequency`, `priority`, `lastModified` 필드 정확히 설정
+
+**3. robots.ts 확인 및 정비 (`app/robots.ts`)**
+- `/admin` 경로 크롤링 차단 여부 확인
+- `/api/*` 경로 disallow 확인
+- Vercel 배포 도메인(`NEXT_PUBLIC_BASE_URL`) 기반 sitemap URL 생성
+
+**4. OG 메타데이터 검토 (`app/place/[id]/opengraph-image.tsx`)**
+- 장소 이미지 없을 때 fallback OG 이미지 정상 렌더링 확인
+- `og:url` 정규 URL 설정 여부 확인
+
+### 검증 방법
+```bash
+npm run build          # 빌드 오류 없음 확인
+npx tsc --noEmit       # TS 0 오류 확인
+npm run test           # 247개 이상 통과 (regression 없음)
+curl https://seoul-30.vercel.app/sitemap.xml   # 배포 후 sitemap 확인
+```
+
+### 금지 사항
+- `generateStaticParams()` 로 전체 장소를 빌드 타임에 pre-render 하지 말 것 (API 쿼터 소진)
+- mock 장소 ID를 sitemap에 하드코딩하지 말 것
+
+---
+
+## Phase 63 - Push 알림 열람률 추적 (예정)
+
+**목표**: Push 알림 클릭 후 실제 앱 방문을 측정할 수 있도록 UTM 파라미터를 딥링크 URL에 추가한다.
+
+### 작업 범위
+
+**1. Push 알림 딥링크 URL에 UTM 파라미터 추가 (`app/api/push/send/route.ts`)**
+- 현재 딥링크: `/?category=culture`
+- 목표: `/?category=culture&utm_source=push&utm_medium=notification&utm_campaign=daily`
+- `utm_campaign` 값은 `send` API 호출 시 쿼리스트링으로 받거나 날짜 기반 자동 생성
+
+**2. SW notificationclick URL 전달 유지 확인 (`public/sw.js`)**
+- 현재 `existing.navigate(url)` 로 딥링크 URL을 그대로 전달하는지 확인
+- UTM이 포함된 URL이 탈락 없이 브라우저로 전달되는지 검증
+
+**3. UTM 파라미터 수신 확인 (`app/page.tsx`)**
+- `useSearchParams()`에서 `utm_source` 등을 읽어 Vercel Analytics에 이벤트 전송 (선택)
+- 단순히 URL에 포함하는 것만으로도 Vercel Analytics / Google Analytics가 자동 추적함
+- 별도 클라이언트 이벤트 코드는 오버엔지니어링이므로 URL 주입만 구현
+
+**4. 회귀 테스트 추가 (`tests/unit/push-send.test.ts`)**
+- 기존 `push-send.test.ts`에 UTM 파라미터 포함 여부 테스트 추가
+- `notificationData.url`에 `utm_source=push`가 포함되는지 assert
+
+### 주의 사항
+- UTM 파라미터는 사용자에게 노출되는 URL에만 추가 (서버 로그·DB에 저장 금지)
+- Vercel 무료 플랜에서 Analytics는 이미 활성화됨 — 추가 비용 없음
+- `CRON_SECRET` 인증 로직은 건드리지 말 것
+
+---
+
+## Phase 64 - 필터 UX 개선 (예정)
+
+**목표**: 복합 필터(카테고리+태그+자치구+시간+무료+운영중+검색어) 상태의 URL 동기화 안정화와 사용자 편의 개선.
+
+### 작업 범위
+
+**1. 필터 초기화 버튼 추가 (`app/page.tsx`, `components/seoul30/FilterBar.tsx`)**
+- 활성 필터가 1개 이상일 때 "필터 초기화" 버튼 표시
+- 클릭 시 모든 필터를 기본값으로 리셋 + URL 쿼리스트링 제거
+- i18n 키: `common.resetFilters` (ko: "초기화", en: "Reset")
+
+**2. 활성 필터 수 뱃지 표시**
+- FilterBar 또는 모바일 필터 토글 버튼에 활성 필터 수 표시 (예: "필터 3")
+- 필터 패널이 닫혀 있을 때도 현재 적용된 필터 수를 알 수 있게
+
+**3. URL 동기화 엣지케이스 수정**
+- 페이지 새로고침 시 URL 쿼리스트링에서 필터 상태 복원 검증
+- 브라우저 뒤로가기 시 필터 상태 복원 검증
+- `useSearchParams` + `useRouter.replace` 패턴 일관성 확인
+
+**4. 모바일 필터 패널 접근성**
+- 필터 패널 열기/닫기 버튼에 `aria-expanded` 추가
+- 필터 패널 닫힌 상태에서 ESC 키 동작 무시 (현재 PushSubscribeButton과 충돌 가능성 확인)
+
+### 검증 방법
+```bash
+npm run test           # 기존 테스트 regression 없음
+npm run test:e2e       # filter.spec.ts 통과 확인
+```
+
+### 주의 사항
+- `lib/scoring.ts` 수정 금지 — 필터는 하드 필터(route.ts)에서 적용, scoring 로직 불변
+- 태그 필터 AND 교집합 로직(`tag-filter.test.ts`) regression 금지
+
+---
+
+## Phase 65 - 성능 최적화 (예정)
+
+**목표**: 번들 크기 분석 및 불필요한 Client Component를 Server Component로 이동. LCP·INP·CLS 지표 개선.
+
+### 작업 범위
+
+**1. 번들 분석 (`@next/bundle-analyzer`)**
+- `npm install --save-dev @next/bundle-analyzer` 후 `next.config.mjs`에 analyzer 설정
+- `ANALYZE=true npm run build` 로 번들 리포트 생성
+- 주요 확인 항목: shadcn/ui 컴포넌트 중 사용하지 않는 것, lucide-react 아이콘 tree-shaking 적용 여부
+- 분석 후 `@next/bundle-analyzer`는 devDependency 유지, `next.config.mjs` 설정은 env 플래그로 조건부 활성화
+
+**2. 불필요한 `'use client'` 제거**
+- `'use client'` 선언된 컴포넌트 중 상태·이벤트가 없는 순수 표시 컴포넌트 확인
+- 후보: `PlaceImage.tsx`, `EmptyState.tsx`, `ScoreBadge.tsx` — 실제 파일 읽고 판단
+- Server Component 전환 시 `onClick`/`useState`/`useEffect` 사용 여부 먼저 확인 필수
+
+**3. lucide-react 아이콘 최적화**
+- 현재 `import { MapPin, Clock, ... } from 'lucide-react'` 방식 확인
+- Next.js + lucide-react 최신 버전은 named export tree-shaking 지원 — 추가 작업 불필요할 수 있음
+- 번들 분석 결과 lucide가 크면 `import MapPin from 'lucide-react/dist/esm/icons/map-pin'` 방식으로 전환
+
+**4. 이미지 preload 힌트 추가 (`app/layout.tsx`)**
+- LCP 이미지(홈 화면 첫 번째 PlaceCard 이미지)를 예측할 수 없으므로 `fetchpriority="high"` 속성 적용 검토
+- `PlaceImage.tsx`에서 첫 번째 이미지에 `priority` prop 전달하는 패턴 확인
+
+### 주의 사항
+- `components/ui/` (shadcn 자동 생성) 수정 금지
+- `ANALYZE=true` 빌드 산출물(`.next/analyze/`)은 `.gitignore`에 추가
+- Server Component 전환은 실제 파일을 읽어 확인 후 진행 — 추정으로 수정 금지
+
+---
+
 ## Phase 61 - 실 API 전환 안정화 (2026-05-27)
 
 - **완료**: Fixture 기반 adapter 단위 테스트 4개 파일 신규 (44 테스트), Snapshot TTL 환경변수화 (1h→기본 2h, `SNAPSHOT_TTL_SECONDS`), 관련 admin UI·README 업데이트.
