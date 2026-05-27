@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v4'
+const CACHE_VERSION = 'v5'
 const STATIC_CACHE  = `seoul30-static-${CACHE_VERSION}`
 const API_CACHE     = `seoul30-api-${CACHE_VERSION}`
 const PAGE_CACHE    = `seoul30-pages-${CACHE_VERSION}`
@@ -215,7 +215,11 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
       const existing = list.find((c) => c.url.includes(self.location.origin))
-      if (existing) return existing.focus()
+      if (existing) {
+        // 기존 창이 있으면 알림 URL로 이동 후 포커스
+        // (이전: existing.focus()만 — 카테고리 URL로 이동하지 않던 버그 수정)
+        return existing.navigate(url).then((client) => client?.focus())
+      }
       return clients.openWindow(url)
     })
   )

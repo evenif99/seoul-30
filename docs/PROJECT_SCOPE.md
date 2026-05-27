@@ -1,5 +1,14 @@
 # PROJECT_SCOPE
 
+## Phase 56 Scope Update (2026-05-27)
+
+- `hooks/use-push.ts` — `currentTags: string[]` 상태 추가 (localStorage `seoul30:push:tags` 복원), `updateTags(tags)` 함수 신규 (PushManager 재구독 없이 서버 태그만 갱신), `subscribe`/`unsubscribe` 시 localStorage 동기화.
+- `PushSubscribeButton` — 구독 중 상태에서 현재 태그 요약 표시 (`알림 구독 중 · 문화, 도서관` 형태) + 편집 패널 신규 (ChevronDown 토글, 카테고리 칩, 저장/취소/구독취소).
+- `sw.js` — `notificationclick` 버그 수정: 기존 창 있을 때 `existing.focus()`만 하던 것을 `existing.navigate(url).then(client?.focus())`로 교체 → 카테고리 딥링크 URL로 실제 이동. 캐시 버전 v4 → **v5** 범프.
+- i18n 키 추가 (ko + en): `push.editTitle`, `push.subscribedAll`, `push.save`, `push.unsubscribeAction`.
+- `tests/unit/service-worker-cache.test.ts` — v5 버전 + notificationclick navigate 회귀 테스트 추가.
+- 테스트 160개 통과.
+
 ## Additional Phase Scope Update — SW 이미지 캐시 버그 수정 (2026-05-27)
 
 - `public/sw.js` — Phase 55에서 `unoptimized: true` 제거로 인한 이미지 캐싱 회귀 수정.

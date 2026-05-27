@@ -1,5 +1,25 @@
 # HANDOFF
 
+## Phase 56 - Push 개인화 UX 완성 (2026-05-27)
+
+- **완료**: 구독 태그 조회·편집 UI + notificationclick 카테고리 랜딩 수정.
+- **다음**: Phase 57 (데이터 품질·정합성 강화).
+- 유닛 160개 통과 · E2E 14개 통과 · TS 0 오류.
+
+### 변경 파일
+| 파일 | 변경 내용 |
+|---|---|
+| `hooks/use-push.ts` | `currentTags`, `updateTags` 추가, subscribe/unsubscribe localStorage 동기화 |
+| `components/seoul30/PushSubscribeButton.tsx` | 구독 중 태그 요약 표시 + 편집 패널 (ChevronDown, 저장, 구독취소) |
+| `public/sw.js` | notificationclick navigate 버그 수정, 캐시 버전 v5 |
+| `messages/ko.json` / `en.json` | push.editTitle, subscribedAll, save, unsubscribeAction 추가 |
+| `tests/unit/service-worker-cache.test.ts` | v5 + notificationclick navigate 테스트 추가 |
+
+### 기술 결정
+- `updateTags`: 브라우저 PushManager 구독 유지 + `/api/push/subscribe` POST upsert만 재호출 → 알림 권한 팝업 없이 태그 갱신
+- `currentTags`: localStorage `seoul30:push:tags` 에서 복원, 기존 구독자(키 없음)는 `[]` = 전체로 표시
+- 편집 패널 열 때 `currentTags`로 `selected` 초기화
+
 ## Additional Phase - SW 이미지 캐시 버그 수정 (2026-05-27)
 
 - **완료**: Phase 55 회귀 수정 — `/_next/image` 경로 인터셉트 + SW 캐시 v4 범프 + PushSubscribeButton 취소 초기화.

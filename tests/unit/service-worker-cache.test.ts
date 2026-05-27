@@ -6,12 +6,17 @@ const sw = readFileSync(join(process.cwd(), 'public/sw.js'), 'utf8')
 
 describe('service worker API cache fallback', () => {
   it('uses the current cache version for refreshed PWA assets', () => {
-    expect(sw).toContain("const CACHE_VERSION = 'v4'")
+    expect(sw).toContain("const CACHE_VERSION = 'v5'")
   })
 
   it('intercepts /_next/image requests for offline image caching', () => {
     expect(sw).toContain("url.pathname.startsWith('/_next/image')")
     expect(sw).toContain('IMAGE_TTL_MS')
+  })
+
+  it('notificationclick navigates existing window to notification URL', () => {
+    expect(sw).toContain('existing.navigate(url)')
+    expect(sw).toContain("client?.focus()")
   })
 
   it('marks cached /api/places responses as offline stale data', () => {

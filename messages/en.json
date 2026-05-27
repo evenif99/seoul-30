@@ -151,8 +151,12 @@
     "denied": "Notifications blocked",
     "deniedTitle": "Notifications are blocked in your browser",
     "selectTitle": "Choose categories to receive alerts for",
+    "editTitle": "Edit notification categories",
+    "subscribedAll": "All categories",
     "confirm": "Subscribe",
+    "save": "Save",
     "cancel": "Cancel",
+    "unsubscribeAction": "Unsubscribe",
     "categories": {
       "culture": "Culture & Exhibits",
       "library": "Library",
