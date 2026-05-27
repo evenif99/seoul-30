@@ -157,6 +157,7 @@ curl https://seoul-30-webapp.vercel.app/api/health
 | [docs/PROJECT_SCOPE.md](docs/PROJECT_SCOPE.md) | Phase별 완료 범위 |
 | [docs/RUNBOOK.md](docs/RUNBOOK.md) | 헬스체크 · 배포 · 롤백 · 장애 대응 |
 | [docs/HANDOFF.md](docs/HANDOFF.md) | 인계 상태 및 작업 규칙 |
+| [docs/BUGFIX.md](docs/BUGFIX.md) | 버그 감사 및 수정 기록 (BUG-01~10) |
 
 ---
 

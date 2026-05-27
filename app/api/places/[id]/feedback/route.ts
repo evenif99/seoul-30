@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
   if (vote !== 'UP' && vote !== 'DOWN') {
     return NextResponse.json({ error: 'vote must be UP or DOWN' }, { status: 400 })
   }
-  if (typeof sessionId !== 'string' || sessionId.length < 8) {
+  if (typeof sessionId !== 'string' || sessionId.length < 8 || sessionId.length > 128) {
     return NextResponse.json({ error: 'Invalid sessionId' }, { status: 400 })
   }
 

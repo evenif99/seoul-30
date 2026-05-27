@@ -127,15 +127,21 @@ function pickBestMatch(items: TourSearchItem[], place: NormalizedPlace): TourSea
   const normalizedName = normalizeText(place.name)
   const district = normalizeText(place.district)
 
+  // 정확 일치: 제목 완전 일치 + 자치구 포함 (BUG-06: 무관한 items[0] fallback 제거)
   return (
     items.find((item) => {
       const title = normalizeText(item.title)
       const address = normalizeText(item.addr1)
       return title === normalizedName && (!district || address.includes(district))
     }) ??
-    items.find((item) => normalizeText(item.addr1).includes(district)) ??
-    items.find((item) => normalizeText(item.title).includes(normalizedName)) ??
-    items[0]
+    // 자치구 일치
+    items.find((item) => district && normalizeText(item.addr1).includes(district) &&
+      normalizeText(item.title).includes(normalizedName.slice(0, 4))) ??
+    // 이름 부분 일치 (최소 4글자 이상)
+    (normalizedName.length >= 4
+      ? items.find((item) => normalizeText(item.title).includes(normalizedName.slice(0, 4)))
+      : undefined)
+    // 마지막 items[0] fallback 제거 — 전혀 다른 장소 이미지 오적용 방지
   )
 }
 
@@ -143,6 +149,8 @@ function normalizeText(value?: string): string {
   return (value ?? '').replace(/\s+/g, '').toLowerCase()
 }
 
+// process.env를 런타임에 직접 읽어야 vi.stubEnv 테스트 격리가 동작한다.
+// env 객체는 모듈 로드 시점에 고정되므로 여기서는 사용하지 않는다.
 function getTourApiKey(): string {
   return process.env.TOUR_API_KEY ?? env.TOUR_API_KEY
 }

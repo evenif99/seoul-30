@@ -20,6 +20,7 @@ import { PwaInstallBanner } from '@/components/seoul30/PwaInstallBanner'
 import { useTranslations, useLocale } from 'next-intl'
 import { relativeTime } from '@/lib/utils/relative-time'
 import { isCurrentlyOpen } from '@/lib/utils/time'
+import { useRecent } from '@/hooks/use-recent'
 import { cn } from '@/lib/utils'
 import type { RecommendationResult } from '@/lib/types/recommendation'
 import type { NormalizedPlace, PlaceTag } from '@/lib/types/place'
@@ -102,7 +103,8 @@ export default function HomePage() {
   const [locating, setLocating] = useState(false)
   const [showLocationModal, setShowLocationModal] = useState(false)
   const [locationDenied, setLocationDenied] = useState(false)
-  const [recentIds, setRecentIds] = useState<string[]>([])
+  // useRecent 훅 공유: push() 호출 즉시 dedup 반영 (BUG-07: 마운트 1회 읽기 stale 해결)
+  const { recent: recentIds } = useRecent()
 
   // URL에서 필터 복원 (클라이언트 마운트 및 브라우저 뒤/앞 이동)
   useEffect(() => {
@@ -121,14 +123,6 @@ export default function HomePage() {
   useEffect(() => {
     const shown = localStorage.getItem('seoul30_gps_onboarding')
     if (!shown) setShowLocationModal(true)
-  }, [])
-
-  // 최근 본 장소 목록 로드 (soft-dedup용)
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('seoul30:recent')
-      if (raw) setRecentIds(JSON.parse(raw))
-    } catch {}
   }, [])
 
   // API 호출: district, category, freeOnly 변경 시
